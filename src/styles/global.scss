@@ -1,0 +1,21 @@
+html {
+  background-color: #faf3eb;
+}
+
+body {
+  font-family: 'SF-Pro-Display-Regular', sans-serif;
+  background-color: #faf3eb;
+}
+
+.global_container {
+  padding: 20px 80px;
+  width: 100%;
+  margin: 0 auto;
+
+  h1 {
+    font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+    font-size: 36px;
+    font-weight: 500;
+    margin: 0;
+  }
+}

@@ -1,0 +1,110 @@
+.top_cont {
+  margin-top: 14px;
+  margin-bottom: 40px;
+  max-width: 1062px;
+  height: 265px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  .top_inner_cont {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  img {
+    align-self: self-end;
+  }
+}
+
+.bot_cont {
+  width: 1280px;
+  height: 419px;
+  background-color: #fffaf4;
+  border-radius: 20px;
+  padding: 10px 30px;
+
+  h2 {
+    font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+    font-size: 36px;
+    font-weight: 500;
+    margin-bottom: 22px;
+  }
+
+  .howitworks_cont {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 140px;
+
+    img {
+      width: 100%;
+      max-width: 44.65px;
+      aspect-ratio: 1/1;
+      object-fit: cover;
+    }
+
+    p {
+      font-size: 26px;
+    }
+
+    .icon_block {
+      width: 308px;
+      max-height: 139px;
+
+      p {
+        margin: 4px auto;
+      }
+
+      .p_upload {
+        max-width: 225px;
+        max-height: 31px;
+      }
+
+      .p_weanalyze {
+        max-width: 257px;
+        text-align: center;
+      }
+
+      .p_getrecommends {
+        max-width: 308px;
+        text-align: center;
+      }
+
+      .icon_wrapper {
+        flex-shrink: 0;
+        margin: 0 auto;
+        width: 76px;
+        height: 76px;
+        background: #f5eee6;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+  }
+
+  .whatwecheck_cont {
+  }
+}
+
+.h1_div {
+  max-width: 656px;
+}
+.p_div {
+  max-width: 516px;
+  p {
+    font-size: 26px;
+    font-weight: 400;
+    color: #434040;
+  }
+}
+
+.teacher_img {
+  width: 100%;
+  max-width: 231px;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+}
