@@ -87,6 +87,34 @@
   }
 
   .whatwecheck_cont {
+    max-width: 1208px;
+    display: grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(442px, 1fr) 1fr;
+    gap: 20px;
+
+    p {
+      font-size: 26px;
+
+      position: relative;
+
+      padding-left: 24px;
+
+      &::before {
+        content: '';
+        position: absolute;
+
+        width: 30px;
+        height: 30px;
+
+        top: 9%;
+        left: -1%;
+
+        background-image: url('../assets/check.png');
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
   }
 }
 
