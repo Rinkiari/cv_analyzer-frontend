@@ -8,14 +8,14 @@ import servicepic from '../assets/service.png';
 import dashboardpic from '../assets/dashboard.png';
 
 const HomePage = () => {
+  // eslint-disable-next-line no-unused-vars
   const [step, setStep] = useState(1);
 
   const maxSteps = 5;
   const percent = (step / maxSteps) * 100;
 
   return (
-    <div className="global_container">
-      <Header />
+    <>
       <Progress.Root value={percent} max={100} maxW="1041px">
         <Progress.Track bg="black" borderRadius="6px" h="4px" overflow="hidden">
           <Progress.Range bg="yellow.400" transition="width 300ms ease" />
@@ -85,7 +85,7 @@ const HomePage = () => {
           <p>анализ сопроводительного письма</p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 export default HomePage;
