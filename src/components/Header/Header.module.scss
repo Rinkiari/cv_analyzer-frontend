@@ -5,17 +5,26 @@
   align-items: center;
   margin-bottom: 40px;
 
-  p {
-    font-size: 23px;
-  }
+  .header_inner_container {
+    width: 562px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
 
-  a {
-    font-size: 23px;
-    color: #fbc02d;
+    p {
+      font-size: 25px;
+    }
+
+    .login_button {
+      font-size: 25px;
+      color: #fbc02d;
+      padding-bottom: 4px;
+    }
   }
 }
 
-.header {
+.header_logo {
   font-family: 'SF-Compact-Rounded', sans-serif;
   font-size: 32px !important;
 }

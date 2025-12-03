@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Header from '../components/Header';
 import styles from './HomePage.module.scss';
 import { Progress, Button } from '@chakra-ui/react';
@@ -7,14 +8,27 @@ import servicepic from '../assets/service.png';
 import dashboardpic from '../assets/dashboard.png';
 
 const HomePage = () => {
+  const [step, setStep] = useState(1);
+
+  const maxSteps = 5;
+  const percent = (step / maxSteps) * 100;
+
   return (
     <div className="global_container">
       <Header />
-      <Progress.Root maxW="1041px" size="sm" colorPalette="yellow">
-        <Progress.Track>
-          <Progress.Range />
+      <Progress.Root value={percent} max={100} maxW="1041px">
+        <Progress.Track bg="black" borderRadius="6px" h="4px" overflow="hidden">
+          <Progress.Range bg="yellow.400" transition="width 300ms ease" />
         </Progress.Track>
       </Progress.Root>
+
+      {/* <div style={{ marginTop: 12 }}>
+        <button onClick={() => setStep((s) => Math.max(0, s - 1))}>Prev</button>
+        <button onClick={() => setStep((s) => Math.min(maxSteps, s + 1))}>Next</button>
+        <span style={{ marginLeft: 12 }}>
+          {step}/{maxSteps}
+        </span>
+      </div> */}
       <div className={styles.top_cont}>
         <div className={styles.top_inner_cont}>
           <div className={styles.h1_div}>
