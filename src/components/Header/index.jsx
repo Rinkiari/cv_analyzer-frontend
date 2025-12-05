@@ -1,10 +1,13 @@
 import styles from './Header.module.scss';
+import { Link } from 'react-router';
 import { Button } from '@chakra-ui/react';
 
 const Header = () => {
   return (
     <div className={styles.header_container}>
-      <p className={styles.header_logo}>ResumeIQ</p>
+      <Link to="/">
+        <p className={styles.header_logo}>ResumeIQ</p>
+      </Link>
       <div className={styles.header_inner_container}>
         <p>о сервисе</p>
         <p>контакты</p>

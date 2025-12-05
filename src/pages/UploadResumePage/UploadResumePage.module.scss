@@ -1,0 +1,117 @@
+.h1_text {
+  max-width: 502px;
+  margin-top: 8px;
+  margin-bottom: 40px;
+}
+.buttons_wrapper {
+  position: relative;
+  max-width: 488px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &::before {
+    content: '';
+    position: absolute;
+
+    width: 122px;
+    height: 122px;
+
+    top: -70px;
+    left: 930px;
+
+    background-image: url('../../assets/cv.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .btn {
+    width: 217px;
+    height: 50px;
+    background-color: #fbc02d;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: border 0.09s ease-in-out;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+.upload_wrapper {
+  margin-top: 60px;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 373px;
+  border-radius: 23px;
+
+  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
+      2px repeat-x,
+    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
+      repeat-x,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
+      repeat-y,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
+      repeat-y;
+
+  background-repeat: no-repeat;
+
+  img {
+    width: 146px;
+    height: 146px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
+
+  h3 {
+    font-size: 30px;
+    font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 26px;
+    padding-top: 12px;
+  }
+}
+
+.uploadButton_div {
+  width: 100%;
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .upload_button {
+    width: 217px;
+    height: 50px;
+    background-color: #8fddc1;
+    border-radius: 16px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: 0.25 ease;
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
+}
+
+.active {
+  border: 3px solid #000 !important;
+}

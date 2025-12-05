@@ -1,0 +1,51 @@
+.upload_wrapper {
+  margin-top: 60px;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 373px;
+  border-radius: 23px;
+
+  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
+      2px repeat-x,
+    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
+      repeat-x,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
+      repeat-y,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
+      repeat-y;
+
+  background-repeat: no-repeat;
+
+  img {
+    width: 146px;
+    height: 146px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
+
+  h3 {
+    font-size: 30px;
+    font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 26px;
+    padding-top: 12px;
+  }
+}
+
+.dragging {
+  background: #fff8e1;
+  border-color: #fbc02d;
+}
+
+.hidden_input {
+  display: none;
+}

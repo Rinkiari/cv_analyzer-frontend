@@ -1,34 +1,16 @@
-import { useState } from 'react';
 import Header from '../components/Header';
 import styles from './HomePage.module.scss';
-import { Progress, Button } from '@chakra-ui/react';
+import { Button } from '@chakra-ui/react';
+import ProgressBar from '../components/ProgressBar';
+import { Link } from 'react-router';
 import teacherpic from '../assets/teacher.png';
 import folderpic from '../assets/folder.png';
 import servicepic from '../assets/service.png';
 import dashboardpic from '../assets/dashboard.png';
 
 const HomePage = () => {
-  // eslint-disable-next-line no-unused-vars
-  const [step, setStep] = useState(1);
-
-  const maxSteps = 5;
-  const percent = (step / maxSteps) * 100;
-
   return (
     <>
-      <Progress.Root value={percent} max={100} maxW="1041px">
-        <Progress.Track bg="black" borderRadius="6px" h="4px" overflow="hidden">
-          <Progress.Range bg="yellow.400" transition="width 300ms ease" />
-        </Progress.Track>
-      </Progress.Root>
-
-      {/* <div style={{ marginTop: 12 }}>
-        <button onClick={() => setStep((s) => Math.max(0, s - 1))}>Prev</button>
-        <button onClick={() => setStep((s) => Math.min(maxSteps, s + 1))}>Next</button>
-        <span style={{ marginLeft: 12 }}>
-          {step}/{maxSteps}
-        </span>
-      </div> */}
       <div className={styles.top_cont}>
         <div className={styles.top_inner_cont}>
           <div className={styles.h1_div}>
@@ -37,16 +19,19 @@ const HomePage = () => {
           <div className={styles.p_div}>
             <p>Загрузи резюме или вставь ссылку - получи подробный анализ за 10 секунд</p>
           </div>
-          <Button
-            height="50px"
-            width="217px"
-            fontSize="24px"
-            borderRadius="16px"
-            variant="subtle"
-            bg="#FBC02D"
-            _hover={{ bg: '#ffd468' }}>
-            Проверить
-          </Button>
+
+          <Link to="/uploadresume">
+            <Button
+              height="50px"
+              width="217px"
+              fontSize="24px"
+              borderRadius="16px"
+              variant="subtle"
+              bg="#FBC02D"
+              _hover={{ bg: '#ffd468' }}>
+              Проверить
+            </Button>
+          </Link>
         </div>
 
         <img src={teacherpic} alt="teacher" className={styles.teacher_img} />
