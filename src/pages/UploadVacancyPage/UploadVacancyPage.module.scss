@@ -1,10 +1,9 @@
 .h1_text {
   max-width: 502px;
   margin-top: 8px;
-  height: 82.8px;
+  margin-bottom: 40px;
 }
 .buttons_wrapper {
-  margin-top: 39px;
   position: relative;
   max-width: 488px;
   display: flex;
@@ -21,7 +20,7 @@
     top: -70px;
     left: 930px;
 
-    background-image: url('../../assets/cv.png');
+    background-image: url('../../assets/vacancy.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -58,7 +57,7 @@
   align-items: center;
 
   width: 100%;
-  height: 373px;
+  height: 111px;
   border-radius: 23px;
 
   background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
@@ -71,13 +70,6 @@
       repeat-y;
 
   background-repeat: no-repeat;
-
-  img {
-    width: 146px;
-    height: 146px;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-  }
 
   h3 {
     font-size: 30px;

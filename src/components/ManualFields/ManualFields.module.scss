@@ -1,0 +1,76 @@
+.manual_wrapper {
+  margin-top: 60px;
+  cursor: pointer;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  height: 373px;
+  border-radius: 23px;
+
+  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
+      2px repeat-x,
+    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
+      repeat-x,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
+      repeat-y,
+    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
+      repeat-y;
+
+  background-repeat: no-repeat;
+
+  .fio_field {
+    position: relative;
+    width: 1244px;
+    height: 46px;
+    background-color: #ffde8a48;
+    border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    p {
+      width: 199px;
+      font-size: 26px;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 198px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #000;
+    }
+
+    .editable {
+      display: block;
+
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      height: 29.9px;
+      width: 1020px;
+      font-size: 22px;
+      outline: none;
+    }
+
+    .editable::-webkit-scrollbar {
+      height: 2px;
+    }
+
+    .editable::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 4px;
+    }
+  }
+}

@@ -3,6 +3,7 @@ import Layout from './layouts/Layout';
 import HomePage from './pages/HomePage';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import UploadResumePage from './pages/UploadResumePage/UploadResumePage';
+import UploadVacancyPage from './pages/UploadVacancyPage/UploadVacancyPage';
 import Header from './components/Header';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/uploadresume" element={<UploadResumePage />} />
+          <Route path="uploadvacancy" element={<UploadVacancyPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>
       </Routes>

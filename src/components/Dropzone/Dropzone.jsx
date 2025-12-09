@@ -1,8 +1,11 @@
 import { useState, useRef } from 'react';
 import styles from './Dropzone.module.scss';
+import cloudpic from '../../assets/cloud.png';
+import clearIcon from '../../assets/fknbin.png';
 
 export default function Dropzone({ onFileSelect }) {
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
   const inputRef = useRef(null);
 
   const handleSelectFile = (e) => {
@@ -24,6 +27,7 @@ export default function Dropzone({ onFileSelect }) {
       return;
     }
 
+    setSelectedFile(file);
     onFileSelect(file);
   };
 
@@ -35,6 +39,12 @@ export default function Dropzone({ onFileSelect }) {
     validateAndSend(file);
   };
 
+  const clearFile = () => {
+    setSelectedFile(null);
+    onFileSelect(null);
+    inputRef.current.value = '';
+  };
+
   return (
     <div
       className={`${styles.upload_wrapper} ${isDragging ? styles.dragging : ''}`}
@@ -43,9 +53,15 @@ export default function Dropzone({ onFileSelect }) {
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       onClick={() => inputRef.current.click()}>
-      <img src="../../assets/cloud.png" alt="cloud" />
+      <img className={styles.cloud_picture} src={cloudpic} alt="cloud" />
       <h3>Выберите файл в формате PDF или DOCX</h3>
-      <p>или перетащите его сюда</p>
+      <p className={styles.drugIt_text}>или перетащите его сюда</p>
+      {selectedFile && (
+        <div className={styles.fileBox}>
+          <p className={styles.fileName}>{selectedFile.name}</p>
+          <img src={clearIcon} alt="remove" className={styles.removeIcon} onClick={clearFile} />
+        </div>
+      )}
 
       <input
         type="file"
