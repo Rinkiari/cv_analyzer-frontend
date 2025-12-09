@@ -3,6 +3,7 @@ import styles from './HomePage.module.scss';
 import { Button } from '@chakra-ui/react';
 import ProgressBar from '../components/ProgressBar';
 import { Link } from 'react-router';
+
 import teacherpic from '../assets/teacher.png';
 import folderpic from '../assets/folder.png';
 import servicepic from '../assets/service.png';

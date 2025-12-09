@@ -1,8 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import styles from './UploadVacancyPage.module.scss';
-import ManualFields from '../../components/ManualFields/ManualFields';
+import TextArea from '../../components/TextArea/TextArea';
 
 const UploadVacancyPage = () => {
+  const navigate = useNavigate();
+  const handleClick = () => {
+    navigate('/uploadletter');
+  };
+
   //link or text
   const [active, setActive] = useState('link');
 
@@ -22,10 +28,24 @@ const UploadVacancyPage = () => {
           Добавить текст
         </button>
       </div>
-      {active === 'link' ? <input type="text" placeholder="вставьте ссылку" /> : <ManualFields />}
+      {active === 'link' ? (
+        <div className={styles.manual_wrapper}>
+          <div className={styles.fio_field}>
+            <p>Ссылка</p>
+            <div
+              className={styles.editable}
+              contentEditable
+              suppressContentEditableWarning={true}></div>
+          </div>
+        </div>
+      ) : (
+        <TextArea />
+      )}
       <div className={styles.uploadButton_div}>
         <button className={styles.upload_button}>Загрузить</button>
-        <button className={styles.upload_button}>Пропустить</button>
+        <button className={styles.upload_button} onClick={handleClick}>
+          Пропустить
+        </button>
       </div>
     </>
   );

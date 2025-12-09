@@ -1,9 +1,10 @@
 .h1_text {
-  max-width: 502px;
+  max-width: 650px;
   margin-top: 8px;
-  margin-bottom: 40px;
+  height: 82.8px;
 }
 .buttons_wrapper {
+  margin-top: 39px;
   position: relative;
   max-width: 488px;
   display: flex;
@@ -18,9 +19,9 @@
     height: 122px;
 
     top: -70px;
-    left: 930px;
+    left: 920px;
 
-    background-image: url('../../assets/vacancy.png');
+    background-image: url('../../assets/letter.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -57,7 +58,7 @@
   align-items: center;
 
   width: 100%;
-  height: 111px;
+  height: 373px;
   border-radius: 23px;
 
   background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
@@ -70,6 +71,13 @@
       repeat-y;
 
   background-repeat: no-repeat;
+
+  img {
+    width: 146px;
+    height: 146px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+  }
 
   h3 {
     font-size: 30px;
@@ -108,81 +116,4 @@
 
 .active {
   border: 3px solid #000 !important;
-}
-
-.manual_wrapper {
-  margin-top: 60px;
-  cursor: pointer;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-
-  width: 100%;
-  height: 111px;
-  border-radius: 23px;
-
-  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
-      2px repeat-x,
-    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
-      repeat-x,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
-      repeat-y,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
-      repeat-y;
-
-  background-repeat: no-repeat;
-
-  .fio_field {
-    position: relative;
-    width: 1244px;
-    height: 46px;
-    background-color: #ffde8a48;
-    border-radius: 10px;
-
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    p {
-      width: 120px;
-      font-size: 24px;
-      flex-shrink: 0;
-      margin-left: 12px;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 128px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: #000;
-    }
-
-    .editable {
-      display: block;
-
-      white-space: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
-
-      height: 29.9px;
-      width: 1020px;
-      font-size: 22px !important;
-      outline: none;
-    }
-
-    .editable::-webkit-scrollbar {
-      height: 2px;
-    }
-
-    .editable::-webkit-scrollbar-thumb {
-      background: #ccc;
-      border-radius: 4px;
-    }
-  }
 }
