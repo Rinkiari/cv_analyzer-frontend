@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 const UploadLetterPage = () => {
   const navigate = useNavigate();
   const handleClick = () => {
-    navigate('/tetetetete');
+    navigate('/resultspage');
   };
 
   const [active, setActive] = useState('pdf_docx');

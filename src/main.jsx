@@ -4,10 +4,12 @@ import './styles/global.scss';
 
 // import { createSystem, defaultConfig } from '@chakra-ui/react';
 import { Provider } from './components/ui/provider.jsx';
+import { Provider as ReduxProvider } from 'react-redux';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 
 import App from './App.jsx';
+import store from './store/store.js';
 
 // export const system = createSystem(defaultConfig, {
 //   theme: {
@@ -21,9 +23,11 @@ import App from './App.jsx';
 // });
 
 createRoot(document.getElementById('root')).render(
-  <BrowserRouter>
-    <Provider>
-      <App />
-    </Provider>
-  </BrowserRouter>,
+  <ReduxProvider store={store}>
+    <BrowserRouter>
+      <Provider>
+        <App />
+      </Provider>
+    </BrowserRouter>
+  </ReduxProvider>,
 );

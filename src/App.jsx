@@ -5,6 +5,7 @@ import ErrorPage from './pages/ErrorPage/ErrorPage';
 import UploadResumePage from './pages/UploadResumePage/UploadResumePage';
 import UploadVacancyPage from './pages/UploadVacancyPage/UploadVacancyPage';
 import UploadLetterPage from './pages/UploadLetterPage/UploadLetterPage';
+import ResultsPage from './pages/ResultsPage/ResultsPage';
 import Header from './components/Header';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
           <Route path="/uploadresume" element={<UploadResumePage />} />
           <Route path="uploadvacancy" element={<UploadVacancyPage />} />
           <Route path="uploadletter" element={<UploadLetterPage />} />
+          <Route path="resultspage" element={<ResultsPage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>
       </Routes>

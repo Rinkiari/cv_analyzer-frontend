@@ -1,0 +1,14 @@
+.icon_container {
+  width: 600px;
+  margin: 110px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 380px;
+    height: 380px;
+    object-fit: contain;
+    aspect-ratio: 1/1;
+  }
+}

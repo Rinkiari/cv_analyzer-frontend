@@ -11,7 +11,7 @@ function ManualFields() {
           suppressContentEditableWarning={true}></div>
       </div>
       <div className={styles.fio_field}>
-        <p>Возраст</p>
+        <p>Позиция</p>
         <div
           className={styles.editable}
           contentEditable
@@ -26,13 +26,6 @@ function ManualFields() {
       </div>
       <div className={styles.fio_field}>
         <p>Опыт</p>
-        <div
-          className={styles.editable}
-          contentEditable
-          suppressContentEditableWarning={true}></div>
-      </div>
-      <div className={styles.fio_field}>
-        <p>Образование</p>
         <div
           className={styles.editable}
           contentEditable

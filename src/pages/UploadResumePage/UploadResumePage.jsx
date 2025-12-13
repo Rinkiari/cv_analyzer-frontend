@@ -2,46 +2,40 @@ import { useState } from 'react';
 import styles from './UploadResumePage.module.scss';
 import Dropzone from '../../components/Dropzone/Dropzone';
 import ManualFields from '../../components/ManualFields/ManualFields';
+import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { uploadResume } from '../../slices/resumeSlice';
 
 const UploadResumePage = () => {
   const navigate = useNavigate();
-  const handleClick = () => {
-    navigate('/uploadvacancy');
-  };
+  const dispatch = useDispatch();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [active, setActive] = useState('pdf_docx');
-
   const [file, setFile] = useState(null);
 
   // eslint-disable-next-line no-unused-vars
-  const handleUpload = async () => {
+  const handleUploadAndNext = async () => {
     if (!file) {
       alert('Выберите файл перед загрузкой!');
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const formData = new FormData();
-      formData.append('uploadedFile', file);
+      const result = await dispatch(uploadResume(file)).unwrap();
+      console.log('Ответ сервера (сохранён в стор):', result);
 
-      const response = await fetch('http://localhost:8080/cv/pdf', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Ошибка загрузки');
-
-      // const data = await response.json();
-      const dataText = await response.text();
-
-      console.log('Ответ сервера:', dataText);
+      navigate('/uploadvacancy');
 
       alert('Файл успешно загружен!');
     } catch (err) {
-      console.error(err);
-      alert('Не удалось загрузить файл.');
+      console.error('Ошибка при загрузке через thunk:', err);
+      alert('Не удалось загрузить файл: ' + (err || 'Unknown error'));
     } finally {
+      setIsLoading(false);
       console.log('proccess end');
     }
   };
@@ -65,12 +59,17 @@ const UploadResumePage = () => {
         </button>
       </div>
       {active === 'pdf_docx' ? <Dropzone onFileSelect={setFile} /> : <ManualFields />}
+
       <div className={styles.uploadButton_div}>
-        <button
-          className={styles.upload_button}
-          // onClick={handleUpload}
-          onClick={handleClick}>
-          Загрузить
+        <button className={styles.upload_button} onClick={handleUploadAndNext} disabled={isLoading}>
+          {isLoading ? (
+            <>
+              Загрузка...
+              <Spinner size="sm" thickness="3px" speed="0.65s" ml="8px" color="white" />
+            </>
+          ) : (
+            'Загрузить'
+          )}
         </button>
       </div>
     </>
