@@ -95,5 +95,32 @@
     width: 97%;
     height: 88%;
     padding: 12px;
+
+    overflow-y: auto;
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    strong {
+      font-weight: 600;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 10px;
+    }
+    li {
+      margin-bottom: 6px;
+    }
+
+    code {
+      display: block;
+      background: #fff6e0;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
   }
 }

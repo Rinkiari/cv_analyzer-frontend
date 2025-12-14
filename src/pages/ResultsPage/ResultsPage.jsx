@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
+import ReactMarkdown from 'react-markdown';
 
 const OPTIONS = [
   { id: 'structure', label: 'Структура и корректность' },
@@ -54,7 +55,9 @@ function ResultsPage() {
 
       <div className={styles.textarea_div}>
         {status === 'succeeded' && responseText ? (
-          <p className={styles.textarea_p}>{renderResponse()}</p>
+          <div className={styles.textarea_p}>
+            <ReactMarkdown>{renderResponse()}</ReactMarkdown>
+          </div>
         ) : (
           status === 'idle' && <p className={styles.textarea_p}>Результат ещё не получен.</p>
         )}

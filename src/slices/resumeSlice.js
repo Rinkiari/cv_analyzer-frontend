@@ -7,7 +7,17 @@ export const uploadResume = createAsyncThunk(
       const formData = new FormData();
       formData.append('uploadedFile', file);
 
-      const response = await fetch('http://localhost:8080/cv/pdf', {
+      let url = 'http://localhost:8080/cv/pdf';
+
+      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        url = 'http://localhost:8080/cv/docx';
+      }
+
+      if (file.name.toLowerCase().endsWith('.docx')) {
+        url = 'http://localhost:8080/cv/docx';
+      }
+
+      const response = await fetch(url, {
         method: 'POST',
         body: formData,
       });
