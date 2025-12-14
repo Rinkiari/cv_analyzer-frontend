@@ -17,8 +17,33 @@ export const uploadResume = createAsyncThunk(
         return rejectWithValue(text || 'Ошибка загрузки');
       }
 
-      const dataText = await response.text();
-      return dataText;
+      return await response.json();
+    } catch (err) {
+      return rejectWithValue(err.message || 'Network error');
+    }
+  },
+);
+
+export const uploadManualResume = createAsyncThunk(
+  'resume/uploadManualResume',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { manualForm } = getState().resume;
+
+      const response = await fetch('http://localhost:8080/cv/manual', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(manualForm),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        return rejectWithValue(text || 'Ошибка загрузки');
+      }
+
+      return await response.json();
     } catch (err) {
       return rejectWithValue(err.message || 'Network error');
     }
@@ -31,12 +56,25 @@ const resumeSlice = createSlice({
     responseText: null,
     status: 'idle',
     error: null,
+    manualForm: {
+      fullName: '',
+      position: '',
+      skills: '',
+      experience: '',
+      education: '',
+      aboutYourself: '',
+    },
   },
+
   reducers: {
     clearResumeState(state) {
       state.responseText = null;
       state.status = 'idle';
       state.error = null;
+    },
+    updateManualField(state, action) {
+      const { field, value } = action.payload;
+      state.manualForm[field] = value;
     },
   },
   extraReducers: (builder) => {
@@ -52,9 +90,21 @@ const resumeSlice = createSlice({
       .addCase(uploadResume.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload || action.error.message;
+      })
+      .addCase(uploadManualResume.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(uploadManualResume.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.responseText = action.payload;
+      })
+      .addCase(uploadManualResume.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.payload;
       });
   },
 });
 
-export const { clearResumeState } = resumeSlice.actions;
+export const { clearResumeState, updateManualField } = resumeSlice.actions;
+
 export default resumeSlice.reducer;

@@ -4,10 +4,10 @@ import styles from './ResultsPage.module.scss';
 
 const OPTIONS = [
   { id: 'structure', label: 'Структура и корректность' },
-  { id: 'tech', label: 'Технологии' },
+  { id: 'technologies', label: 'Технологии' },
   { id: 'relevance', label: 'Релевантность' },
-  { id: 'other', label: 'Прочие рекомендации' },
-  { id: 'letter', label: 'Письмо' },
+  { id: 'another', label: 'Прочие рекомендации' },
+  // { id: 'letter', label: 'Письмо' },
 ];
 
 function ResultsPage() {
@@ -20,16 +20,15 @@ function ResultsPage() {
   const renderResponse = () => {
     if (!responseText) return null;
 
-    // if это string - рендерим как есть
-    if (typeof responseText === 'string') return responseText;
-
-    // Если это объект/массив — аккуратно сериализуем для отображения
-    try {
-      return JSON.stringify(responseText, null, 2);
-    } catch (e) {
-      console.log(e);
-      return String(responseText);
+    if (typeof responseText === 'string') {
+      return responseText;
     }
+
+    if (typeof responseText === 'object') {
+      return responseText[activeTab] || 'Нет данных для этого раздела';
+    }
+
+    return String(responseText);
   };
 
   return (
@@ -54,11 +53,8 @@ function ResultsPage() {
       </div>
 
       <div className={styles.textarea_div}>
-        {/* if ответ — многострочный json, лучше использовать <pre> для сохранения форматирования */}
         {status === 'succeeded' && responseText ? (
-          <p className={styles.textarea_p}>
-            {renderResponse()} {/* позже здесь будет логика по activeTab */}
-          </p>
+          <p className={styles.textarea_p}>{renderResponse()}</p>
         ) : (
           status === 'idle' && <p className={styles.textarea_p}>Результат ещё не получен.</p>
         )}

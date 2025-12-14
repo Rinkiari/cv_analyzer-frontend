@@ -6,6 +6,7 @@ import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { uploadResume } from '../../slices/resumeSlice';
+import { uploadManualResume } from '../../slices/resumeSlice';
 
 const UploadResumePage = () => {
   const navigate = useNavigate();
@@ -14,6 +15,14 @@ const UploadResumePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [active, setActive] = useState('pdf_docx');
   const [file, setFile] = useState(null);
+
+  const handleSubmit = async () => {
+    if (active === 'pdf_docx') {
+      await handleUploadAndNext();
+    } else {
+      await handleManualUpload();
+    }
+  };
 
   // eslint-disable-next-line no-unused-vars
   const handleUploadAndNext = async () => {
@@ -40,6 +49,20 @@ const UploadResumePage = () => {
     }
   };
 
+  const handleManualUpload = async () => {
+    setIsLoading(true);
+
+    try {
+      await dispatch(uploadManualResume()).unwrap();
+      navigate('/uploadvacancy');
+    } catch (e) {
+      console.log(e);
+      alert('Ошибка отправки данных');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <h1 className={styles.h1_text}>
@@ -61,7 +84,7 @@ const UploadResumePage = () => {
       {active === 'pdf_docx' ? <Dropzone onFileSelect={setFile} /> : <ManualFields />}
 
       <div className={styles.uploadButton_div}>
-        <button className={styles.upload_button} onClick={handleUploadAndNext} disabled={isLoading}>
+        <button className={styles.upload_button} onClick={handleSubmit} disabled={isLoading}>
           {isLoading ? (
             <>
               Загрузка...
