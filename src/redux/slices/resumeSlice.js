@@ -60,9 +60,37 @@ export const uploadManualResume = createAsyncThunk(
   },
 );
 
+export const startAnalysis = createAsyncThunk(
+  'resume/startAnalysis',
+  async ({ cvId, link }, { rejectWithValue }) => {
+    try {
+      const body = { cvId };
+      if (link) body.link = link;
+
+      const response = await fetch('http://localhost:8080/analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        return rejectWithValue(text);
+      }
+
+      return await response.json(); // analysisId
+    } catch (e) {
+      return rejectWithValue(e.message);
+    }
+  },
+);
+
 const resumeSlice = createSlice({
   name: 'resume',
   initialState: {
+    cvId: null,
+    analysisId: null,
+    analysisResult: null,
     responseText: null,
     status: 'idle',
     error: null,
@@ -94,6 +122,7 @@ const resumeSlice = createSlice({
         state.error = null;
       })
       .addCase(uploadResume.fulfilled, (state, action) => {
+        state.cvId = action.payload;
         state.status = 'succeeded';
         state.responseText = action.payload;
       })
@@ -105,12 +134,16 @@ const resumeSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(uploadManualResume.fulfilled, (state, action) => {
+        state.cvId = action.payload;
         state.status = 'succeeded';
         state.responseText = action.payload;
       })
       .addCase(uploadManualResume.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
+      })
+      .addCase(startAnalysis.fulfilled, (state, action) => {
+        state.analysisId = action.payload;
       });
   },
 });

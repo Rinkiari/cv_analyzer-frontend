@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux';
-import { updateManualField } from '../../slices/resumeSlice';
+import { updateManualField } from '../../redux/slices/resumeSlice';
 import styles from './ManualFields.module.scss';
 
 function ManualFields() {

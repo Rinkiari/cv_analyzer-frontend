@@ -1,7 +1,5 @@
-import Header from '../components/Header';
 import styles from './HomePage.module.scss';
 import { Button } from '@chakra-ui/react';
-import ProgressBar from '../components/ProgressBar';
 import { Link } from 'react-router';
 
 import teacherpic from '../assets/teacher.png';
@@ -69,6 +67,7 @@ const HomePage = () => {
           <p>конкурентоспособность</p>
           <p>релевантность под вакансию</p>
           <p>анализ сопроводительного письма</p>
+          <p>технологии</p>
         </div>
       </div>
     </>

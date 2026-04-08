@@ -5,8 +5,8 @@ import ManualFields from '../../components/ManualFields/ManualFields';
 import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
 import { useDispatch } from 'react-redux';
-import { uploadResume } from '../../slices/resumeSlice';
-import { uploadManualResume } from '../../slices/resumeSlice';
+import { uploadResume } from '../../redux/slices/resumeSlice';
+import { uploadManualResume } from '../../redux/slices/resumeSlice';
 
 const UploadResumePage = () => {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ const UploadResumePage = () => {
     setIsLoading(true);
 
     try {
-      const result = await dispatch(uploadResume(file)).unwrap();
+      const result = await dispatch(uploadResume(file)).unwrap(); // result = cvId и он уже автоматически лежит в redux
       console.log('Ответ сервера (сохранён в стор):', result);
 
       navigate('/uploadvacancy');

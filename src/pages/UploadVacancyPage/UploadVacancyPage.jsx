@@ -1,12 +1,43 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useSelector, useDispatch } from 'react-redux';
+import { startAnalysis } from '../../redux/slices/resumeSlice';
 import styles from './UploadVacancyPage.module.scss';
 import TextArea from '../../components/TextArea/TextArea';
 
 const UploadVacancyPage = () => {
   const navigate = useNavigate();
-  const handleClick = () => {
-    navigate('/uploadletter');
+  const dispatch = useDispatch();
+  const cvId = useSelector((state) => state.resume.cvId);
+
+  const [link, setLink] = useState('');
+
+  // const handleClick = () => {
+  //   navigate('/uploadletter');
+  // };
+
+  const handleSubmit = async () => {
+    try {
+      if (!cvId) {
+        alert('Сначала загрузите резюме');
+        return;
+      }
+
+      const result = await dispatch(
+        startAnalysis({
+          cvId,
+          link: link || undefined, // важно
+        }),
+      ).unwrap();
+      localStorage.setItem('analysisId', result);
+
+      console.log('analysisId:', result);
+
+      navigate('/resultspage');
+    } catch (e) {
+      console.error(e);
+      alert('Ошибка анализа');
+    }
   };
 
   //link or text
@@ -32,18 +63,22 @@ const UploadVacancyPage = () => {
         <div className={styles.manual_wrapper}>
           <div className={styles.fio_field}>
             <p>Ссылка</p>
-            <div
+            <input
               className={styles.editable}
-              contentEditable
-              suppressContentEditableWarning={true}></div>
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              placeholder="Введите ссылку"
+            />
           </div>
         </div>
       ) : (
         <TextArea />
       )}
       <div className={styles.uploadButton_div}>
-        <button className={styles.upload_button}>Загрузить</button>
-        <button className={styles.upload_button} onClick={handleClick}>
+        <button className={styles.upload_button} onClick={handleSubmit}>
+          Загрузить
+        </button>
+        <button className={styles.upload_button} onClick={handleSubmit}>
           Пропустить
         </button>
       </div>
