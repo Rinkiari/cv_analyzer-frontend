@@ -1,11 +1,17 @@
+h1 {
+  color: black !important;
+}
+
 .option_item {
   position: relative;
   cursor: pointer;
+  color: black !important;
+  opacity: 0.8;
 
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
-    color: #000;
+    opacity: 1;
   }
 }
 
@@ -91,6 +97,7 @@
   .textarea_p {
     resize: none;
     font-size: 22px;
+    color: black !important;
 
     width: 97%;
     height: 88%;

@@ -15,6 +15,11 @@
 
     h1 {
       margin: 0 !important;
+      color: black !important;
+    }
+
+    button {
+      color: black !important;
     }
   }
 
@@ -30,11 +35,16 @@
   border-radius: 20px;
   padding: 10px 30px;
 
+  p {
+    color: black !important;
+  }
+
   h2 {
     font-family: 'SF-Pro-Display-Medium', sans-serif !important;
     font-size: 36px;
     font-weight: 500;
     margin-bottom: 22px;
+    color: black !important;
   }
 
   .howitworks_cont {

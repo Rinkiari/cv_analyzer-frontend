@@ -2,6 +2,7 @@
   max-width: 502px;
   margin-top: 8px;
   margin-bottom: 40px;
+  color: black !important;
 }
 .buttons_wrapper {
   position: relative;
@@ -9,6 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: black !important;
 
   &::before {
     content: '';
@@ -95,6 +97,7 @@
     width: 217px;
     height: 50px;
     background-color: #8fddc1;
+    color: black !important;
     border-radius: 16px;
     font-size: 24px;
     cursor: pointer;
@@ -151,6 +154,7 @@
       font-size: 24px;
       flex-shrink: 0;
       margin-left: 12px;
+      color: black !important;
     }
 
     &::after {
@@ -174,6 +178,8 @@
       width: 1020px;
       font-size: 22px !important;
       outline: none;
+
+      background-color: transparent;
     }
 
     .editable::-webkit-scrollbar {
