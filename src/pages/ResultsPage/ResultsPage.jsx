@@ -3,6 +3,8 @@ import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
 import ReactMarkdown from 'react-markdown';
 
+import { API_URL } from '../../config/api';
+
 const OPTIONS = [
   { id: 'structure', label: 'Структура и корректность' },
   { id: 'technologies', label: 'Технологии' },
@@ -27,7 +29,7 @@ function ResultsPage() {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(`http://localhost:8080/analysis?analysisId=${analysisId}`);
+        const res = await fetch(`${API_URL}/analysis?analysisId=${analysisId}`);
 
         // ГОТОВО
         if (res.status === 200) {

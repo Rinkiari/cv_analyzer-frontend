@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { API_URL } from '../../config/api';
 
 export const uploadResume = createAsyncThunk(
   'resume/uploadResume',
@@ -7,14 +8,14 @@ export const uploadResume = createAsyncThunk(
       const formData = new FormData();
       formData.append('uploadedFile', file);
 
-      let url = 'http://localhost:8080/cv/pdf';
+      let url = `${API_URL}/cv/pdf`;
 
       if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        url = 'http://localhost:8080/cv/docx';
+        url = `${API_URL}/cv/docx`;
       }
 
       if (file.name.toLowerCase().endsWith('.docx')) {
-        url = 'http://localhost:8080/cv/docx';
+        url = `${API_URL}/cv/docx`;
       }
 
       const response = await fetch(url, {
@@ -40,7 +41,7 @@ export const uploadManualResume = createAsyncThunk(
     try {
       const { manualForm } = getState().resume;
 
-      const response = await fetch('http://localhost:8080/cv/manual', {
+      const response = await fetch(`${API_URL}/cv/manual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,7 +68,7 @@ export const startAnalysis = createAsyncThunk(
       const body = { cvId };
       if (link) body.link = link;
 
-      const response = await fetch('http://localhost:8080/analysis', {
+      const response = await fetch(`${API_URL}/analysis`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),

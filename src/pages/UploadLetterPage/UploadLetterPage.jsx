@@ -4,6 +4,8 @@ import Dropzone from '../../components/Dropzone/Dropzone';
 import TextArea from '../../components/TextArea/TextArea';
 import { useNavigate } from 'react-router';
 
+import { API_URL } from '../../config/api';
+
 const UploadLetterPage = () => {
   const navigate = useNavigate();
   const handleClick = () => {
@@ -25,7 +27,7 @@ const UploadLetterPage = () => {
       const formData = new FormData();
       formData.append('uploadedFile', file);
 
-      const response = await fetch('http://localhost:8080/cv/pdf', {
+      const response = await fetch(`${API_URL}/cv/pdf`, {
         method: 'POST',
         body: formData,
       });
