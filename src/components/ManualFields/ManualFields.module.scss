@@ -39,6 +39,7 @@
       font-size: 26px;
       flex-shrink: 0;
       margin-left: 12px;
+      color: black !important;
     }
 
     &::after {
@@ -62,6 +63,7 @@
       width: 1020px;
       font-size: 22px;
       outline: none;
+      color: black !important;
     }
 
     .editable::-webkit-scrollbar {
