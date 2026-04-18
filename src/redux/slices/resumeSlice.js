@@ -1,9 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL } from '../../config/api';
 
+const buildAuthHeaders = (token, extraHeaders = {}) => {
+  const headers = { ...extraHeaders };
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  return headers;
+};
+
+const getAccessToken = (getState) => {
+  const tokenFromRedux = getState()?.auth?.accessToken;
+  if (tokenFromRedux) return tokenFromRedux;
+
+  const tokenFromStorage = localStorage.getItem('auth_accessToken');
+  return tokenFromStorage || null;
+};
+
 export const uploadResume = createAsyncThunk(
   'resume/uploadResume',
-  async (file, { rejectWithValue }) => {
+  async (file, { getState, rejectWithValue }) => {
     try {
       const formData = new FormData();
       formData.append('uploadedFile', file);
@@ -18,8 +36,13 @@ export const uploadResume = createAsyncThunk(
         url = `${API_URL}/cv/docx`;
       }
 
+      const token = getAccessToken(getState);
+
       const response = await fetch(url, {
         method: 'POST',
+        headers: {
+          Authorization: buildAuthHeaders(token),
+        },
         body: formData,
       });
 
@@ -40,12 +63,13 @@ export const uploadManualResume = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const { manualForm } = getState().resume;
+      const token = getAccessToken(getState);
 
       const response = await fetch(`${API_URL}/cv/manual`, {
         method: 'POST',
-        headers: {
+        headers: buildAuthHeaders(token, {
           'Content-Type': 'application/json',
-        },
+        }),
         body: JSON.stringify(manualForm),
       });
 
