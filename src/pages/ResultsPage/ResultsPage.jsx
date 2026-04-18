@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
 import ReactMarkdown from 'react-markdown';
+import Loader from '../../components/Loader/Loader';
 
 import { API_URL } from '../../config/api';
 
@@ -71,7 +72,13 @@ function ResultsPage() {
   }
 
   if (loading) {
-    return <h2>Анализируем резюме...</h2>;
+    return (
+      <div className={styles.loadingScreen}>
+        <h2 className={styles.loadingTitle}>Анализируем резюме...</h2>
+        <Loader />
+        <p className={styles.loadingText}>Это может занять несколько секунд</p>
+      </div>
+    );
   }
 
   if (errorState) {
