@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router';
 import Layout from './layouts/Layout';
 import HomePage from './pages/HomePage';
+import AuthPage from './pages/AuthPage/AuthPage';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import UploadResumePage from './pages/UploadResumePage/UploadResumePage';
 import UploadVacancyPage from './pages/UploadVacancyPage/UploadVacancyPage';
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<AuthPage />} />
           <Route path="/uploadresume" element={<UploadResumePage />} />
           <Route path="uploadvacancy" element={<UploadVacancyPage />} />
           <Route path="uploadletter" element={<UploadLetterPage />} />
