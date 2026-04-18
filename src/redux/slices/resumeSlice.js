@@ -1,22 +1,23 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { API_URL } from '../../config/api';
-
-const buildAuthHeaders = (token, extraHeaders = {}) => {
-  const headers = { ...extraHeaders };
-
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
-
-  return headers;
-};
+import { logout } from './authSlice';
 
 const getAccessToken = (getState) => {
   const tokenFromRedux = getState()?.auth?.accessToken;
   if (tokenFromRedux) return tokenFromRedux;
 
-  const tokenFromStorage = localStorage.getItem('auth_accessToken');
-  return tokenFromStorage || null;
+  if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') {
+    const tokenFromStorage = localStorage.getItem('auth_accessToken');
+    return tokenFromStorage || null;
+  }
+
+  return null;
+};
+
+const buildHeaders = (token, extraHeaders = {}) => {
+  const headers = { ...extraHeaders };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 };
 
 export const uploadResume = createAsyncThunk(
@@ -40,9 +41,7 @@ export const uploadResume = createAsyncThunk(
 
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          Authorization: buildAuthHeaders(token),
-        },
+        headers: buildHeaders(token),
         body: formData,
       });
 
@@ -67,7 +66,7 @@ export const uploadManualResume = createAsyncThunk(
 
       const response = await fetch(`${API_URL}/cv/manual`, {
         method: 'POST',
-        headers: buildAuthHeaders(token, {
+        headers: buildHeaders(token, {
           'Content-Type': 'application/json',
         }),
         body: JSON.stringify(manualForm),
@@ -94,7 +93,9 @@ export const startAnalysis = createAsyncThunk(
 
       const response = await fetch(`${API_URL}/analysis`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(body),
       });
 
@@ -131,9 +132,20 @@ const resumeSlice = createSlice({
 
   reducers: {
     clearResumeState(state) {
+      state.cvId = null;
+      state.analysisId = null;
+      state.analysisResult = null;
       state.responseText = null;
       state.status = 'idle';
       state.error = null;
+      state.manualForm = {
+        fullName: '',
+        position: '',
+        skills: '',
+        experience: '',
+        education: '',
+        aboutYourself: '',
+      };
     },
     updateManualField(state, action) {
       const { field, value } = action.payload;
@@ -169,6 +181,22 @@ const resumeSlice = createSlice({
       })
       .addCase(startAnalysis.fulfilled, (state, action) => {
         state.analysisId = action.payload;
+      })
+      .addCase(logout, (state) => {
+        state.cvId = null;
+        state.analysisId = null;
+        state.analysisResult = null;
+        state.responseText = null;
+        state.status = 'idle';
+        state.error = null;
+        state.manualForm = {
+          fullName: '',
+          position: '',
+          skills: '',
+          experience: '',
+          education: '',
+          aboutYourself: '',
+        };
       });
   },
 });

@@ -70,6 +70,16 @@ export default function AuthPage() {
     setRegisterForm((prev) => ({ ...prev, [field]: event.target.value }));
   };
 
+  const getReadableAuthError = (error) => {
+    if (!error) return 'Ошибка авторизации';
+
+    if (typeof error === 'string' && error.includes('Invalid login or password')) {
+      return 'Неверный логин или пароль';
+    }
+
+    return error;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -111,7 +121,7 @@ export default function AuthPage() {
 
       navigate('/', { replace: true });
     } catch (error) {
-      setLocalError(error || 'Ошибка авторизации');
+      setLocalError(getReadableAuthError(error));
     }
   };
 
@@ -201,7 +211,7 @@ export default function AuthPage() {
               </label>
             )}
 
-            {localError && <div className={styles.error}>{errorMessage}</div>}
+            {errorMessage && <div className={styles.error}>{errorMessage}</div>}
 
             <Button
               type="submit"

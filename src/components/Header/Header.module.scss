@@ -30,3 +30,15 @@
   font-size: 32px !important;
   color: black !important;
 }
+
+.auth_actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+  }
+}

@@ -1,8 +1,9 @@
 import styles from './Header.module.scss';
-import { useNavigate, Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Button } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectAuth } from '../../redux/slices/authSlice';
+import accountpic from '../../assets/portrait2.png';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -19,24 +20,28 @@ const Header = () => {
       <Link to="/">
         <p className={styles.header_logo}>ResumeIQ</p>
       </Link>
-
       <div className={styles.header_inner_container}>
         <p>о сервисе</p>
         <p>контакты</p>
+        {auth?.isAuthenticated ? (
+          <div className={styles.auth_actions}>
+            <Link to="/myprofile">
+              <img src={accountpic} alt="account" />
+            </Link>
 
-        {auth.isAuthenticated ? (
-          <Button
-            className={styles.login_button}
-            onClick={handleLogout}
-            height="35.1px"
-            width="135px"
-            borderRadius="16px"
-            variant="subtle"
-            bg="#000"
-            color="#FBC02D"
-            _hover={{ bg: '#161616' }}>
-            выйти
-          </Button>
+            <Button
+              className={styles.login_button}
+              onClick={handleLogout}
+              height="35.1px"
+              width="135px"
+              borderRadius="16px"
+              variant="subtle"
+              bg="#000"
+              color="#FBC02D"
+              _hover={{ bg: '#161616' }}>
+              выйти
+            </Button>
+          </div>
         ) : (
           <Button
             asChild
@@ -54,5 +59,4 @@ const Header = () => {
     </div>
   );
 };
-
 export default Header;

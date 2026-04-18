@@ -1,12 +1,13 @@
 import { Routes, Route } from 'react-router';
 import Layout from './layouts/Layout';
 import HomePage from './pages/HomePage';
-import AuthPage from './pages/AuthPage/AuthPage';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import UploadResumePage from './pages/UploadResumePage/UploadResumePage';
 import UploadVacancyPage from './pages/UploadVacancyPage/UploadVacancyPage';
 import UploadLetterPage from './pages/UploadLetterPage/UploadLetterPage';
 import ResultsPage from './pages/ResultsPage/ResultsPage';
+import MyProfilePage from './pages/MyProfilePage/MyProfilePage';
+import AuthPage from './pages/AuthPage/AuthPage';
 import Header from './components/Header';
 
 function App() {
@@ -16,11 +17,12 @@ function App() {
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<AuthPage />} />
           <Route path="/uploadresume" element={<UploadResumePage />} />
           <Route path="uploadvacancy" element={<UploadVacancyPage />} />
           <Route path="uploadletter" element={<UploadLetterPage />} />
           <Route path="resultspage" element={<ResultsPage />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/myprofile" element={<MyProfilePage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>
       </Routes>

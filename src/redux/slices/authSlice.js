@@ -36,8 +36,13 @@ function readStoredAuth() {
 function persistAuth(payload) {
   if (!canUseStorage()) return;
 
-  const { userId, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt } =
-    payload;
+  const {
+    userId,
+    accessToken,
+    refreshToken,
+    accessTokenExpiresAt,
+    refreshTokenExpiresAt,
+  } = payload;
 
   if (userId) localStorage.setItem(STORAGE_KEYS.userId, userId);
   if (accessToken) localStorage.setItem(STORAGE_KEYS.accessToken, accessToken);
@@ -52,7 +57,6 @@ function persistAuth(payload) {
 
 function clearStoredAuth() {
   if (!canUseStorage()) return;
-
   Object.values(STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
 }
 
@@ -182,8 +186,6 @@ const authSlice = createSlice({
       state.error = null;
       state.isAuthenticated = false;
       clearStoredAuth();
-
-      localStorage.removeItem('analysisId');
     },
     clearAuthError(state) {
       state.error = null;

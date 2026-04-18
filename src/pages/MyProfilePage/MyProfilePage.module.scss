@@ -1,0 +1,170 @@
+.page {
+  padding-bottom: 48px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 32px;
+}
+
+.titleBlock,
+.profileCard,
+.emptyState,
+.loadingState,
+.errorState,
+.analysisCard {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.titleBlock {
+  padding: 28px;
+}
+
+.kicker,
+.cardLabel,
+.analysisIndex {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 10px;
+}
+
+.titleBlock h1 {
+  font-size: 40px;
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.68);
+  max-width: 620px;
+}
+
+.profileCard {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.profileCard h2 {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.cardActions,
+.errorActions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.content {
+  display: grid;
+  gap: 18px;
+}
+
+.emptyState,
+.loadingState,
+.errorState {
+  padding: 28px;
+}
+
+.emptyState h2,
+.errorState h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.emptyState p,
+.loadingState p,
+.errorState p {
+  color: rgba(0, 0, 0, 0.68);
+  font-size: 16px;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.analysesGrid {
+  display: grid;
+  gap: 18px;
+}
+
+.analysisCard {
+  padding: 24px;
+}
+
+.analysisHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.analysisHeader h3 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.analysisMeta {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+}
+
+.sections {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.section {
+  border-radius: 18px;
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 16px;
+}
+
+.section h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  text-transform: capitalize;
+}
+
+.section pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.82);
+}
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .sections {
+    grid-template-columns: 1fr;
+  }
+
+  .analysisHeader {
+    flex-direction: column;
+  }
+}
