@@ -1,9 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
 import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
-
 import { API_URL } from '../../config/api';
 
 const OPTIONS = [
@@ -14,80 +13,114 @@ const OPTIONS = [
   { id: 'vacancyComparison', label: 'Сравнение с вакансией' },
 ];
 
+const LOADING_MESSAGES = [
+  'Анализируем структуру резюме...',
+  'Проверяем технологии и навыки...',
+  'Сравниваем с вакансией...',
+  'Формируем рекомендации...',
+];
+
 function ResultsPage() {
   const reduxAnalysisId = useSelector((state) => state.resume.analysisId);
+  const reduxGeneratedLetter = useSelector((state) => state.resume.generatedLetter);
 
   const analysisId = reduxAnalysisId || localStorage.getItem('analysisId');
+  const generatedLetter =
+    reduxGeneratedLetter?.analysisId === analysisId ? reduxGeneratedLetter?.text : null;
 
   const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [errorState, setErrorState] = useState(null);
   const [activeTab, setActiveTab] = useState('structure');
+  const [loadingStep, setLoadingStep] = useState(0);
 
-  // polling
+  const loading = Boolean(analysisId) && !result && !errorState;
+
   useEffect(() => {
-    if (!analysisId) return;
+    if (!loading) return;
 
-    const interval = setInterval(async () => {
+    let cancelled = false;
+    let timeoutId = null;
+
+    const poll = async () => {
       try {
         const res = await fetch(`${API_URL}/analysis?analysisId=${analysisId}`);
 
-        // ГОТОВО
+        if (cancelled) return;
+
         if (res.status === 200) {
           const data = await res.json();
-
           setResult(data);
-          setLoading(false);
-          clearInterval(interval);
+          return;
         }
 
-        // ЕЩЁ ОБРАБАТЫВАЕТСЯ
         if (res.status === 202) {
-          console.log('Анализ ещё не готов...');
+          timeoutId = setTimeout(poll, 2000);
+          return;
         }
 
-        // ОШИБКА
         if (res.status === 500) {
           setErrorState('Ошибка анализа');
-          setLoading(false);
-          clearInterval(interval);
+          return;
         }
-      } catch (e) {
-        setErrorState(e.message);
-        setLoading(false);
-        clearInterval(interval);
-      }
-    }, 2000);
 
-    return () => clearInterval(interval);
-  }, [analysisId]);
+        const text = await res.text();
+        setErrorState(text || `Ошибка анализа (${res.status})`);
+      } catch (e) {
+        if (cancelled) return;
+        setErrorState(e.message);
+      }
+    };
+
+    poll();
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [analysisId, loading]);
+
+  useEffect(() => {
+    if (!loading) return;
+
+    const messageInterval = setInterval(() => {
+      setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
+    }, 1800);
+
+    return () => clearInterval(messageInterval);
+  }, [loading]);
 
   const renderResponse = () => {
     if (!result) return null;
     return result[activeTab] || 'Нет данных';
   };
 
+  const loadingMessage = useMemo(() => LOADING_MESSAGES[loadingStep], [loadingStep]);
+
   if (!analysisId) {
-    return <h2>Нет данных для анализа</h2>;
+    return <h2 className={styles.centerMessage}>Нет данных для анализа</h2>;
   }
 
   if (loading) {
     return (
       <div className={styles.loadingScreen}>
-        <h2 className={styles.loadingTitle}>Анализируем резюме...</h2>
-        <Loader />
-        <p className={styles.loadingText}>Это может занять несколько секунд</p>
+        <div className={styles.loadingContent}>
+          <p className={styles.loadingKicker}>ResumeIQ</p>
+          <h2 className={styles.loadingTitle}>Анализируем резюме...</h2>
+          <p className={styles.loadingSubtitle}>{loadingMessage}</p>
+          <Loader />
+          <p className={styles.loadingHint}>Обычно это занимает 5–10 секунд</p>
+        </div>
       </div>
     );
   }
 
   if (errorState) {
-    return <h2>Ошибка: {errorState}</h2>;
+    return <h2 className={styles.centerMessage}>Ошибка: {errorState}</h2>;
   }
 
   return (
-    <>
-      <h1>Результаты анализа</h1>
+    <div className={styles.page}>
+      <h1 className={styles.pageTitle}>Результаты анализа</h1>
 
       <div className={styles.options_div}>
         {OPTIONS.map((option) => (
@@ -105,7 +138,23 @@ function ResultsPage() {
           <ReactMarkdown>{renderResponse()}</ReactMarkdown>
         </div>
       </div>
-    </>
+
+      {generatedLetter ? (
+        <section className={styles.letterCard}>
+          <div className={styles.letterHeader}>
+            <div>
+              <p className={styles.letterKicker}>Сопроводительное письмо</p>
+              <h2>Готовый вариант для отклика</h2>
+            </div>
+            <p className={styles.letterMeta}>Сгенерировано для текущего анализа</p>
+          </div>
+
+          <div className={styles.letterBody}>
+            <ReactMarkdown>{generatedLetter}</ReactMarkdown>
+          </div>
+        </section>
+      ) : null}
+    </div>
   );
 }
 

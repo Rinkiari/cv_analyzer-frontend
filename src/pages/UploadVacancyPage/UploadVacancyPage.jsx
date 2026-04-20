@@ -33,7 +33,7 @@ const UploadVacancyPage = () => {
 
       console.log('analysisId:', result);
 
-      navigate('/resultspage');
+      navigate('/generateletter');
     } catch (e) {
       console.error(e);
       alert('Ошибка анализа');

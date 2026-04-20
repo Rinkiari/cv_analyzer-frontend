@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { Button } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectAuth } from '../../redux/slices/authSlice';
+import { clearGeneratedLetter } from '../../redux/slices/resumeSlice';
 import accountpic from '../../assets/portrait2.png';
 
 const Header = () => {
@@ -11,6 +12,10 @@ const Header = () => {
   const auth = useSelector(selectAuth);
 
   const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('analysis_generated_letter');
+    }
+    dispatch(clearGeneratedLetter());
     dispatch(logout());
     navigate('/', { replace: true });
   };

@@ -1,7 +1,8 @@
 import { useEffect, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
+import ReactMarkdown from 'react-markdown';
 import styles from './MyProfilePage.module.scss';
 import { fetchAnalysesHistory, selectProfile } from '../../redux/slices/profileSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
@@ -16,10 +17,24 @@ function getStoredAccessToken() {
   return localStorage.getItem('auth_accessToken');
 }
 
-function formatValue(value) {
+function formatText(value) {
   if (value === null || value === undefined || value === '') return 'Нет данных';
+  if (Array.isArray(value)) return value.join(', ');
   if (typeof value === 'object') return JSON.stringify(value, null, 2);
-  return String(value).replace(/\n/g, '\n');
+  return String(value);
+}
+
+function formatDate(value) {
+  if (!value) return 'Без даты';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function getStatusMessage(error) {
@@ -29,6 +44,14 @@ function getStatusMessage(error) {
   if (error.status === 500) return 'Ошибка сервера. Попробуйте позже.';
   return error.message || 'Не удалось загрузить историю анализов.';
 }
+
+const ANALYSIS_FIELDS = [
+  ['structure', 'Структура и корректность'],
+  ['technologies', 'Технологии'],
+  ['relevance', 'Релевантность'],
+  ['another', 'Прочие рекомендации'],
+  ['vacancyComparison', 'Сравнение с вакансией'],
+];
 
 export default function MyProfilePage() {
   const dispatch = useDispatch();
@@ -56,7 +79,9 @@ export default function MyProfilePage() {
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Личный кабинет</p>
           <h1>История анализов</h1>
-          <p className={styles.subtitle}>Здесь собраны все проверки резюме и их рекомендации.</p>
+          <p className={styles.subtitle}>
+            Здесь собраны все проверки резюме и сопроводительные письма.
+          </p>
         </div>
 
         <div className={styles.profileCard}>
@@ -77,13 +102,13 @@ export default function MyProfilePage() {
               </Button>
             ) : (
               <Button
-                asChild
+                onClick={() => navigate('/login')}
                 height="44px"
                 borderRadius="14px"
                 bg="#000"
                 color="#FBC02D"
                 _hover={{ bg: '#161616' }}>
-                <Link to="/login">Войти</Link>
+                Войти
               </Button>
             )}
           </div>
@@ -124,34 +149,45 @@ export default function MyProfilePage() {
           </div>
         ) : (
           <div className={styles.analysesGrid}>
-            {profile.analyses.map((analysis, index) => {
-              const entries = Object.entries(analysis || {});
+            {profile.analyses.map((item, index) => {
+              const analysis = item?.analysis || {};
+              const letter = item?.letter || null;
+
+              console.log('letter: ', letter);
+
               return (
-                <article
-                  key={analysis?.id || analysis?.analysisId || index}
-                  className={styles.analysisCard}>
+                <article key={analysis?.id || index} className={styles.analysisCard}>
                   <div className={styles.analysisHeader}>
                     <div>
                       <p className={styles.analysisIndex}>Анализ #{index + 1}</p>
-                      <h3>
-                        {analysis?.title ||
-                          analysis?.name ||
-                          analysis?.cvName ||
-                          'Результат анализа'}
-                      </h3>
+                      <h3>Результат анализа</h3>
                     </div>
-                    <p className={styles.analysisMeta}>
-                      {analysis?.createdAt || analysis?.date || analysis?.timestamp || 'Без даты'}
-                    </p>
+                    <p className={styles.analysisMeta}>{formatDate(analysis?.createdAt)}</p>
                   </div>
 
                   <div className={styles.sections}>
-                    {entries.map(([key, value]) => (
-                      <div key={key} className={styles.section}>
-                        <h4>{key}</h4>
-                        <pre>{formatValue(value)}</pre>
+                    <section className={styles.section}>
+                      <h4>Параметры анализа</h4>
+                      <div className={styles.analysisList}>
+                        {ANALYSIS_FIELDS.map(([field, label]) => (
+                          <div key={field} className={styles.analysisRow}>
+                            <p className={styles.rowLabel}>{label}</p>
+                            <pre className={styles.rowValue}>{formatText(analysis?.[field])}</pre>
+                          </div>
+                        ))}
                       </div>
-                    ))}
+                    </section>
+
+                    <section className={`${styles.section} ${styles.letterSection}`}>
+                      <h4>Сопроводительное письмо</h4>
+                      {letter?.text ? (
+                        <pre className={styles.letterText}>
+                          <ReactMarkdown>{letter.text}</ReactMarkdown>
+                        </pre>
+                      ) : (
+                        <p className={styles.emptyLetter}>Письмо не сгенерировано.</p>
+                      )}
+                    </section>
                   </div>
                 </article>
               );
