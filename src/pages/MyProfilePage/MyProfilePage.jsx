@@ -1,6 +1,7 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { API_URL } from '../../config/api';
 import { Button, Spinner } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import styles from './MyProfilePage.module.scss';
@@ -66,6 +67,41 @@ export default function MyProfilePage() {
   const isLoggedIn = Boolean((auth?.accessToken || storedAccessToken) && userId);
   const userLabel = useMemo(() => userId || 'Гость', [userId]);
 
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    const fetchNameInfo = async () => {
+      try {
+        const res = await fetch(`${API_URL}/users?userId=${userId}`, {
+          headers: {
+            Authorization: `Bearer ${getStoredAccessToken()}`,
+          },
+        });
+
+        if (res.status === 200) {
+          const data = await res.json();
+          setName(data);
+          return;
+        }
+        if (res.status === 401) {
+          return;
+        }
+
+        if (res.status === 404) {
+          return;
+        }
+
+        if (res.status === 500) {
+          return;
+        }
+      } catch (e) {
+        console.log('e:', e);
+      }
+    };
+
+    fetchNameInfo();
+  }, []);
+
   useEffect(() => {
     if (!isLoggedIn) return;
     dispatch(fetchAnalysesHistory());
@@ -87,7 +123,8 @@ export default function MyProfilePage() {
         <div className={styles.profileCard}>
           <div>
             <p className={styles.cardLabel}>Пользователь</p>
-            <h2>{userLabel}</h2>
+            <h2 className={styles.h2_name}>{name.firstName}</h2>
+            <h3>ID: {userLabel}</h3>
           </div>
           <div className={styles.cardActions}>
             {isLoggedIn ? (
