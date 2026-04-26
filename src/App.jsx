@@ -9,8 +9,11 @@ import ResultsPage from './pages/ResultsPage/ResultsPage';
 import MyProfilePage from './pages/MyProfilePage/MyProfilePage';
 import AuthPage from './pages/AuthPage/AuthPage';
 import Header from './components/Header';
+import { useTokenRefresh } from './hooks/Usetokenrefresh';
 
 function App() {
+  useTokenRefresh();
+
   return (
     <div className="global_container">
       <Header />
