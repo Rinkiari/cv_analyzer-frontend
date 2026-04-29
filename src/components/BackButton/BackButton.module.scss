@@ -1,0 +1,21 @@
+.back_btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.5);
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}

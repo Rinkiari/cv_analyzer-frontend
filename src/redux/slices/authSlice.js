@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { API_URL } from '../../config/api';
+import { clearResumeState } from './resumeSlice';
 
 const STORAGE_KEYS = {
   userId: 'auth_userId',
@@ -36,13 +37,8 @@ function readStoredAuth() {
 function persistAuth(payload) {
   if (!canUseStorage()) return;
 
-  const {
-    userId,
-    accessToken,
-    refreshToken,
-    accessTokenExpiresAt,
-    refreshTokenExpiresAt,
-  } = payload;
+  const { userId, accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt } =
+    payload;
 
   if (userId) localStorage.setItem(STORAGE_KEYS.userId, userId);
   if (accessToken) localStorage.setItem(STORAGE_KEYS.accessToken, accessToken);
@@ -111,11 +107,12 @@ async function authRequest(path, body) {
 
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
-  async ({ login, password }, { rejectWithValue }) => {
+  async ({ login, password }, { dispatch, rejectWithValue }) => {
     try {
       const data = await authRequest('/auth/login', { login, password });
       const auth = normalizeAuthPayload(data);
       persistAuth(auth);
+      dispatch(clearResumeState());
       return auth;
     } catch (error) {
       return rejectWithValue(error.message || 'Не удалось войти');
@@ -125,11 +122,12 @@ export const loginUser = createAsyncThunk(
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
-  async ({ name, login, password }, { rejectWithValue }) => {
+  async ({ name, login, password }, { dispatch, rejectWithValue }) => {
     try {
       const data = await authRequest('/auth/register', { name, login, password });
       const auth = normalizeAuthPayload(data);
       persistAuth(auth);
+      dispatch(clearResumeState());
       return auth;
     } catch (error) {
       return rejectWithValue(error.message || 'Не удалось зарегистрироваться');

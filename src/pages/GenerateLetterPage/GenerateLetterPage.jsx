@@ -6,6 +6,7 @@ import styles from './GenerateLetterPage.module.scss';
 import letterIcon from '../../assets/letter.png';
 import { generateLetter } from '../../redux/slices/resumeSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
+import BackButton from '../../components/BackButton/BackButton';
 
 const GenerateLetterPage = () => {
   const navigate = useNavigate();
@@ -21,19 +22,15 @@ const GenerateLetterPage = () => {
 
   const handleGenerate = async () => {
     setLocalError('');
-
     if (!analysisId) {
       setLocalError('Не найден analysisId. Сначала запустите анализ заново.');
       return;
     }
-
     if (!isLoggedIn) {
       navigate('/login');
       return;
     }
-
     setIsLoading(true);
-
     try {
       await dispatch(generateLetter()).unwrap();
       navigate('/resultspage', { replace: true });
@@ -52,6 +49,7 @@ const GenerateLetterPage = () => {
 
   return (
     <main className={styles.page}>
+      <BackButton to="/uploadvacancy" />
       <section className={styles.hero}>
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Бонус для зарегистрированных</p>
@@ -59,7 +57,6 @@ const GenerateLetterPage = () => {
           <p className={styles.subtitle}>
             Нажмите на кнопку правее, и мы подготовим письмо для отклика на основе текущего анализа.
           </p>
-
           <div className={styles.infoCard}>
             <img src={letterIcon} alt="letter icon" />
             <div>
@@ -82,7 +79,6 @@ const GenerateLetterPage = () => {
                 Генерация доступна только зарегистрированным пользователям
               </p>
             )}
-
             {analysisId ? (
               <p className={styles.analysisHint}>
                 Анализ: <span>{String(analysisId).slice(0, 8)}...</span>
@@ -114,7 +110,6 @@ const GenerateLetterPage = () => {
                 'Сгенерировать'
               )}
             </Button>
-
             <Button
               onClick={handleSkip}
               height="50px"

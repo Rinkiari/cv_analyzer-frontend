@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
 import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
+import BackButton from '../../components/BackButton/BackButton';
 import { API_URL } from '../../config/api';
 
 const OPTIONS = [
@@ -120,6 +121,7 @@ function ResultsPage() {
 
   return (
     <div className={styles.page}>
+      <BackButton to="/generateletter" />
       <h1 className={styles.pageTitle}>Результаты анализа</h1>
 
       <div className={styles.options_div}>

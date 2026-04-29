@@ -3,31 +3,36 @@ import { API_URL } from '../../config/api';
 import { logout } from './authSlice';
 
 const GENERATED_LETTER_KEY = 'analysis_generated_letter';
+const CV_ID_KEY = 'cvId';
 
 function canUseStorage() {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 }
 
+function readStoredCvId() {
+  if (!canUseStorage()) return null;
+  return localStorage.getItem(CV_ID_KEY) || null;
+}
+function persistCvId(cvId) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(CV_ID_KEY, String(cvId));
+}
+function clearStoredCvId() {
+  if (!canUseStorage()) return;
+  localStorage.removeItem(CV_ID_KEY);
+}
+
 const getAccessToken = (getState) => {
   const tokenFromRedux = getState()?.auth?.accessToken;
   if (tokenFromRedux) return tokenFromRedux;
-
-  if (canUseStorage()) {
-    const tokenFromStorage = localStorage.getItem('auth_accessToken');
-    return tokenFromStorage || null;
-  }
-
+  if (canUseStorage()) return localStorage.getItem('auth_accessToken') || null;
   return null;
 };
 
 const getCurrentAnalysisId = (getState) => {
   const analysisIdFromRedux = getState()?.resume?.analysisId;
   if (analysisIdFromRedux) return analysisIdFromRedux;
-
-  if (canUseStorage()) {
-    return localStorage.getItem('analysisId') || null;
-  }
-
+  if (canUseStorage()) return localStorage.getItem('analysisId') || null;
   return null;
 };
 
@@ -39,27 +44,20 @@ const buildHeaders = (token, extraHeaders = {}) => {
 
 function readStoredGeneratedLetter() {
   if (!canUseStorage()) return null;
-
   const raw = localStorage.getItem(GENERATED_LETTER_KEY);
   if (!raw) return null;
-
   try {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed.text !== 'string') return null;
-    return {
-      analysisId: parsed.analysisId || null,
-      text: parsed.text,
-    };
+    return { analysisId: parsed.analysisId || null, text: parsed.text };
   } catch {
     return null;
   }
 }
-
 function persistGeneratedLetter(payload) {
   if (!canUseStorage()) return;
   localStorage.setItem(GENERATED_LETTER_KEY, JSON.stringify(payload));
 }
-
 function clearStoredGeneratedLetter() {
   if (!canUseStorage()) return;
   localStorage.removeItem(GENERATED_LETTER_KEY);
@@ -67,16 +65,13 @@ function clearStoredGeneratedLetter() {
 
 async function parseErrorMessage(response, fallbackPrefix = 'Ошибка') {
   const fallback = `${fallbackPrefix} (${response.status})`;
-
   try {
     const contentType = response.headers.get('content-type') || '';
-
     if (contentType.includes('application/json')) {
       const data = await response.json();
       if (typeof data === 'string') return data;
       return data?.message || data?.error || data?.detail || JSON.stringify(data) || fallback;
     }
-
     const text = await response.text();
     return text || fallback;
   } catch {
@@ -86,18 +81,14 @@ async function parseErrorMessage(response, fallbackPrefix = 'Ошибка') {
 
 async function parseLetterResponse(response) {
   const contentType = response.headers.get('content-type') || '';
-
   if (contentType.includes('application/json')) {
     const data = await response.json();
-
     if (typeof data === 'string') return data;
     if (data?.text) return String(data.text);
     if (data?.letter?.text) return String(data.letter.text);
     if (data?.content) return String(data.content);
-
     return JSON.stringify(data, null, 2);
   }
-
   return response.text();
 }
 
@@ -109,17 +100,14 @@ export const uploadResume = createAsyncThunk(
       formData.append('uploadedFile', file);
 
       let url = `${API_URL}/cv/pdf`;
-
-      if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-        url = `${API_URL}/cv/docx`;
-      }
-
-      if (file.name.toLowerCase().endsWith('.docx')) {
+      if (
+        file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+        file.name.toLowerCase().endsWith('.docx')
+      ) {
         url = `${API_URL}/cv/docx`;
       }
 
       const token = getAccessToken(getState);
-
       const response = await fetch(url, {
         method: 'POST',
         headers: buildHeaders(token),
@@ -131,7 +119,9 @@ export const uploadResume = createAsyncThunk(
         return rejectWithValue(text || 'Ошибка загрузки');
       }
 
-      return await response.json();
+      const result = await response.json();
+      persistCvId(result);
+      return result;
     } catch (err) {
       return rejectWithValue(err.message || 'Network error');
     }
@@ -147,9 +137,7 @@ export const uploadManualResume = createAsyncThunk(
 
       const response = await fetch(`${API_URL}/cv/manual`, {
         method: 'POST',
-        headers: buildHeaders(token, {
-          'Content-Type': 'application/json',
-        }),
+        headers: buildHeaders(token, { 'Content-Type': 'application/json' }),
         body: JSON.stringify(manualForm),
       });
 
@@ -158,7 +146,9 @@ export const uploadManualResume = createAsyncThunk(
         return rejectWithValue(text || 'Ошибка загрузки');
       }
 
-      return await response.json();
+      const result = await response.json();
+      persistCvId(result);
+      return result;
     } catch (err) {
       return rejectWithValue(err.message || 'Network error');
     }
@@ -174,9 +164,7 @@ export const startAnalysis = createAsyncThunk(
 
       const response = await fetch(`${API_URL}/analysis`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
 
@@ -188,7 +176,7 @@ export const startAnalysis = createAsyncThunk(
       clearStoredGeneratedLetter();
       dispatch(clearGeneratedLetter());
 
-      return await response.json(); // analysisId
+      return await response.json();
     } catch (e) {
       return rejectWithValue(e.message);
     }
@@ -200,19 +188,16 @@ export const generateLetter = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const analysisId = getCurrentAnalysisId(getState);
-      if (!analysisId) {
-        return rejectWithValue('Отсутствует analysisId');
-      }
+      if (!analysisId) return rejectWithValue('Отсутствует analysisId');
 
       const token = getAccessToken(getState);
-      if (!token) {
+      if (!token)
         return rejectWithValue('Для генерации сопроводительного письма нужно войти в аккаунт');
-      }
 
-      const response = await fetch(`${API_URL}/letters?analysisId=${encodeURIComponent(analysisId)}`, {
-        method: 'POST',
-        headers: buildHeaders(token),
-      });
+      const response = await fetch(
+        `${API_URL}/letters?analysisId=${encodeURIComponent(analysisId)}`,
+        { method: 'POST', headers: buildHeaders(token) },
+      );
 
       if (!response.ok) {
         return rejectWithValue(await parseErrorMessage(response, 'Ошибка генерации письма'));
@@ -222,10 +207,7 @@ export const generateLetter = createAsyncThunk(
       const letterText = String(letterRaw || '').trim() || 'Сопроводительное письмо не получено';
       persistGeneratedLetter({ analysisId, text: letterText });
 
-      return {
-        analysisId,
-        text: letterText,
-      };
+      return { analysisId, text: letterText };
     } catch (err) {
       return rejectWithValue(err.message || 'Network error');
     }
@@ -237,13 +219,18 @@ const storedGeneratedLetter = readStoredGeneratedLetter();
 const resumeSlice = createSlice({
   name: 'resume',
   initialState: {
-    cvId: null,
+    cvId: readStoredCvId(),
     analysisId: null,
     analysisResult: null,
     responseText: null,
     generatedLetter: storedGeneratedLetter,
     status: 'idle',
     error: null,
+    vacancyInput: {
+      mode: 'link',
+      link: '',
+      text: '',
+    },
     manualForm: {
       fullName: '',
       position: '',
@@ -256,6 +243,9 @@ const resumeSlice = createSlice({
 
   reducers: {
     clearResumeState(state) {
+      clearStoredCvId();
+      clearStoredGeneratedLetter();
+      if (canUseStorage()) localStorage.removeItem('analysisId');
       state.cvId = null;
       state.analysisId = null;
       state.analysisResult = null;
@@ -263,6 +253,7 @@ const resumeSlice = createSlice({
       state.generatedLetter = null;
       state.status = 'idle';
       state.error = null;
+      state.vacancyInput = { mode: 'link', link: '', text: '' };
       state.manualForm = {
         fullName: '',
         position: '',
@@ -276,10 +267,15 @@ const resumeSlice = createSlice({
       const { field, value } = action.payload;
       state.manualForm[field] = value;
     },
+    updateVacancyInput(state, action) {
+      const { field, value } = action.payload;
+      state.vacancyInput[field] = value;
+    },
     clearGeneratedLetter(state) {
       state.generatedLetter = null;
     },
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(uploadResume.pending, (state) => {
@@ -315,6 +311,9 @@ const resumeSlice = createSlice({
         state.generatedLetter = action.payload;
       })
       .addCase(logout, (state) => {
+        clearStoredCvId();
+        clearStoredGeneratedLetter();
+        if (canUseStorage()) localStorage.removeItem('analysisId');
         state.cvId = null;
         state.analysisId = null;
         state.analysisResult = null;
@@ -322,6 +321,7 @@ const resumeSlice = createSlice({
         state.generatedLetter = null;
         state.status = 'idle';
         state.error = null;
+        state.vacancyInput = { mode: 'link', link: '', text: '' };
         state.manualForm = {
           fullName: '',
           position: '',
@@ -334,6 +334,7 @@ const resumeSlice = createSlice({
   },
 });
 
-export const { clearResumeState, updateManualField, clearGeneratedLetter } = resumeSlice.actions;
+export const { clearResumeState, updateManualField, updateVacancyInput, clearGeneratedLetter } =
+  resumeSlice.actions;
 
 export default resumeSlice.reducer;

@@ -99,6 +99,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 20px;
 
   .upload_button {
     width: 217px;
@@ -118,4 +119,47 @@
 
 .active {
   border: 3px solid #000 !important;
+}
+
+// --- уже загружено ---
+.already_card {
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 28px;
+  border-radius: 20px;
+  background: #f6fef9;
+  border: 1.5px solid #8fddc1;
+  max-width: 600px;
+}
+
+.already_icon {
+  font-size: 32px;
+  color: #2eac78;
+  flex-shrink: 0;
+}
+
+.already_title {
+  font-size: 22px;
+  font-weight: 600;
+  color: black;
+  margin: 0 0 4px;
+}
+
+.already_sub {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.55);
+  margin: 0;
+}
+
+.upload_button_ghost {
+  background-color: transparent !important;
+  border: 2px solid rgba(0, 0, 0, 0.18) !important;
+  color: rgba(0, 0, 0, 0.65) !important;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.4) !important;
+    color: black !important;
+  }
 }
