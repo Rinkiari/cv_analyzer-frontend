@@ -24,7 +24,6 @@ const UploadResumePage = () => {
     }
   };
 
-  // eslint-disable-next-line no-unused-vars
   const handleUploadAndNext = async () => {
     if (!file) {
       alert('Выберите файл перед загрузкой!');

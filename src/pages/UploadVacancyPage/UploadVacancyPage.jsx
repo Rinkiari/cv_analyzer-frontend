@@ -12,10 +12,6 @@ const UploadVacancyPage = () => {
 
   const [link, setLink] = useState('');
 
-  // const handleClick = () => {
-  //   navigate('/uploadletter');
-  // };
-
   const handleSubmit = async () => {
     try {
       if (!cvId) {
