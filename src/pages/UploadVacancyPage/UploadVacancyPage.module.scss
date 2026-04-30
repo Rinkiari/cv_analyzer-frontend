@@ -1,111 +1,123 @@
+.page {
+  padding-top: 38px;
+  padding-bottom: 48px;
+}
+
 .h1_text {
-  max-width: 502px;
+  max-width: 600px;
   margin-top: 8px;
-  margin-bottom: 40px;
+  margin-bottom: 28px;
   color: black !important;
 }
 
-.buttons_wrapper {
-  position: relative;
-  max-width: 488px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+// двухколоночная сетка
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: stretch;
+}
+
+// общие стили карточек
+.titleBlock,
+.actionCard {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+.titleBlock {
+  padding: 28px;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  margin-bottom: 10px;
+}
+
+.cardTitle {
+  font-size: 34px;
+  line-height: 1.1;
+  margin-bottom: 12px;
   color: black !important;
+}
 
-  &::before {
-    content: '';
-    position: absolute;
+.subtitle {
+  font-size: 17px;
+  color: rgba(0, 0, 0, 0.68);
+  line-height: 1.55;
+}
 
-    width: 122px;
-    height: 122px;
+// карточка с лампочкой — копирует стиль infoCard с GenerateLetterPage
+.infoCard {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: 20px;
+  background: #fffaf4;
+  border: 1px solid rgba(251, 192, 45, 0.18);
+  display: flex;
+  gap: 18px;
+  align-items: center;
 
-    top: -70px;
-    left: 930px;
-
-    background-image: url('../../assets/vacancy.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    flex-shrink: 0;
   }
 
+  h3 {
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: black !important;
+  }
+
+  p {
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.68);
+    line-height: 1.5;
+  }
+}
+
+// правая карточка
+.actionCard {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.buttons_wrapper {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  margin-top: 12px;
+
   .btn {
-    width: 217px;
-    height: 50px;
+    width: 110px;
+    height: 44px;
     background-color: #fbc02d;
     border: none;
-    border-radius: 16px;
+    border-radius: 14px;
     cursor: pointer;
-    font-size: 24px;
-
+    font-size: 18px;
     display: flex;
     align-items: center;
     justify-content: center;
-
     transition: border 0.09s ease-in-out;
 
     &:focus {
       outline: none;
     }
-  }
-}
 
-.upload_wrapper {
-  margin-top: 60px;
-  cursor: pointer;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
-  height: 111px;
-  border-radius: 23px;
-
-  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
-      2px repeat-x,
-    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
-      repeat-x,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
-      repeat-y,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
-      repeat-y;
-
-  background-repeat: no-repeat;
-
-  h3 {
-    font-size: 30px;
-    font-family: 'SF-Pro-Display-Medium', sans-serif !important;
-    font-weight: 500;
-  }
-
-  p {
-    font-size: 26px;
-    padding-top: 12px;
-  }
-}
-
-.uploadButton_div {
-  width: 100%;
-  margin-top: 28px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-
-  .upload_button {
-    width: 217px;
-    height: 50px;
-    background-color: #8fddc1;
-    color: black !important;
-    border-radius: 16px;
-    font-size: 24px;
-    cursor: pointer;
-    transition: 0.25 ease;
-
-    &:hover {
-      opacity: 0.9;
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
   }
 }
@@ -114,83 +126,91 @@
   border: 3px solid #000 !important;
 }
 
-.manual_wrapper {
-  margin-top: 60px;
-  cursor: pointer;
+.inputWrapper {
+  width: 100%;
+}
 
+.fio_field {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background-color: #ffde8a48;
+  border-radius: 12px;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   gap: 10px;
 
-  width: 100%;
-  height: 111px;
-  border-radius: 23px;
+  p {
+    width: 90px;
+    font-size: 20px;
+    flex-shrink: 0;
+    margin-left: 14px;
+    color: black !important;
+  }
 
-  background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
-      2px repeat-x,
-    repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) bottom / 100% 2px
-      repeat-x,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) left / 2px 100%
-      repeat-y,
-    repeating-linear-gradient(to bottom, #fbc02d 0 30px, transparent 31px 62px) right / 2px 100%
-      repeat-y;
+  &::after {
+    content: '';
+    position: absolute;
+    left: 106px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 2px;
+  }
 
-  background-repeat: no-repeat;
+  .editable {
+    flex: 1;
+    height: 32px;
+    font-size: 18px !important;
+    outline: none;
+    color: black !important;
+    background-color: transparent;
+    border: none;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 14px;
 
-  .fio_field {
-    position: relative;
-    width: 1244px;
-    height: 46px;
-    background-color: #ffde8a48;
-    border-radius: 10px;
-
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    p {
-      width: 120px;
-      font-size: 24px;
-      flex-shrink: 0;
-      margin-left: 12px;
-      color: black !important;
-    }
-
-    &::after {
-      content: '';
-      position: absolute;
-      left: 128px;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: #000;
-    }
-
-    .editable {
-      display: block;
-
-      white-space: nowrap;
-      overflow-x: auto;
-      overflow-y: hidden;
-
-      height: 29.9px;
-      width: 1020px;
-      font-size: 22px !important;
-      outline: none;
-
-      color: black !important;
-      background-color: transparent;
-    }
-
-    .editable::-webkit-scrollbar {
+    &::-webkit-scrollbar {
       height: 2px;
     }
 
-    .editable::-webkit-scrollbar-thumb {
+    &::-webkit-scrollbar-thumb {
       background: #ccc;
       border-radius: 4px;
     }
+  }
+}
+
+.buttonsRow {
+  display: grid;
+  gap: 12px;
+}
+
+.upload_button {
+  width: 100%;
+  height: 50px;
+  background-color: #000;
+  color: #fbc02d !important;
+  border: none;
+  border-radius: 16px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.upload_button_skip {
+  background-color: #8fddc1;
+  color: #000 !important;
+}
+
+@media (max-width: 980px) {
+  .hero {
+    grid-template-columns: 1fr;
   }
 }

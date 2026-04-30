@@ -22,7 +22,7 @@ const UploadVacancyPage = () => {
     if (!HH_VACANCY_REGEX.test(link.trim())) {
       return 'Ссылка должна быть с hh.ru или hh.kz и вести на вакансию (например: https://hh.ru/vacancy/123456)';
     }
-    return null; // всё ок
+    return null;
   }
 
   const handleSubmit = async () => {
@@ -38,10 +38,9 @@ const UploadVacancyPage = () => {
         const linkError = validateHhLink(link);
         if (linkError) {
           if (!link || !link.trim()) {
-            toast.warn(linkError); // стандартный
+            toast.warn(linkError);
           } else {
             toast.warn(linkError, {
-              // кастомный — только для неверного формата
               autoClose: 8000,
               closeButton: true,
               hideProgressBar: false,
@@ -52,10 +51,7 @@ const UploadVacancyPage = () => {
       }
 
       const result = await dispatch(startAnalysis({ cvId, link: link || undefined })).unwrap();
-
       localStorage.setItem('analysisId', result);
-      console.log('analysisId:', result);
-
       navigate('/generateletter');
     } catch (e) {
       console.error(e);
@@ -79,58 +75,81 @@ const UploadVacancyPage = () => {
   };
 
   return (
-    <>
+    <main className={styles.page}>
       <BackButton to="/uploadresume" />
-      <h1 className={styles.h1_text}>Вставьте ссылку на вакансию или добавьте текст</h1>
-      <div className={styles.buttons_wrapper}>
-        <button
-          className={`${styles.btn} ${vacancyInput.mode === 'link' ? styles.active : ''}`}
-          onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'link' }))}>
-          Вставить ссылку
-        </button>
-        <button
-          disabled
-          className={`${styles.btn} ${vacancyInput.mode === 'text' ? styles.active : ''}`}
-          onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
-          Добавить текст
-        </button>
-      </div>
+      <h1 className={styles.h1_text}>Вставьте ссылку на вакансию</h1>
 
-      {vacancyInput.mode === 'link' ? (
-        <div className={styles.manual_wrapper}>
-          <div className={styles.fio_field}>
-            <p>Ссылка</p>
-            <input
-              className={styles.editable}
-              value={vacancyInput.link}
-              onChange={(e) =>
-                dispatch(updateVacancyInput({ field: 'link', value: e.target.value }))
-              }
-              placeholder="Введите ссылку с HeadHunter"
-            />
+      <section className={styles.hero}>
+        {/* левая карточка — подсказка */}
+        <div className={styles.titleBlock}>
+          <p className={styles.kicker}>Необязательно, но полезно</p>
+          <h2 className={styles.cardTitle}>Укажите вакансию — получите больше</h2>
+          <p className={styles.subtitle}>
+            Анализ резюме без вакансии — это общие рекомендации. С вакансией — точное сравнение
+            навыков и требований.
+          </p>
+          <div className={styles.infoCard}>
+            <img src={bulbpng} alt="bulb icon" />
+            <div>
+              <h3>Бонус для зарегистрированных</h3>
+              <p>
+                Укажите ссылку — и на следующем шаге вы сможете сгенерировать сопроводительное
+                письмо под эту вакансию.
+              </p>
+            </div>
           </div>
         </div>
-      ) : (
-        <TextArea />
-      )}
 
-      <div>
-        <img src={bulbpng} alt="bulb" />
-        <p>
-          Укажите ссылку на вакансию — и на следующем шаге вы сможете сгенерировать сопроводительное
-          письмо. Доступно зарегистрированным пользователям.
-        </p>
-      </div>
+        {/* правая карточка — инпут и кнопки */}
+        <div className={styles.actionCard}>
+          <div>
+            <p className={styles.kicker}>Источник вакансии</p>
+            <div className={styles.buttons_wrapper}>
+              <button
+                className={`${styles.btn} ${vacancyInput.mode === 'link' ? styles.active : ''}`}
+                onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'link' }))}>
+                Ссылка
+              </button>
+              <button
+                disabled
+                className={`${styles.btn} ${vacancyInput.mode === 'text' ? styles.active : ''}`}
+                onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
+                Текст
+              </button>
+            </div>
 
-      <div className={styles.uploadButton_div}>
-        <button className={styles.upload_button} onClick={handleSubmit}>
-          Загрузить
-        </button>
-        <button className={styles.upload_button} onClick={handleSkip}>
-          Пропустить
-        </button>
-      </div>
-    </>
+            <div className={styles.inputWrapper}>
+              {vacancyInput.mode === 'link' ? (
+                <div className={styles.fio_field}>
+                  <p>Ссылка</p>
+                  <input
+                    className={styles.editable}
+                    value={vacancyInput.link}
+                    onChange={(e) =>
+                      dispatch(updateVacancyInput({ field: 'link', value: e.target.value }))
+                    }
+                    placeholder="https://hh.ru/vacancy/..."
+                  />
+                </div>
+              ) : (
+                <TextArea />
+              )}
+            </div>
+          </div>
+
+          <div className={styles.buttonsRow}>
+            <button className={styles.upload_button} onClick={handleSubmit}>
+              Загрузить
+            </button>
+            <button
+              className={`${styles.upload_button} ${styles.upload_button_skip}`}
+              onClick={handleSkip}>
+              Пропустить
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
 
