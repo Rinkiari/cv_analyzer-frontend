@@ -1,6 +1,8 @@
+import 'react-toastify/dist/ReactToastify.css';
 import './styles/fonts.scss';
 import 'normalize.css';
 import './styles/global.scss';
+import { Slide, ToastContainer } from 'react-toastify';
 
 import { Provider } from './components/ui/provider.jsx';
 import { Provider as ReduxProvider } from 'react-redux';
@@ -15,6 +17,15 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <Provider>
         <App />
+        <ToastContainer
+          position="top-center"
+          autoClose={3500}
+          toastClassName="custom-toast"
+          closeButton={false}
+          transition={Slide}
+          pauseOnHover={false}
+          hideProgressBar
+        />
       </Provider>
     </BrowserRouter>
   </ReduxProvider>,

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
 import styles from './GenerateLetterPage.module.scss';
+import { toast } from 'react-toastify';
 import letterIcon from '../../assets/letter.png';
 import { generateLetter } from '../../redux/slices/resumeSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
@@ -27,6 +28,7 @@ const GenerateLetterPage = () => {
       return;
     }
     if (!isLoggedIn) {
+      toast.warn('Сначала войдите в аккаунт');
       navigate('/login');
       return;
     }

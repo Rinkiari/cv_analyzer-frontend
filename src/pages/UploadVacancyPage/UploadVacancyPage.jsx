@@ -3,7 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { startAnalysis, updateVacancyInput } from '../../redux/slices/resumeSlice';
 import BackButton from '../../components/BackButton/BackButton';
 import styles from './UploadVacancyPage.module.scss';
+import { toast } from 'react-toastify';
 import TextArea from '../../components/TextArea/TextArea';
+import bulbpng from '../../assets/bulb.png';
 
 const UploadVacancyPage = () => {
   const navigate = useNavigate();
@@ -11,18 +13,45 @@ const UploadVacancyPage = () => {
   const cvId = useSelector((state) => state.resume.cvId);
   const vacancyInput = useSelector((state) => state.resume.vacancyInput);
 
+  const HH_VACANCY_REGEX = /^https?:\/\/([a-z]+\.)?hh\.(ru|kz)\/vacancy\/\d+/;
+
+  function validateHhLink(link) {
+    if (!link || !link.trim()) {
+      return 'Введите ссылку на вакансию';
+    }
+    if (!HH_VACANCY_REGEX.test(link.trim())) {
+      return 'Ссылка должна быть с hh.ru или hh.kz и вести на вакансию (например: https://hh.ru/vacancy/123456)';
+    }
+    return null; // всё ок
+  }
+
   const handleSubmit = async () => {
     try {
       if (!cvId) {
-        alert('Сначала загрузите резюме');
+        toast.warn('Сначала загрузите резюме');
         return;
       }
 
       const link = vacancyInput.mode === 'link' ? vacancyInput.link : vacancyInput.text;
 
-      const result = await dispatch(
-        startAnalysis({ cvId, link: link || undefined }),
-      ).unwrap();
+      if (vacancyInput.mode === 'link') {
+        const linkError = validateHhLink(link);
+        if (linkError) {
+          if (!link || !link.trim()) {
+            toast.warn(linkError); // стандартный
+          } else {
+            toast.warn(linkError, {
+              // кастомный — только для неверного формата
+              autoClose: 8000,
+              closeButton: true,
+              hideProgressBar: false,
+            });
+          }
+          return;
+        }
+      }
+
+      const result = await dispatch(startAnalysis({ cvId, link: link || undefined })).unwrap();
 
       localStorage.setItem('analysisId', result);
       console.log('analysisId:', result);
@@ -30,14 +59,14 @@ const UploadVacancyPage = () => {
       navigate('/generateletter');
     } catch (e) {
       console.error(e);
-      alert('Ошибка анализа');
+      toast.error('Ошибка загрузки: ' + (e || 'Неизвестная ошибка'));
     }
   };
 
   const handleSkip = async () => {
     try {
       if (!cvId) {
-        alert('Сначала загрузите резюме');
+        toast.warn('Сначала загрузите резюме');
         return;
       }
       const result = await dispatch(startAnalysis({ cvId })).unwrap();
@@ -45,7 +74,7 @@ const UploadVacancyPage = () => {
       navigate('/generateletter');
     } catch (e) {
       console.error(e);
-      alert('Ошибка анализа');
+      toast.error('Ошибка загрузки: ' + (e || 'Неизвестная ошибка'));
     }
   };
 
@@ -60,6 +89,7 @@ const UploadVacancyPage = () => {
           Вставить ссылку
         </button>
         <button
+          disabled
           className={`${styles.btn} ${vacancyInput.mode === 'text' ? styles.active : ''}`}
           onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
           Добавить текст
@@ -76,13 +106,21 @@ const UploadVacancyPage = () => {
               onChange={(e) =>
                 dispatch(updateVacancyInput({ field: 'link', value: e.target.value }))
               }
-              placeholder="Введите ссылку"
+              placeholder="Введите ссылку с HeadHunter"
             />
           </div>
         </div>
       ) : (
         <TextArea />
       )}
+
+      <div>
+        <img src={bulbpng} alt="bulb" />
+        <p>
+          Укажите ссылку на вакансию — и на следующем шаге вы сможете сгенерировать сопроводительное
+          письмо. Доступно зарегистрированным пользователям.
+        </p>
+      </div>
 
       <div className={styles.uploadButton_div}>
         <button className={styles.upload_button} onClick={handleSubmit}>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styles from './UploadResumePage.module.scss';
+import { toast } from 'react-toastify';
 import Dropzone from '../../components/Dropzone/Dropzone';
 import ManualFields from '../../components/ManualFields/ManualFields';
 import BackButton from '../../components/BackButton/BackButton';
@@ -12,6 +13,7 @@ const UploadResumePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const existingCvId = useSelector((state) => state.resume.cvId);
+  const manualForm = useSelector((state) => state.resume.manualForm);
 
   const [isLoading, setIsLoading] = useState(false);
   const [active, setActive] = useState('pdf_docx');
@@ -29,7 +31,7 @@ const UploadResumePage = () => {
 
   const handleUploadAndNext = async () => {
     if (!file) {
-      alert('Выберите файл перед загрузкой!');
+      toast.warn('Выберите файл перед загрузкой');
       return;
     }
     setIsLoading(true);
@@ -37,23 +39,29 @@ const UploadResumePage = () => {
       const result = await dispatch(uploadResume(file)).unwrap();
       console.log('Ответ сервера (сохранён в стор):', result);
       navigate('/uploadvacancy');
-      alert('Файл успешно загружен!');
+      toast.success('Файл успешно загружен!');
     } catch (err) {
       console.error('Ошибка при загрузке через thunk:', err);
-      alert('Не удалось загрузить файл: ' + (err || 'Unknown error'));
+      toast.error('Не удалось загрузить файл: ' + (err || 'Неизвестная ошибка'));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleManualUpload = async () => {
+    const isEmpty = Object.values(manualForm).some((v) => !v || !v.toString().trim());
+    if (isEmpty) {
+      toast.warn('Заполните все поля резюме');
+      return;
+    }
+
     setIsLoading(true);
     try {
       await dispatch(uploadManualResume()).unwrap();
       navigate('/uploadvacancy');
     } catch (e) {
       console.log(e);
-      alert('Ошибка отправки данных');
+      toast.error('Не удалось загрузить файл: ' + (e || 'Unknown error'));
     } finally {
       setIsLoading(false);
     }
