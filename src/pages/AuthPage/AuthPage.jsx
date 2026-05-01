@@ -3,20 +3,12 @@ import { Link, useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
 import styles from './AuthPage.module.scss';
+import { toast } from 'react-toastify';
 import { clearAuthError, loginUser, registerUser, selectAuth } from '../../redux/slices/authSlice';
 import cvIllustration from '../../assets/cv.png';
 
-const initialLoginForm = {
-  login: '',
-  password: '',
-};
-
-const initialRegisterForm = {
-  name: '',
-  login: '',
-  password: '',
-  confirmPassword: '',
-};
+const initialLoginForm = { login: '', password: '' };
+const initialRegisterForm = { name: '', login: '', password: '', confirmPassword: '' };
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -24,23 +16,17 @@ export default function AuthPage() {
   const auth = useSelector(selectAuth);
 
   const [isAnimating, setIsAnimating] = useState(false);
-
   const [mode, setMode] = useState('login');
   const [loginForm, setLoginForm] = useState(initialLoginForm);
   const [registerForm, setRegisterForm] = useState(initialRegisterForm);
-  const [localError, setLocalError] = useState('');
-  const errorMessage = localError || auth.error || '';
 
   const isLoading = auth.status === 'loading';
 
   const switchMode = (nextMode) => {
     if (nextMode === mode) return;
-
     setIsAnimating(true);
-
     setTimeout(() => {
       setMode(nextMode);
-      setLocalError('');
       dispatch(clearAuthError());
       setIsAnimating(false);
     }, 200);
@@ -53,7 +39,6 @@ export default function AuthPage() {
   }, [auth.isAuthenticated, auth.accessToken, navigate]);
 
   const title = useMemo(() => (mode === 'login' ? 'Вход в аккаунт' : 'Создание аккаунта'), [mode]);
-
   const subtitle = useMemo(
     () =>
       mode === 'login'
@@ -62,54 +47,41 @@ export default function AuthPage() {
     [mode],
   );
 
-  const handleLoginChange = (field) => (event) => {
-    setLoginForm((prev) => ({ ...prev, [field]: event.target.value }));
-  };
+  const handleLoginChange = (field) => (e) =>
+    setLoginForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleRegisterChange = (field) => (event) => {
-    setRegisterForm((prev) => ({ ...prev, [field]: event.target.value }));
-  };
+  const handleRegisterChange = (field) => (e) =>
+    setRegisterForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const getReadableAuthError = (error) => {
     if (!error) return 'Ошибка авторизации';
-
-    if (typeof error === 'string' && error.includes('Invalid login or password')) {
+    if (typeof error === 'string' && error.includes('Invalid login or password'))
       return 'Неверный логин или пароль';
-    }
-
     return error;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    setLocalError('');
     dispatch(clearAuthError());
 
     try {
       if (mode === 'login') {
         if (!loginForm.login.trim() || !loginForm.password.trim()) {
-          setLocalError('Заполните логин и пароль');
+          toast.warn('Заполните логин и пароль');
           return;
         }
-
         await dispatch(
-          loginUser({
-            login: loginForm.login.trim(),
-            password: loginForm.password,
-          }),
+          loginUser({ login: loginForm.login.trim(), password: loginForm.password }),
         ).unwrap();
       } else {
         if (!registerForm.name.trim() || !registerForm.login.trim() || !registerForm.password) {
-          setLocalError('Заполните имя, логин и пароль');
+          toast.warn('Заполните имя, логин и пароль');
           return;
         }
-
         if (registerForm.password !== registerForm.confirmPassword) {
-          setLocalError('Пароли не совпадают');
+          toast.warn('Пароли не совпадают');
           return;
         }
-
         await dispatch(
           registerUser({
             name: registerForm.name.trim(),
@@ -121,7 +93,7 @@ export default function AuthPage() {
 
       navigate('/', { replace: true });
     } catch (error) {
-      setLocalError(getReadableAuthError(error));
+      toast.error(getReadableAuthError(error));
     }
   };
 
@@ -132,7 +104,6 @@ export default function AuthPage() {
           <p className={styles.kicker}>ResumeIQ</p>
           <h1>{title}</h1>
           <p className={styles.subtitle}>{subtitle}</p>
-
           <div className={styles.heroCard}>
             <img src={cvIllustration} alt="resume illustration" />
             <div>
@@ -170,7 +141,6 @@ export default function AuthPage() {
                 />
               </label>
             )}
-
             <label className={styles.field}>
               <span>Логин</span>
               <input
@@ -182,7 +152,6 @@ export default function AuthPage() {
                 autoComplete="username"
               />
             </label>
-
             <label className={styles.field}>
               <span>Пароль</span>
               <input
@@ -197,7 +166,6 @@ export default function AuthPage() {
                 autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               />
             </label>
-
             {mode === 'register' && (
               <label className={styles.field}>
                 <span>Повторите пароль</span>
@@ -210,8 +178,6 @@ export default function AuthPage() {
                 />
               </label>
             )}
-
-            {errorMessage && <div className={styles.error}>{errorMessage}</div>}
 
             <Button
               type="submit"

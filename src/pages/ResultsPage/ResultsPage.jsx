@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import styles from './ResultsPage.module.scss';
+import attentionpng from '../../assets/attention.png';
 import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
 import BackButton from '../../components/BackButton/BackButton';
@@ -116,7 +117,18 @@ function ResultsPage() {
   }
 
   if (errorState) {
-    return <h2 className={styles.centerMessage}>Ошибка: {errorState}</h2>;
+    return (
+      <div className={styles.errorScreen}>
+        <div className={styles.errorContent}>
+          <img src={attentionpng} className={styles.errorIcon} alt="attention" />
+          <h2>Что-то пошло не так</h2>
+          <p>{errorState}</p>
+          <button className={styles.errorButton} onClick={() => window.location.reload()}>
+            Попробовать снова
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

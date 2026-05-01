@@ -17,14 +17,12 @@ const GenerateLetterPage = () => {
     useSelector((state) => state.resume.analysisId) || localStorage.getItem('analysisId');
 
   const [isLoading, setIsLoading] = useState(false);
-  const [localError, setLocalError] = useState('');
 
   const isLoggedIn = Boolean(auth?.isAuthenticated && auth?.accessToken);
 
   const handleGenerate = async () => {
-    setLocalError('');
     if (!analysisId) {
-      setLocalError('Не найден analysisId. Сначала запустите анализ заново.');
+      toast.error('Не найден analysisId. Сначала запустите анализ заново.');
       return;
     }
     if (!isLoggedIn) {
@@ -37,7 +35,7 @@ const GenerateLetterPage = () => {
       await dispatch(generateLetter()).unwrap();
       navigate('/resultspage', { replace: true });
     } catch (error) {
-      setLocalError(
+      toast.error(
         typeof error === 'string' ? error : error?.message || 'Не удалось сгенерировать письмо',
       );
     } finally {
@@ -89,8 +87,6 @@ const GenerateLetterPage = () => {
               <p className={styles.analysisHint}>AnalysisId не найден</p>
             )}
           </div>
-
-          {localError ? <div className={styles.errorBox}>{localError}</div> : null}
 
           <div className={styles.buttonsRow}>
             <Button
