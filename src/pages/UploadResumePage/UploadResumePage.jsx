@@ -8,6 +8,7 @@ import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadResume, uploadManualResume } from '../../redux/slices/resumeSlice';
+import cvpng from '../../assets/cv.png';
 
 const UploadResumePage = () => {
   const navigate = useNavigate();
@@ -67,70 +68,101 @@ const UploadResumePage = () => {
     }
   };
 
-  // баннер «резюме уже загружено»
-  if (!showUploadForm && existingCvId) {
-    return (
-      <>
-        <BackButton to="/" />
-        <h1 className={styles.h1_text}>Загрузите резюме в удобном формате</h1>
+  return (
+    <main className={styles.page}>
+      <BackButton to="/" />
+      <h1 className={styles.h1_text}>Загрузите резюме</h1>
 
-        <div className={styles.already_card}>
-          <span className={styles.already_icon}>✓</span>
-          <div>
-            <p className={styles.already_title}>Резюме уже загружено</p>
-            <p className={styles.already_sub}>Можно продолжить или загрузить другое</p>
+      <section className={styles.hero}>
+        {/* левый блок — описание шага */}
+        <div className={styles.titleBlock}>
+          <p className={styles.kicker}>Первый шаг</p>
+          <h2 className={styles.cardTitle}>Загрузите ваше резюме</h2>
+          <p className={styles.subtitle}>
+            Загрузите готовый файл или заполните резюме вручную — мы разберём его и подготовим
+            персональный анализ.
+          </p>
+          <div className={styles.infoCard}>
+            <img src={cvpng} alt="cv icon" />
+            <div>
+              <h3>Поддерживаемые форматы</h3>
+              <p>PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить вручную.</p>
+            </div>
           </div>
         </div>
 
-        <div className={styles.uploadButton_div}>
-          <button className={styles.upload_button} onClick={() => navigate('/uploadvacancy')}>
-            Продолжить
-          </button>
-          <button
-            className={`${styles.upload_button} ${styles.upload_button_ghost}`}
-            onClick={() => setShowUploadForm(true)}>
-            Загрузить другое
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  // обычная форма загрузки
-  return (
-    <>
-      <BackButton to="/" />
-      <h1 className={styles.h1_text}>
-        {active === 'pdf_docx' ? 'Загрузите резюме в удобном формате' : 'Заполните резюме вручную'}
-      </h1>
-      <div className={styles.buttons_wrapper}>
-        <button
-          className={`${styles.btn} ${active === 'pdf_docx' ? styles.active : ''}`}
-          onClick={() => setActive('pdf_docx')}>
-          PDF / DOCX
-        </button>
-        <button
-          className={`${styles.btn} ${active === 'manual' ? styles.active : ''}`}
-          onClick={() => setActive('manual')}>
-          Ввести вручную
-        </button>
-      </div>
-
-      {active === 'pdf_docx' ? <Dropzone onFileSelect={setFile} /> : <ManualFields />}
-
-      <div className={styles.uploadButton_div}>
-        <button className={styles.upload_button} onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? (
+        {/* правый блок — форма или баннер «уже загружено» */}
+        <div className={styles.actionCard}>
+          {/* баннер «резюме уже загружено» */}
+          {!showUploadForm && existingCvId ? (
             <>
-              Загрузка...
-              <Spinner size="sm" thickness="3px" speed="0.65s" ml="8px" color="white" />
+              <div className={styles.alreadyBlock}>
+                <div className={styles.alreadyIcon}>✓</div>
+                <div>
+                  <p className={styles.alreadyTitle}>Резюме уже загружено</p>
+                  <p className={styles.alreadySub}>Можно продолжить или загрузить другое</p>
+                </div>
+              </div>
+              <div className={styles.buttonsRow}>
+                <button className={styles.upload_button} onClick={() => navigate('/uploadvacancy')}>
+                  Продолжить
+                </button>
+                <button
+                  className={`${styles.upload_button} ${styles.upload_button_ghost}`}
+                  onClick={() => setShowUploadForm(true)}>
+                  Загрузить другое
+                </button>
+              </div>
             </>
           ) : (
-            'Загрузить'
+            /* обычная форма загрузки */
+            <>
+              <div>
+                <p className={styles.kicker}>Источник резюме</p>
+                <div className={styles.buttons_wrapper}>
+                  <button
+                    className={`${styles.btn} ${active === 'pdf_docx' ? styles.active : ''}`}
+                    onClick={() => setActive('pdf_docx')}>
+                    PDF / DOCX
+                  </button>
+                  <button
+                    className={`${styles.btn} ${active === 'manual' ? styles.active : ''}`}
+                    onClick={() => setActive('manual')}>
+                    Вручную
+                  </button>
+                </div>
+
+                <div className={styles.inputWrapper}>
+                  {active === 'pdf_docx' ? (
+                    <div style={{ marginTop: '-44px' }}>
+                      <Dropzone onFileSelect={setFile} />
+                    </div>
+                  ) : (
+                    <ManualFields />
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.buttonsRow}>
+                <button
+                  className={styles.upload_button}
+                  onClick={handleSubmit}
+                  disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      Загрузка...
+                      <Spinner size="sm" thickness="3px" speed="0.65s" ml="8px" color="white" />
+                    </>
+                  ) : (
+                    'Загрузить'
+                  )}
+                </button>
+              </div>
+            </>
           )}
-        </button>
-      </div>
-    </>
+        </div>
+      </section>
+    </main>
   );
 };
 
