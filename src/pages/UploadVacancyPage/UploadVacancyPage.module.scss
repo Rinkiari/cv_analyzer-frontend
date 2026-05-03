@@ -92,38 +92,57 @@
   gap: 24px;
 }
 
-.buttons_wrapper {
+.segmentedControl {
+  position: relative;
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
+  width: 100%;
   margin-top: 12px;
+  margin-bottom: 20px;
+  background: rgba(0, 0, 0, 0.07);
+  border-radius: 14px;
+  padding: 4px;
+  box-sizing: border-box;
+}
 
-  .btn {
-    width: 110px;
-    height: 44px;
-    background-color: #fbc02d;
-    border: none;
-    border-radius: 14px;
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: border 0.09s ease-in-out;
+.slider {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  background: #fbc02d;
+  border-radius: 11px;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
 
-    &:focus {
-      outline: none;
-    }
+.segBtn {
+  flex: 1;
+  height: 40px;
+  background: transparent;
+  border: none;
+  border-radius: 11px;
+  cursor: pointer;
+  font-size: 17px;
+  color: rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+  transition: color 0.22s ease;
 
-    &:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-    }
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
   }
 }
 
-.active {
-  border: 3px solid #000 !important;
+.segActive {
+  color: #000;
+  font-weight: 500;
 }
 
 .inputWrapper {

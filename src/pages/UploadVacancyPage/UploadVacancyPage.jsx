@@ -104,15 +104,19 @@ const UploadVacancyPage = () => {
         <div className={styles.actionCard}>
           <div>
             <p className={styles.kicker}>Источник вакансии</p>
-            <div className={styles.buttons_wrapper}>
+            <div className={styles.segmentedControl}>
+              <span
+                className={styles.slider}
+                style={{ transform: vacancyInput.mode === 'link' ? 'translateX(0%)' : 'translateX(100%)' }}
+              />
               <button
-                className={`${styles.btn} ${vacancyInput.mode === 'link' ? styles.active : ''}`}
+                className={`${styles.segBtn} ${vacancyInput.mode === 'link' ? styles.segActive : ''}`}
                 onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'link' }))}>
                 Ссылка
               </button>
               <button
                 disabled
-                className={`${styles.btn} ${vacancyInput.mode === 'text' ? styles.active : ''}`}
+                className={`${styles.segBtn} ${vacancyInput.mode === 'text' ? styles.segActive : ''}`}
                 onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
                 Текст
               </button>
