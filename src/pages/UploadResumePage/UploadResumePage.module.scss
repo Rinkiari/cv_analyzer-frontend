@@ -5,8 +5,10 @@
 
 .h1_text {
   max-width: 600px;
-  margin-top: 4px;
-  margin-bottom: 16px;
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 28px;
+  line-height: 1.2;
   color: black !important;
 }
 
@@ -31,7 +33,7 @@
 }
 
 .titleBlock {
-  padding: 28px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
 }
@@ -45,71 +47,71 @@
 }
 
 .cardTitle {
-  font-size: 34px;
+  font-size: 28px;
   line-height: 1.1;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: black !important;
 }
 
 .subtitle {
-  font-size: 17px;
+  font-size: 15px;
   color: rgba(0, 0, 0, 0.68);
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .infoCard {
-  margin-top: 24px;
-  padding: 20px;
-  border-radius: 20px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: #fffaf4;
   border: 1px solid rgba(251, 192, 45, 0.18);
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: center;
 
   img {
-    width: 72px;
-    height: 72px;
+    width: 56px;
+    height: 56px;
     object-fit: contain;
     flex-shrink: 0;
   }
 
   h3 {
-    font-size: 18px;
-    margin-bottom: 6px;
+    font-size: 16px;
+    margin-bottom: 4px;
     color: black !important;
   }
 
   p {
-    font-size: 15px;
+    font-size: 14px;
     color: rgba(0, 0, 0, 0.68);
-    line-height: 1.5;
+    line-height: 1.45;
   }
 }
 
 // правая карточка
 .actionCard {
-  padding: 28px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 24px;
+  gap: 16px;
 }
 
 .buttons_wrapper {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-bottom: 12px;
+  margin-top: 8px;
 
   .btn {
-    width: 130px;
-    height: 44px;
+    width: 120px;
+    height: 38px;
     background-color: #fbc02d;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -128,26 +130,29 @@
 .inputWrapper {
   width: 100%;
   min-width: 0;
-  margin-top: 16px;
-  // оба варианта (Dropzone и ManualFields) имеют height: 373px,
-  // фиксируем обёртку на ту же высоту чтобы layout не дёргался при переключении
-  height: 373px;
+  margin-top: 12px;
+  // фиксируем обёртку и переопределяем высоту дочерних компонентов
+  height: 290px;
+
+  & > * {
+    height: 100% !important;
+  }
 }
 
-// мини-список фич в левом блоке — прижат к низу для визуального баланса
+// мини-список фич в левом блоке — фиксированный отступ от infoCard
 .featuresCard {
-  margin-top: auto;
-  padding: 18px 20px;
-  border-radius: 18px;
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: #f7f8fa;
   border: 1px solid rgba(0, 0, 0, 0.06);
 
   h4 {
-    font-size: 14px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: rgba(0, 0, 0, 0.55);
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   ul {
@@ -155,21 +160,21 @@
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 8px;
+    gap: 6px;
   }
 
   li {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 15px;
+    font-size: 14px;
     color: rgba(0, 0, 0, 0.78);
 
     &::before {
       content: '✓';
       color: #2eac78;
       font-weight: 700;
-      font-size: 16px;
+      font-size: 14px;
       flex-shrink: 0;
     }
   }
@@ -177,17 +182,17 @@
 
 .buttonsRow {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .upload_button {
   width: 100%;
-  height: 50px;
+  height: 44px;
   background-color: #000;
   color: #fbc02d !important;
   border: none;
-  border-radius: 16px;
-  font-size: 20px;
+  border-radius: 14px;
+  font-size: 18px;
   cursor: pointer;
   transition: opacity 0.2s ease;
   display: flex;
@@ -231,12 +236,12 @@
 }
 
 .alreadyIcon {
-  width: 146px;
-  height: 146px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   background: #8fddc1;
   color: #fff;
-  font-size: 80px;
+  font-size: 56px;
   font-weight: 700;
   line-height: 1;
   display: flex;
@@ -246,7 +251,7 @@
 }
 
 .alreadyTitle {
-  font-size: 30px;
+  font-size: 22px;
   font-weight: 500;
   font-family: 'SF-Pro-Display-Medium', sans-serif !important;
   color: black;
@@ -254,7 +259,7 @@
 }
 
 .alreadySub {
-  font-size: 20px;
+  font-size: 16px;
   color: rgba(0, 0, 0, 0.55);
   margin: 0;
 }
