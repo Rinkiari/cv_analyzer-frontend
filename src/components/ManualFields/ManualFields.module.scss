@@ -1,14 +1,16 @@
 .manual_wrapper {
-  margin-top: 60px;
   cursor: pointer;
+  box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 14px;
 
   width: 100%;
+  min-width: 0;
   height: 373px;
   border-radius: 23px;
 
@@ -25,18 +27,20 @@
 
   .fio_field {
     position: relative;
-    width: 97%;
+    width: 100%;
+    min-width: 0;
     height: 46px;
     background-color: #ffde8a48;
     border-radius: 10px;
+    box-sizing: border-box;
 
     display: flex;
     align-items: center;
     gap: 10px;
 
     p {
-      width: 199px;
-      font-size: 26px;
+      width: 150px;
+      font-size: 18px;
       flex-shrink: 0;
       margin-left: 12px;
       color: black !important;
@@ -45,25 +49,27 @@
     &::after {
       content: '';
       position: absolute;
-      left: 198px;
-      top: 0;
-      bottom: 0;
+      left: 162px;
+      top: 8px;
+      bottom: 8px;
       width: 2px;
-      background: #000;
+      background: rgba(0, 0, 0, 0.3);
     }
 
     .editable {
       display: block;
+      flex: 1;
+      min-width: 0;
 
       white-space: nowrap;
       overflow-x: auto;
       overflow-y: hidden;
 
       height: 29.9px;
-      width: 1020px;
-      font-size: 22px;
+      font-size: 18px;
       outline: none;
       color: black !important;
+      padding-right: 12px;
     }
 
     .editable::-webkit-scrollbar {

@@ -89,6 +89,16 @@ const UploadResumePage = () => {
               <p>PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить вручную.</p>
             </div>
           </div>
+
+          <div className={styles.featuresCard}>
+            <h4>Что мы извлечём</h4>
+            <ul>
+              <li>ФИО и желаемую позицию</li>
+              <li>Опыт работы и проекты</li>
+              <li>Навыки и технологии</li>
+              <li>Образование и сертификаты</li>
+            </ul>
+          </div>
         </div>
 
         {/* правый блок — форма или баннер «уже загружено» */}
@@ -133,13 +143,7 @@ const UploadResumePage = () => {
                 </div>
 
                 <div className={styles.inputWrapper}>
-                  {active === 'pdf_docx' ? (
-                    <div style={{ marginTop: '-44px' }}>
-                      <Dropzone onFileSelect={setFile} />
-                    </div>
-                  ) : (
-                    <ManualFields />
-                  )}
+                  {active === 'pdf_docx' ? <Dropzone onFileSelect={setFile} /> : <ManualFields />}
                 </div>
               </div>
 

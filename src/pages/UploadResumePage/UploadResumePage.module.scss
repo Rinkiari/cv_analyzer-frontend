@@ -13,7 +13,7 @@
 // двухколоночная сетка: левый блок меньше, правый больше
 .hero {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
   gap: 24px;
   align-items: stretch;
 }
@@ -25,10 +25,15 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 24px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .titleBlock {
   padding: 28px;
+  display: flex;
+  flex-direction: column;
 }
 
 .kicker {
@@ -122,6 +127,52 @@
 
 .inputWrapper {
   width: 100%;
+  min-width: 0;
+  margin-top: 16px;
+  // оба варианта (Dropzone и ManualFields) имеют height: 373px,
+  // фиксируем обёртку на ту же высоту чтобы layout не дёргался при переключении
+  height: 373px;
+}
+
+// мини-список фич в левом блоке — прижат к низу для визуального баланса
+.featuresCard {
+  margin-top: auto;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: #f7f8fa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+
+  h4 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: rgba(0, 0, 0, 0.55);
+    margin-bottom: 12px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.78);
+
+    &::before {
+      content: '✓';
+      color: #2eac78;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+  }
 }
 
 .buttonsRow {
