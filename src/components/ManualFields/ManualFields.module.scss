@@ -6,13 +6,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 6px;
-  padding: 10px;
+  gap: 8px;
+  padding: 12px;
 
   width: 100%;
   min-width: 0;
-  height: 290px;
-  border-radius: 20px;
+  height: 340px;
+  border-radius: 22px;
 
   background: repeating-linear-gradient(to right, #fbc02d 0 30px, transparent 31px 62px) top / 100%
       2px repeat-x,
@@ -29,29 +29,29 @@
     position: relative;
     width: 100%;
     min-width: 0;
-    height: 36px;
+    height: 42px;
     background-color: #ffde8a48;
-    border-radius: 8px;
+    border-radius: 10px;
     box-sizing: border-box;
 
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 
     p {
-      width: 120px;
-      font-size: 14px;
+      width: 160px;
+      font-size: 17px;
       flex-shrink: 0;
-      margin-left: 10px;
+      margin-left: 12px;
       color: black !important;
     }
 
     &::after {
       content: '';
       position: absolute;
-      left: 130px;
-      top: 6px;
-      bottom: 6px;
+      left: 172px;
+      top: 7px;
+      bottom: 7px;
       width: 2px;
       background: rgba(0, 0, 0, 0.3);
     }
@@ -65,11 +65,11 @@
       overflow-x: auto;
       overflow-y: hidden;
 
-      height: 24px;
-      font-size: 14px;
+      height: 28px;
+      font-size: 17px;
       outline: none;
       color: black !important;
-      padding-right: 10px;
+      padding-right: 12px;
     }
 
     .editable::-webkit-scrollbar {

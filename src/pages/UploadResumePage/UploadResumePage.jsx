@@ -129,14 +129,18 @@ const UploadResumePage = () => {
             <>
               <div>
                 <p className={styles.kicker}>Источник резюме</p>
-                <div className={styles.buttons_wrapper}>
+                <div className={styles.segmentedControl}>
+                  <span
+                    className={styles.slider}
+                    style={{ transform: active === 'pdf_docx' ? 'translateX(0%)' : 'translateX(100%)' }}
+                  />
                   <button
-                    className={`${styles.btn} ${active === 'pdf_docx' ? styles.active : ''}`}
+                    className={`${styles.segBtn} ${active === 'pdf_docx' ? styles.segActive : ''}`}
                     onClick={() => setActive('pdf_docx')}>
                     PDF / DOCX
                   </button>
                   <button
-                    className={`${styles.btn} ${active === 'manual' ? styles.active : ''}`}
+                    className={`${styles.segBtn} ${active === 'manual' ? styles.segActive : ''}`}
                     onClick={() => setActive('manual')}>
                     Вручную
                   </button>
