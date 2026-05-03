@@ -98,6 +98,16 @@ const UploadVacancyPage = () => {
               </p>
             </div>
           </div>
+
+          <div className={styles.featuresCard}>
+            <h4>Что вы получите с вакансией</h4>
+            <ul>
+              <li>Точный анализ совпадения навыков</li>
+              <li>Пробелы между резюме и требованиями</li>
+              <li>Сопроводительное письмо под вакансию</li>
+              <li>Конкретные советы по доработке резюме</li>
+            </ul>
+          </div>
         </div>
 
         {/* правая карточка — инпут и кнопки */}
@@ -138,6 +148,14 @@ const UploadVacancyPage = () => {
               ) : (
                 <TextArea />
               )}
+            </div>
+
+            <div className={styles.hintCard}>
+              <p className={styles.hintKicker}>Пример ссылки</p>
+              <code className={styles.hintExample}>https://hh.ru/vacancy/12345678</code>
+              <p className={styles.hintText}>
+                Откройте вакансию на hh.ru или hh.kz и скопируйте URL из адресной строки браузера.
+              </p>
             </div>
           </div>
 

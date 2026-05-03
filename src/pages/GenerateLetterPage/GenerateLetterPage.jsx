@@ -67,25 +67,52 @@ const GenerateLetterPage = () => {
               </p>
             </div>
           </div>
+
+          <div className={styles.featuresCard}>
+            <h4>Что будет в письме</h4>
+            <ul>
+              <li>Персональное обращение к работодателю</li>
+              <li>Акцент на навыках под вакансию</li>
+              <li>Мотивация и интерес к должности</li>
+              <li>Готово к отправке без правок</li>
+            </ul>
+          </div>
         </div>
 
         <div className={styles.actionCard}>
-          <div className={styles.statusBlock}>
-            <p className={styles.statusLabel}>Статус</p>
-            {isLoggedIn ? (
-              <p className={styles.statusValue}>Вы вошли в аккаунт</p>
-            ) : (
-              <p className={`${styles.statusValue} ${styles.statusWarning}`}>
-                Генерация доступна только зарегистрированным пользователям
+          <div>
+            <div className={styles.statusBlock}>
+              <p className={styles.statusLabel}>Статус</p>
+              {isLoggedIn ? (
+                <p className={styles.statusValue}>Вы вошли в аккаунт</p>
+              ) : (
+                <p className={`${styles.statusValue} ${styles.statusWarning}`}>
+                  Генерация доступна только зарегистрированным пользователям
+                </p>
+              )}
+              {analysisId ? (
+                <p className={styles.analysisHint}>
+                  Анализ: <span>{String(analysisId).slice(0, 8)}...</span>
+                </p>
+              ) : (
+                <p className={styles.analysisHint}>AnalysisId не найден</p>
+              )}
+            </div>
+
+            <div className={styles.hintCard}>
+              <p className={styles.hintKicker}>Как будет выглядеть письмо</p>
+              <div className={styles.previewSnippet}>
+                <p>
+                  «Здравствуйте! Меня заинтересовала ваша вакансия. Опыт работы с нужным вам стеком
+                  и релевантные проекты позволят мне быстро влиться в команду и принести
+                  пользу...»
+                </p>
+              </div>
+              <p className={styles.hintText}>
+                Готовое письмо появится на странице результатов и в личном кабинете рядом с
+                анализом.
               </p>
-            )}
-            {analysisId ? (
-              <p className={styles.analysisHint}>
-                Анализ: <span>{String(analysisId).slice(0, 8)}...</span>
-              </p>
-            ) : (
-              <p className={styles.analysisHint}>AnalysisId не найден</p>
-            )}
+            </div>
           </div>
 
           <div className={styles.buttonsRow}>
