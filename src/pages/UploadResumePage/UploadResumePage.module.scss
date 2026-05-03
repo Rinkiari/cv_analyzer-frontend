@@ -1,12 +1,12 @@
 .page {
-  padding-top: 38px;
-  padding-bottom: 48px;
+  padding-top: 16px;
+  padding-bottom: 24px;
 }
 
 .h1_text {
   max-width: 600px;
-  margin-top: 8px;
-  margin-bottom: 28px;
+  margin-top: 4px;
+  margin-bottom: 16px;
   color: black !important;
 }
 
@@ -217,22 +217,28 @@
 
 // --- баннер «уже загружено» (справа, заместо формы) ---
 .alreadyBlock {
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 20px;
-  padding: 24px;
+  justify-content: center;
+  gap: 18px;
+  padding: 32px 24px;
   border-radius: 20px;
   background: #f6fef9;
   border: 1.5px solid #8fddc1;
+  text-align: center;
 }
 
 .alreadyIcon {
-  width: 52px;
-  height: 52px;
+  width: 146px;
+  height: 146px;
   border-radius: 50%;
   background: #8fddc1;
   color: #fff;
-  font-size: 26px;
+  font-size: 80px;
+  font-weight: 700;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,14 +246,15 @@
 }
 
 .alreadyTitle {
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 500;
+  font-family: 'SF-Pro-Display-Medium', sans-serif !important;
   color: black;
-  margin: 0 0 4px;
+  margin: 0;
 }
 
 .alreadySub {
-  font-size: 16px;
+  font-size: 20px;
   color: rgba(0, 0, 0, 0.55);
   margin: 0;
 }
