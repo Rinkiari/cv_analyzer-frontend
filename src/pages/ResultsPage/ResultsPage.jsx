@@ -1,11 +1,27 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import styles from './ResultsPage.module.scss';
 import attentionpng from '../../assets/attention.png';
 import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
 import BackButton from '../../components/BackButton/BackButton';
 import { API_URL } from '../../config/api';
+
+// убирает базовый markdown-синтаксис, оставляя читаемый plain text
+const stripMarkdown = (md) =>
+  md
+    .replace(/^#{1,6}\s+/gm, '') // заголовки
+    .replace(/\*\*(.+?)\*\*/g, '$1') // **жирный**
+    .replace(/\*(.+?)\*/g, '$1') // *курсив*
+    .replace(/__(.+?)__/g, '$1') // __жирный__
+    .replace(/_(.+?)_/g, '$1') // _курсив_
+    .replace(/`{1,3}([^`]+)`{1,3}/g, '$1') // код
+    .replace(/^\s*[-*+]\s+/gm, '• ') // списки
+    .replace(/^\s*>\s+/gm, '') // цитаты
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [текст](ссылка)
+    .replace(/\n{3,}/g, '\n\n') // лишние переносы
+    .trim();
 
 // иконки категорий (inline SVG — лёгкие и красятся через currentColor)
 const Icon = {
@@ -46,6 +62,12 @@ const Icon = {
       <path d="M21 16v5h-5" />
       <path d="M15 15l6 6" />
       <path d="M4 4l5 5" />
+    </svg>
+  ),
+  letter: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
     </svg>
   ),
 };
@@ -134,17 +156,51 @@ function ResultsPage() {
     return () => clearInterval(messageInterval);
   }, [loading]);
 
+  const LETTER_OPTION = {
+    id: 'letter',
+    label: 'Сопроводительное письмо',
+    accent: '#FBC02D',
+    icon: Icon.letter,
+    isLetter: true,
+  };
+
   const renderResponse = () => {
+    if (activeTab === 'letter') return generatedLetter || 'Нет данных';
     if (!result) return null;
     return result[activeTab] || 'Нет данных';
   };
 
   const loadingMessage = useMemo(() => LOADING_MESSAGES[loadingStep], [loadingStep]);
 
-  const currentOption = useMemo(
-    () => OPTIONS.find((o) => o.id === activeTab) || OPTIONS[0],
-    [activeTab],
-  );
+  const currentOption = useMemo(() => {
+    if (activeTab === 'letter') return LETTER_OPTION;
+    return OPTIONS.find((o) => o.id === activeTab) || OPTIONS[0];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
+  const handleDownloadLetter = () => {
+    if (!generatedLetter) return;
+    const text = stripMarkdown(generatedLetter);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cover-letter-${String(analysisId).slice(0, 8)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyLetter = async () => {
+    if (!generatedLetter) return;
+    try {
+      await navigator.clipboard.writeText(stripMarkdown(generatedLetter));
+      toast.success('Письмо скопировано в буфер обмена');
+    } catch {
+      toast.error('Не удалось скопировать');
+    }
+  };
 
   if (!analysisId) {
     return <h2 className={styles.centerMessage}>Нет данных для анализа</h2>;
@@ -195,7 +251,7 @@ function ResultsPage() {
                 <button
                   key={option.id}
                   className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
-                  style={isActive ? { '--accent': option.accent } : { '--accent': option.accent }}
+                  style={{ '--accent': option.accent }}
                   onClick={() => setActiveTab(option.id)}>
                   <span className={styles.tabIcon} style={{ color: option.accent }}>
                     {option.icon}
@@ -204,6 +260,22 @@ function ResultsPage() {
                 </button>
               );
             })}
+
+            {generatedLetter ? (
+              <>
+                <div className={styles.tabDivider} />
+                <button
+                  className={`${styles.tab} ${styles.tabBonus} ${activeTab === 'letter' ? styles.tabActive : ''}`}
+                  style={{ '--accent': LETTER_OPTION.accent }}
+                  onClick={() => setActiveTab('letter')}>
+                  <span className={styles.tabIcon} style={{ color: LETTER_OPTION.accent }}>
+                    {LETTER_OPTION.icon}
+                  </span>
+                  <span className={styles.tabLabel}>{LETTER_OPTION.label}</span>
+                  <span className={styles.tabBadge}>Бонус</span>
+                </button>
+              </>
+            ) : null}
           </nav>
         </aside>
 
@@ -213,10 +285,38 @@ function ResultsPage() {
             <span className={styles.contentIcon} style={{ color: currentOption.accent, background: `${currentOption.accent}14` }}>
               {currentOption.icon}
             </span>
-            <div>
-              <p className={styles.contentKicker}>Раздел анализа</p>
+            <div className={styles.contentHeaderText}>
+              <p className={styles.contentKicker}>
+                {currentOption.isLetter ? 'Готово к отправке' : 'Раздел анализа'}
+              </p>
               <h2 className={styles.contentTitle}>{currentOption.label}</h2>
             </div>
+
+            {currentOption.isLetter ? (
+              <div className={styles.headerActions}>
+                <button
+                  className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+                  onClick={handleCopyLetter}
+                  title="Скопировать в буфер обмена">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                  </svg>
+                  <span>Копировать</span>
+                </button>
+                <button
+                  className={styles.actionBtn}
+                  onClick={handleDownloadLetter}
+                  title="Скачать как .txt">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                  <span>Скачать</span>
+                </button>
+              </div>
+            ) : null}
           </header>
 
           <div className={styles.markdown}>
@@ -224,22 +324,6 @@ function ResultsPage() {
           </div>
         </article>
       </div>
-
-      {generatedLetter ? (
-        <section className={styles.letterCard}>
-          <div className={styles.letterHeader}>
-            <div>
-              <p className={styles.letterKicker}>Сопроводительное письмо</p>
-              <h2>Готовый вариант для отклика</h2>
-            </div>
-            <p className={styles.letterMeta}>Сгенерировано для текущего анализа</p>
-          </div>
-
-          <div className={styles.letterBody}>
-            <ReactMarkdown>{generatedLetter}</ReactMarkdown>
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }
