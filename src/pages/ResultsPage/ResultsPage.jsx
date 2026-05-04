@@ -5,7 +5,6 @@ import styles from './ResultsPage.module.scss';
 import attentionpng from '../../assets/attention.png';
 import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
-import BackButton from '../../components/BackButton/BackButton';
 import { API_URL } from '../../config/api';
 
 // убирает базовый markdown-синтаксис, оставляя читаемый plain text
@@ -237,7 +236,6 @@ function ResultsPage() {
 
   return (
     <div className={styles.page}>
-      <BackButton to="/generateletter" />
       <h1 className={styles.pageTitle}>Результаты анализа</h1>
 
       <div className={styles.layout}>

@@ -3,7 +3,6 @@ import styles from './UploadResumePage.module.scss';
 import { toast } from 'react-toastify';
 import Dropzone from '../../components/Dropzone/Dropzone';
 import ManualFields from '../../components/ManualFields/ManualFields';
-import BackButton from '../../components/BackButton/BackButton';
 import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -70,7 +69,6 @@ const UploadResumePage = () => {
 
   return (
     <main className={styles.page}>
-      <BackButton to="/" />
       <h1 className={styles.h1_text}>Загрузите резюме</h1>
 
       <section className={styles.hero}>

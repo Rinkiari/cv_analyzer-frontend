@@ -2,17 +2,33 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 20px;
-  padding: 0;
-  background: none;
+  padding: 8px 14px 8px 12px;
+  background: rgba(0, 0, 0, 0.05);
   border: none;
+  border-radius: 999px;
   cursor: pointer;
-  font-size: 18px;
-  color: rgba(0, 0, 0, 0.5);
-  transition: color 0.15s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.65);
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  svg {
+    transition: transform 0.18s ease;
+  }
 
   &:hover {
-    color: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.08);
+    color: #000;
+
+    svg {
+      transform: translateX(-2px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.96);
   }
 
   &:focus {

@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import letterIcon from '../../assets/letter.png';
 import { generateLetter } from '../../redux/slices/resumeSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
-import BackButton from '../../components/BackButton/BackButton';
 
 const GenerateLetterPage = () => {
   const navigate = useNavigate();
@@ -49,7 +48,6 @@ const GenerateLetterPage = () => {
 
   return (
     <main className={styles.page}>
-      <BackButton to="/uploadvacancy" />
       <section className={styles.hero}>
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Бонус для зарегистрированных</p>

@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
 import { startAnalysis, updateVacancyInput } from '../../redux/slices/resumeSlice';
-import BackButton from '../../components/BackButton/BackButton';
 import styles from './UploadVacancyPage.module.scss';
 import { toast } from 'react-toastify';
 import TextArea from '../../components/TextArea/TextArea';
@@ -76,7 +75,6 @@ const UploadVacancyPage = () => {
 
   return (
     <main className={styles.page}>
-      <BackButton to="/uploadresume" />
       <h1 className={styles.h1_text}>Вставьте ссылку на вакансию</h1>
 
       <section className={styles.hero}>
