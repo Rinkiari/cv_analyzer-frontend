@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { API_URL } from '../../config/api';
 import { Button, Spinner } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import styles from './MyProfilePage.module.scss';
 import { fetchAnalysesHistory, selectProfile } from '../../redux/slices/profileSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
+import { ANALYSIS_CATEGORIES, LETTER_CATEGORY } from '../../config/analysisCategories';
 
 function getStoredUserId() {
   if (typeof window === 'undefined') return null;
@@ -16,13 +18,6 @@ function getStoredUserId() {
 function getStoredAccessToken() {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('auth_accessToken');
-}
-
-function formatText(value) {
-  if (value === null || value === undefined || value === '') return 'Нет данных';
-  if (Array.isArray(value)) return value.join(', ');
-  if (typeof value === 'object') return JSON.stringify(value, null, 2);
-  return String(value);
 }
 
 function formatDate(value) {
@@ -38,6 +33,17 @@ function formatDate(value) {
   });
 }
 
+function formatShortDate(value) {
+  if (!value) return 'Без даты';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  return date.toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 function getStatusMessage(error) {
   if (!error) return '';
   if (error.status === 401) return 'Сессия неактивна. Пожалуйста, войдите в аккаунт снова.';
@@ -46,13 +52,19 @@ function getStatusMessage(error) {
   return error.message || 'Не удалось загрузить историю анализов.';
 }
 
-const ANALYSIS_FIELDS = [
-  ['structure', 'Структура и корректность'],
-  ['technologies', 'Технологии'],
-  ['relevance', 'Релевантность'],
-  ['another', 'Прочие рекомендации'],
-  ['vacancyComparison', 'Сравнение с вакансией'],
-];
+const stripMarkdown = (md) =>
+  md
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/_(.+?)_/g, '$1')
+    .replace(/`{1,3}([^`]+)`{1,3}/g, '$1')
+    .replace(/^\s*[-*+]\s+/gm, '• ')
+    .replace(/^\s*>\s+/gm, '')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 
 export default function MyProfilePage() {
   const dispatch = useDispatch();
@@ -67,83 +79,140 @@ export default function MyProfilePage() {
   const isLoggedIn = Boolean((auth?.accessToken || storedAccessToken) && userId);
   const userLabel = useMemo(() => userId || 'Гость', [userId]);
 
-  const [name, setName] = useState('');
+  const [name, setName] = useState({});
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState('structure');
 
   useEffect(() => {
+    if (!userId) return;
     const fetchNameInfo = async () => {
       try {
         const res = await fetch(`${API_URL}/users?userId=${userId}`, {
-          headers: {
-            Authorization: `Bearer ${getStoredAccessToken()}`,
-          },
+          headers: { Authorization: `Bearer ${getStoredAccessToken()}` },
         });
-
         if (res.status === 200) {
           const data = await res.json();
           setName(data);
-          return;
-        }
-        if (res.status === 401) {
-          return;
-        }
-
-        if (res.status === 404) {
-          return;
-        }
-
-        if (res.status === 500) {
-          return;
         }
       } catch (e) {
         console.log('e:', e);
       }
     };
-
     fetchNameInfo();
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
     dispatch(fetchAnalysesHistory());
   }, [dispatch, isLoggedIn]);
 
+  // когда меняется выбранный анализ, сбрасываем активный таб на первый
+  useEffect(() => {
+    setActiveTab('structure');
+  }, [selectedIndex]);
+
   const errorMessage = getStatusMessage(profile.error);
+  const analyses = profile.analyses || [];
+  const selectedItem = analyses[selectedIndex] || null;
+  const selectedAnalysis = selectedItem?.analysis || {};
+  const selectedLetter = selectedItem?.letter?.text || null;
+
+  const currentCategory = useMemo(() => {
+    if (activeTab === 'letter') return LETTER_CATEGORY;
+    return ANALYSIS_CATEGORIES.find((c) => c.id === activeTab) || ANALYSIS_CATEGORIES[0];
+  }, [activeTab]);
+
+  const renderDetailContent = () => {
+    if (activeTab === 'letter') return selectedLetter || 'Письмо не сгенерировано.';
+    return selectedAnalysis?.[activeTab] || 'Нет данных';
+  };
+
+  const handleDownloadLetter = () => {
+    if (!selectedLetter) return;
+    const text = stripMarkdown(selectedLetter);
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cover-letter-${selectedAnalysis?.id?.toString().slice(0, 8) || 'letter'}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyLetter = async () => {
+    if (!selectedLetter) return;
+    try {
+      await navigator.clipboard.writeText(stripMarkdown(selectedLetter));
+      toast.success('Письмо скопировано в буфер обмена');
+    } catch {
+      toast.error('Не удалось скопировать');
+    }
+  };
 
   return (
     <main className={styles.page}>
+      {/* Hero — профиль пользователя */}
       <section className={styles.hero}>
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Личный кабинет</p>
-          <h1>История анализов</h1>
+          <h1 className={styles.heroTitle}>История анализов</h1>
           <p className={styles.subtitle}>
             Здесь собраны все проверки резюме и сопроводительные письма.
           </p>
+
+          <div className={styles.heroStats}>
+            <div className={styles.statItem}>
+              <p className={styles.statValue}>{analyses.length}</p>
+              <p className={styles.statLabel}>анализов</p>
+            </div>
+            <div className={styles.statDivider} />
+            <div className={styles.statItem}>
+              <p className={styles.statValue}>
+                {analyses.filter((a) => a?.letter?.text).length}
+              </p>
+              <p className={styles.statLabel}>писем</p>
+            </div>
+          </div>
         </div>
 
         <div className={styles.profileCard}>
-          <div>
-            <p className={styles.cardLabel}>Пользователь</p>
-            <h2 className={styles.h2_name}>{name.firstName}</h2>
-            <h3>ID: {userLabel}</h3>
+          <div className={styles.profileHeader}>
+            <div className={styles.profileAvatar}>
+              {(name?.firstName?.[0] || 'U').toUpperCase()}
+            </div>
+            <div>
+              <p className={styles.cardLabel}>Пользователь</p>
+              <h2 className={styles.profileName}>
+                {name?.firstName || 'Без имени'}
+              </h2>
+              <p className={styles.profileId}>ID: {userLabel}</p>
+            </div>
           </div>
+
           <div className={styles.cardActions}>
             {isLoggedIn ? (
               <Button
                 onClick={() => navigate('/uploadresume')}
-                height="44px"
+                width="100%"
+                height="48px"
                 borderRadius="14px"
                 bg="#000"
                 color="#FBC02D"
+                fontSize="17px"
                 _hover={{ bg: '#161616' }}>
                 Новый анализ
               </Button>
             ) : (
               <Button
                 onClick={() => navigate('/login')}
-                height="44px"
+                width="100%"
+                height="48px"
                 borderRadius="14px"
                 bg="#000"
                 color="#FBC02D"
+                fontSize="17px"
                 _hover={{ bg: '#161616' }}>
                 Войти
               </Button>
@@ -152,86 +221,167 @@ export default function MyProfilePage() {
         </div>
       </section>
 
-      <section className={styles.content}>
-        {!isLoggedIn ? (
-          <div className={styles.emptyState}>
-            <h2>Чтобы открыть личный кабинет, нужно войти в аккаунт.</h2>
-            <p>После входа здесь появится полная история анализов.</p>
-          </div>
-        ) : profile.status === 'loading' ? (
-          <div className={styles.loadingState}>
-            <Spinner size="lg" thickness="4px" speed="0.65s" color="#FBC02D" />
-            <p>Загружаем историю анализов...</p>
-          </div>
-        ) : errorMessage ? (
-          <div className={styles.errorState}>
-            <h2>Не удалось загрузить историю</h2>
-            <p>{errorMessage}</p>
-            <div className={styles.errorActions}>
-              <Button
-                onClick={() => dispatch(fetchAnalysesHistory())}
-                height="44px"
-                borderRadius="14px"
-                bg="#000"
-                color="#FBC02D"
-                _hover={{ bg: '#161616' }}>
-                Повторить
-              </Button>
-            </div>
-          </div>
-        ) : profile.analyses.length === 0 ? (
-          <div className={styles.emptyState}>
-            <h2>Пока нет анализов</h2>
-            <p>Загрузите резюме, чтобы первая проверка появилась здесь.</p>
-          </div>
-        ) : (
-          <div className={styles.analysesGrid}>
-            {profile.analyses.map((item, index) => {
-              const analysis = item?.analysis || {};
-              const letter = item?.letter || null;
-
-              console.log('letter: ', letter);
-
-              return (
-                <article key={analysis?.id || index} className={styles.analysisCard}>
-                  <div className={styles.analysisHeader}>
-                    <div>
-                      <p className={styles.analysisIndex}>Анализ #{index + 1}</p>
-                      <h3>Результат анализа</h3>
+      {/* Состояния: not logged in / loading / error / empty / data */}
+      {!isLoggedIn ? (
+        <section className={styles.stateCard}>
+          <h2>Войдите в аккаунт</h2>
+          <p>Чтобы увидеть историю анализов и сгенерированные письма, войдите в систему.</p>
+        </section>
+      ) : profile.status === 'loading' ? (
+        <section className={styles.stateCard}>
+          <Spinner size="lg" thickness="4px" speed="0.65s" color="#FBC02D" />
+          <p>Загружаем историю анализов...</p>
+        </section>
+      ) : errorMessage ? (
+        <section className={styles.stateCard}>
+          <h2>Не удалось загрузить историю</h2>
+          <p>{errorMessage}</p>
+          <Button
+            onClick={() => dispatch(fetchAnalysesHistory())}
+            height="44px"
+            borderRadius="14px"
+            bg="#000"
+            color="#FBC02D"
+            _hover={{ bg: '#161616' }}>
+            Повторить
+          </Button>
+        </section>
+      ) : analyses.length === 0 ? (
+        <section className={styles.stateCard}>
+          <h2>Пока нет анализов</h2>
+          <p>Загрузите резюме, чтобы первая проверка появилась здесь.</p>
+          <Button
+            onClick={() => navigate('/uploadresume')}
+            height="44px"
+            borderRadius="14px"
+            bg="#000"
+            color="#FBC02D"
+            _hover={{ bg: '#161616' }}>
+            Создать первый анализ
+          </Button>
+        </section>
+      ) : (
+        <div className={styles.layout}>
+          {/* левая колонка — список анализов */}
+          <aside className={styles.analysesList}>
+            <p className={styles.listKicker}>Все анализы</p>
+            <div className={styles.listInner}>
+              {analyses.map((item, index) => {
+                const a = item?.analysis || {};
+                const hasLetter = Boolean(item?.letter?.text);
+                const isActive = index === selectedIndex;
+                return (
+                  <button
+                    key={a?.id || index}
+                    className={`${styles.analysisItem} ${isActive ? styles.analysisItemActive : ''}`}
+                    onClick={() => setSelectedIndex(index)}>
+                    <div className={styles.itemHeader}>
+                      <span className={styles.itemNumber}>#{analyses.length - index}</span>
+                      <span className={styles.itemDate}>{formatShortDate(a?.createdAt)}</span>
                     </div>
-                    <p className={styles.analysisMeta}>{formatDate(analysis?.createdAt)}</p>
-                  </div>
+                    <p className={styles.itemTitle}>Анализ резюме</p>
+                    <div className={styles.itemBadges}>
+                      <span className={styles.itemBadge}>Анализ</span>
+                      {hasLetter ? (
+                        <span className={`${styles.itemBadge} ${styles.itemBadgeBonus}`}>
+                          Письмо
+                        </span>
+                      ) : null}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
 
-                  <div className={styles.sections}>
-                    <section className={styles.section}>
-                      <h4>Параметры анализа</h4>
-                      <div className={styles.analysisList}>
-                        {ANALYSIS_FIELDS.map(([field, label]) => (
-                          <div key={field} className={styles.analysisRow}>
-                            <p className={styles.rowLabel}>{label}</p>
-                            <pre className={styles.rowValue}>{formatText(analysis?.[field])}</pre>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
+          {/* центральная колонка — категории */}
+          <aside className={styles.sidebar}>
+            <p className={styles.sidebarKicker}>Категории</p>
+            <nav className={styles.tabs}>
+              {ANALYSIS_CATEGORIES.map((option) => {
+                const isActive = activeTab === option.id;
+                return (
+                  <button
+                    key={option.id}
+                    className={`${styles.tab} ${isActive ? styles.tabActive : ''}`}
+                    style={{ '--accent': option.accent }}
+                    onClick={() => setActiveTab(option.id)}>
+                    <span className={styles.tabIcon} style={{ color: option.accent }}>
+                      {option.icon}
+                    </span>
+                    <span className={styles.tabLabel}>{option.label}</span>
+                  </button>
+                );
+              })}
 
-                    <section className={`${styles.section} ${styles.letterSection}`}>
-                      <h4>Сопроводительное письмо</h4>
-                      {letter?.text ? (
-                        <pre className={styles.letterText}>
-                          <ReactMarkdown>{letter.text}</ReactMarkdown>
-                        </pre>
-                      ) : (
-                        <p className={styles.emptyLetter}>Письмо не сгенерировано.</p>
-                      )}
-                    </section>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </section>
+              {selectedLetter ? (
+                <>
+                  <div className={styles.tabDivider} />
+                  <button
+                    className={`${styles.tab} ${activeTab === 'letter' ? styles.tabActive : ''}`}
+                    style={{ '--accent': LETTER_CATEGORY.accent }}
+                    onClick={() => setActiveTab('letter')}>
+                    <span className={styles.tabIcon} style={{ color: LETTER_CATEGORY.accent }}>
+                      {LETTER_CATEGORY.icon}
+                    </span>
+                    <span className={styles.tabLabel}>{LETTER_CATEGORY.label}</span>
+                    <span className={styles.tabBadge}>Бонус</span>
+                  </button>
+                </>
+              ) : null}
+            </nav>
+          </aside>
+
+          {/* правая колонка — контент выбранной категории */}
+          <article className={styles.content} style={{ '--accent': currentCategory.accent }}>
+            <header className={styles.contentHeader}>
+              <span
+                className={styles.contentIcon}
+                style={{ color: currentCategory.accent, background: `${currentCategory.accent}14` }}>
+                {currentCategory.icon}
+              </span>
+              <div className={styles.contentHeaderText}>
+                <p className={styles.contentKicker}>
+                  {currentCategory.isLetter ? 'Готово к отправке' : 'Раздел анализа'}
+                  {' • '}
+                  {formatDate(selectedAnalysis?.createdAt)}
+                </p>
+                <h2 className={styles.contentTitle}>{currentCategory.label}</h2>
+              </div>
+
+              {currentCategory.isLetter ? (
+                <div className={styles.headerActions}>
+                  <button
+                    className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+                    onClick={handleCopyLetter}
+                    title="Скопировать в буфер обмена">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span>Копировать</span>
+                  </button>
+                  <button
+                    className={styles.actionBtn}
+                    onClick={handleDownloadLetter}
+                    title="Скачать как .txt">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span>Скачать</span>
+                  </button>
+                </div>
+              ) : null}
+            </header>
+
+            <div className={styles.markdown}>
+              <ReactMarkdown>{renderDetailContent()}</ReactMarkdown>
+            </div>
+          </article>
+        </div>
+      )}
     </main>
   );
 }
