@@ -75,13 +75,11 @@ const UploadVacancyPage = () => {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.h1_text}>Вставьте ссылку на вакансию</h1>
-
       <section className={styles.hero}>
         {/* левая карточка — подсказка */}
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Необязательно, но полезно</p>
-          <h2 className={styles.cardTitle}>Укажите вакансию — получите больше</h2>
+          <h1 className={styles.cardTitle}>Укажите вакансию — получите больше</h1>
           <p className={styles.subtitle}>
             Анализ резюме без вакансии — это общие рекомендации. С вакансией — точное сравнение
             навыков и требований.
@@ -115,16 +113,22 @@ const UploadVacancyPage = () => {
             <div className={styles.segmentedControl}>
               <span
                 className={styles.slider}
-                style={{ transform: vacancyInput.mode === 'link' ? 'translateX(0%)' : 'translateX(100%)' }}
+                style={{
+                  transform: vacancyInput.mode === 'link' ? 'translateX(0%)' : 'translateX(100%)',
+                }}
               />
               <button
-                className={`${styles.segBtn} ${vacancyInput.mode === 'link' ? styles.segActive : ''}`}
+                className={`${styles.segBtn} ${
+                  vacancyInput.mode === 'link' ? styles.segActive : ''
+                }`}
                 onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'link' }))}>
                 Ссылка
               </button>
               <button
                 disabled
-                className={`${styles.segBtn} ${vacancyInput.mode === 'text' ? styles.segActive : ''}`}
+                className={`${styles.segBtn} ${
+                  vacancyInput.mode === 'text' ? styles.segActive : ''
+                }`}
                 onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
                 Текст
               </button>

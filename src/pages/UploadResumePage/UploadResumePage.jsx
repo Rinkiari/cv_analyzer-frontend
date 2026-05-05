@@ -69,13 +69,11 @@ const UploadResumePage = () => {
 
   return (
     <main className={styles.page}>
-      <h1 className={styles.h1_text}>Загрузите резюме</h1>
-
       <section className={styles.hero}>
         {/* левый блок — описание шага */}
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Первый шаг</p>
-          <h2 className={styles.cardTitle}>Загрузите ваше резюме</h2>
+          <h1 className={styles.cardTitle}>Загрузите ваше резюме</h1>
           <p className={styles.subtitle}>
             Загрузите готовый файл или заполните резюме вручную — мы разберём его и подготовим
             персональный анализ.
@@ -84,7 +82,9 @@ const UploadResumePage = () => {
             <img src={cvpng} alt="cv icon" />
             <div>
               <h3>Поддерживаемые форматы</h3>
-              <p>PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить вручную.</p>
+              <p>
+                PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить вручную.
+              </p>
             </div>
           </div>
 
@@ -130,7 +130,9 @@ const UploadResumePage = () => {
                 <div className={styles.segmentedControl}>
                   <span
                     className={styles.slider}
-                    style={{ transform: active === 'pdf_docx' ? 'translateX(0%)' : 'translateX(100%)' }}
+                    style={{
+                      transform: active === 'pdf_docx' ? 'translateX(0%)' : 'translateX(100%)',
+                    }}
                   />
                   <button
                     className={`${styles.segBtn} ${active === 'pdf_docx' ? styles.segActive : ''}`}
