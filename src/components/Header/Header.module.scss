@@ -1,9 +1,16 @@
+// карточная рамка в едином языке со страницами,
+// внутренняя структура (.header_inner_container) — как было до редизайна
 .header_container {
   max-width: 1276px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
+  padding: 12px 18px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 
   .header_inner_container {
     width: 562px;
@@ -25,10 +32,51 @@
   }
 }
 
-.header_logo {
-  font-family: 'SF-Compact-Rounded', sans-serif;
-  font-size: 32px !important;
-  color: black !important;
+// === LOGO (icon mark + wordmark) ===
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: opacity 0.18s ease;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+// icon-mark в кремовой плашке — рифмуется со .stepIconWrap и .resumeBannerIcon
+.logoMark {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #fffaf4;
+  border: 1px solid rgba(251, 192, 45, 0.32);
+  color: #8b6800;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.logoText {
+  font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+  font-size: 19px;
+  font-weight: 500;
+  color: #000;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+// "IQ" — фирменный жёлтый акцент
+.logoTextAccent {
+  color: #fbc02d;
+  font-weight: 600;
 }
 
 .auth_actions {
