@@ -3,7 +3,7 @@
   padding-bottom: 48px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 56px;
 }
 
 // === SHARED ===
@@ -291,7 +291,7 @@
 .titleFoot {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 14px;
 }
 
 .ctaRow {
@@ -641,7 +641,8 @@
   font-family: 'SF-Pro-Display-Medium', sans-serif !important;
   font-size: 36px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.08);
+  // плотнее, чем прежние 0.08 — цифра-фон читается, но не давит
+  color: rgba(0, 0, 0, 0.13);
   line-height: 1;
   letter-spacing: -0.02em;
 }
@@ -744,7 +745,8 @@
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.55);
-  transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1), background 0.22s ease,
+    color 0.22s ease;
 
   svg {
     width: 12px;
@@ -761,6 +763,30 @@
   max-width: 760px;
 }
 
+// плавное появление ответа при открытии details.
+// fade + лёгкий slide вниз — оживляет раскрытие, не нагружая глаз.
+.faqItem[open] .faqAnswer {
+  animation: faqSlide 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes faqSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// уважаем системное предпочтение: пользователям с reduced motion — без анимации
+@media (prefers-reduced-motion: reduce) {
+  .faqItem[open] .faqAnswer {
+    animation: none;
+  }
+}
+
 @media (max-width: 560px) {
   .faqSummary {
     padding: 18px 20px;
@@ -775,7 +801,12 @@
 
 // === FINAL CTA ===
 .finalCta {
-  background: #000;
+  // тёплая жёлтая «дымка» из правого верхнего угла + второй меньший пик для глубины.
+  // 8% на чёрном даёт прирост яркости <5% — глаз не ловит, поэтому поднимаем до видимого уровня.
+  // ellipse, потому что блок шире, чем выше; центр сдвинут внутрь (90% 0%), чтобы пик
+  // не съедался скруглением углов.
+  background: radial-gradient(ellipse 70% 80% at 90% 0%, rgba(251, 192, 45, 0.22), transparent 65%),
+    radial-gradient(circle 240px at 95% 5%, rgba(251, 192, 45, 0.18), transparent 70%), #000;
   border-radius: 24px;
   padding: 56px 32px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
@@ -791,10 +822,11 @@
 }
 
 .finalKicker {
+  // приглушаем до белого с прозрачностью — единственным жёлтым акцентом остаётся CTA-кнопка
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 12px;
-  color: #fbc02d;
+  color: rgba(255, 255, 255, 0.5);
   margin: 0 0 14px;
 }
 
