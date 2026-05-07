@@ -1,6 +1,6 @@
 import styles from './HomePage.module.scss';
 import { Link } from 'react-router';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ANALYSIS_CATEGORIES } from '../config/analysisCategories';
@@ -39,6 +39,30 @@ const CATEGORY_DESCRIPTIONS = {
   vacancyComparison: 'Совпадения и пробелы между вашим резюме и текстом вакансии.',
 };
 
+// демо-контент для интерактивной превью-карточки в hero
+const PREVIEW_CONTENT = {
+  structure: {
+    strengths: ['Чёткие блоки с опытом и навыками', 'Понятная хронология проектов'],
+    improvements: ['Добавить краткое summary в начало'],
+  },
+  technologies: {
+    strengths: ['React, TypeScript, Node.js — релевантны рынку', 'Указаны версии и контекст использования'],
+    improvements: ['Сгруппировать стек: frontend / backend / tooling'],
+  },
+  relevance: {
+    strengths: ['Опыт соответствует уровню Middle+', 'Доменные знания в e-commerce'],
+    improvements: ['Уточнить, в каких проектах вели команду'],
+  },
+  another: {
+    strengths: ['Достижения описаны через результат, а не процесс'],
+    improvements: ['Сократить общие формулировки в «О себе»', 'Добавить ссылки на портфолио'],
+  },
+  vacancyComparison: {
+    strengths: ['Совпадения: React, TypeScript, REST API'],
+    improvements: ['В вакансии важен GraphQL — упомяните опыт', 'Добавить опыт с CI/CD'],
+  },
+};
+
 const FAQ_ITEMS = [
   {
     q: 'Сохраняется ли моё резюме?',
@@ -63,6 +87,11 @@ const HomePage = () => {
   const cvId = useSelector((s) => s.resume.cvId);
   const analysisId = useSelector((s) => s.resume.analysisId);
   const { isAuthenticated, firstName, userInfoStatus } = useSelector(selectAuth);
+
+  const [previewId, setPreviewId] = useState(ANALYSIS_CATEGORIES[0].id);
+  const previewCategory =
+    ANALYSIS_CATEGORIES.find((c) => c.id === previewId) || ANALYSIS_CATEGORIES[0];
+  const previewData = PREVIEW_CONTENT[previewId] || PREVIEW_CONTENT.structure;
 
   // подгружаем имя один раз после логина
   useEffect(() => {
@@ -184,38 +213,52 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* mock-карточка результата */}
-        <div className={styles.previewCard} aria-hidden="true">
-          <div className={styles.previewHeader}>
+        {/* интерактивная превью-карточка результата */}
+        <div className={styles.previewCard}>
+          <div className={styles.previewHeader} aria-hidden="true">
             <span className={styles.previewDot} style={{ background: '#ff5f57' }} />
             <span className={styles.previewDot} style={{ background: '#febc2e' }} />
             <span className={styles.previewDot} style={{ background: '#28c840' }} />
-            <span className={styles.previewTitle}>Результаты анализа</span>
+            <span className={styles.previewTitle}>Результаты анализа · превью</span>
           </div>
 
           <div className={styles.previewBody}>
-            <div className={styles.previewSidebar}>
-              {ANALYSIS_CATEGORIES.map((cat, i) => (
-                <div
-                  key={cat.id}
-                  className={`${styles.previewTab} ${i === 0 ? styles.previewTabActive : ''}`}
-                  style={{ '--accent': cat.accent }}>
-                  <span className={styles.previewTabIcon}>{cat.icon}</span>
-                  <span className={styles.previewTabLabel}>{cat.label}</span>
-                </div>
-              ))}
+            <div className={styles.previewSidebar} role="tablist" aria-label="Категории превью">
+              {ANALYSIS_CATEGORIES.map((cat) => {
+                const isActive = cat.id === previewId;
+                return (
+                  <button
+                    type="button"
+                    key={cat.id}
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`${styles.previewTab} ${isActive ? styles.previewTabActive : ''}`}
+                    style={{ '--accent': cat.accent }}
+                    onClick={() => setPreviewId(cat.id)}>
+                    <span className={styles.previewTabIcon}>{cat.icon}</span>
+                    <span className={styles.previewTabLabel}>{cat.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            <div className={styles.previewContent} style={{ '--accent': ANALYSIS_CATEGORIES[0].accent }}>
-              <p className={styles.previewKicker}>Категория · Структура</p>
+            <div
+              key={previewId}
+              role="tabpanel"
+              className={styles.previewContent}
+              style={{ '--accent': previewCategory.accent }}>
+              <p className={styles.previewKicker}>Категория · {previewCategory.label}</p>
               <h4 className={styles.previewH}>Сильные стороны</h4>
               <ul className={styles.previewList}>
-                <li>Чёткие блоки с опытом и навыками</li>
-                <li>Понятная хронология проектов</li>
+                {previewData.strengths.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
               <h4 className={styles.previewH}>Что улучшить</h4>
               <ul className={styles.previewList}>
-                <li>Добавить краткое summary в начало</li>
+                {previewData.improvements.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
               </ul>
             </div>
           </div>
