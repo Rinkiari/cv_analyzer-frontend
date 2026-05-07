@@ -35,6 +35,25 @@ const CATEGORY_DESCRIPTIONS = {
   vacancyComparison: 'Совпадения и пробелы между вашим резюме и текстом вакансии.',
 };
 
+const FAQ_ITEMS = [
+  {
+    q: 'Сохраняется ли моё резюме?',
+    a: 'Без авторизации файл обрабатывается анонимно и не привязывается к профилю — мы используем его только чтобы построить отчёт. Если вы вошли в аккаунт, анализ попадает в вашу историю, чтобы можно было вернуться к нему позже.',
+  },
+  {
+    q: 'Кто видит мои данные?',
+    a: 'Файл уходит только на наш сервер анализа. Мы не передаём резюме третьим лицам и не используем его для обучения сторонних моделей.',
+  },
+  {
+    q: 'Это правда бесплатно?',
+    a: 'Да. Сервис без оплаты и без скрытых лимитов на количество проверок. Аккаунт нужен только если хотите сохранять историю и генерировать сопроводительное письмо.',
+  },
+  {
+    q: 'Какие форматы поддерживаются?',
+    a: 'PDF и DOCX — или можно заполнить данные вручную, если файла под рукой нет. Текст вакансии добавляется ссылкой или копированием.',
+  },
+];
+
 const HomePage = () => {
   return (
     <main className={styles.page}>
@@ -66,13 +85,13 @@ const HomePage = () => {
             </div>
             <div className={styles.statDivider} />
             <div className={styles.statItem}>
-              <p className={styles.statValue}>5</p>
-              <p className={styles.statLabel}>категорий</p>
+              <p className={styles.statValue}>PDF · DOCX</p>
+              <p className={styles.statLabel}>или вручную</p>
             </div>
             <div className={styles.statDivider} />
             <div className={styles.statItem}>
-              <p className={styles.statValue}>PDF · DOCX</p>
-              <p className={styles.statLabel}>или вручную</p>
+              <p className={styles.statValue}>Бесплатно</p>
+              <p className={styles.statLabel}>без регистрации</p>
             </div>
           </div>
         </div>
@@ -149,6 +168,28 @@ const HomePage = () => {
               <h3 className={styles.featureTitle}>{cat.label}</h3>
               <p className={styles.featureText}>{CATEGORY_DESCRIPTIONS[cat.id]}</p>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* === FAQ / TRUST === */}
+      <section className={styles.section}>
+        <p className={styles.kicker}>Часто спрашивают</p>
+        <h2 className={styles.sectionTitle}>Без скрытых условий</h2>
+
+        <div className={styles.faqList}>
+          {FAQ_ITEMS.map((item) => (
+            <details key={item.q} className={styles.faqItem}>
+              <summary className={styles.faqSummary}>
+                <span>{item.q}</span>
+                <span className={styles.faqChevron} aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </span>
+              </summary>
+              <p className={styles.faqAnswer}>{item.a}</p>
+            </details>
           ))}
         </div>
       </section>

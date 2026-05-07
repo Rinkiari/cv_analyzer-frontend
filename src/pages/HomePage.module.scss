@@ -442,6 +442,100 @@
   margin: 0;
 }
 
+// === FAQ ===
+.faqList {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &[open] .faqChevron {
+    transform: rotate(180deg);
+    background: rgba(251, 192, 45, 0.18);
+    color: #8b6800;
+  }
+
+  &[open] .faqSummary {
+    color: #000;
+  }
+}
+
+.faqSummary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  transition: background 0.18s ease, color 0.18s ease;
+  user-select: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(251, 192, 45, 0.6);
+    outline-offset: -2px;
+  }
+}
+
+.faqChevron {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.55);
+  transition: transform 0.22s ease, background 0.22s ease, color 0.22s ease;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.faqAnswer {
+  padding: 0 26px 22px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 760px;
+}
+
+@media (max-width: 560px) {
+  .faqSummary {
+    padding: 18px 20px;
+    font-size: 16px;
+  }
+
+  .faqAnswer {
+    padding: 0 20px 18px;
+    font-size: 14px;
+  }
+}
+
 // === FINAL CTA ===
 .finalCta {
   background: #000;
