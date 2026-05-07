@@ -25,16 +25,25 @@ const stripMarkdown = (md) =>
 
 const OPTIONS = ANALYSIS_CATEGORIES;
 
-const LOADING_MESSAGES = [
+const LOADING_MESSAGES_ANALYSIS = [
   'Анализируем структуру резюме...',
   'Проверяем технологии и навыки...',
   'Сравниваем с вакансией...',
   'Формируем рекомендации...',
 ];
 
+const LOADING_MESSAGES_LETTER = [
+  'Готовим сопроводительное письмо...',
+  'Подбираем формулировки под вакансию...',
+  'Расставляем акценты на ваших навыках...',
+  'Финализируем текст...',
+];
+
 function ResultsPage() {
   const reduxAnalysisId = useSelector((state) => state.resume.analysisId);
   const reduxGeneratedLetter = useSelector((state) => state.resume.generatedLetter);
+  const letterStatus = useSelector((state) => state.resume.letterStatus);
+  const letterError = useSelector((state) => state.resume.letterError);
 
   const analysisId = reduxAnalysisId || localStorage.getItem('analysisId');
   const generatedLetter =
@@ -45,10 +54,13 @@ function ResultsPage() {
   const [activeTab, setActiveTab] = useState('structure');
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const loading = Boolean(analysisId) && !result && !errorState;
+  const analysisLoading = Boolean(analysisId) && !result && !errorState;
+  const letterLoading = letterStatus === 'pending';
+  const loading = analysisLoading || letterLoading;
+  const phase = analysisLoading ? 'analysis' : letterLoading ? 'letter' : 'done';
 
   useEffect(() => {
-    if (!loading) return;
+    if (!analysisLoading) return;
 
     let cancelled = false;
     let timeoutId = null;
@@ -89,17 +101,31 @@ function ResultsPage() {
       cancelled = true;
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [analysisId, loading]);
+  }, [analysisId, analysisLoading]);
+
+  // при смене фазы (анализ → письмо) сбрасываем счётчик сообщений, чтобы не прыгал на середину
+  useEffect(() => {
+    setLoadingStep(0);
+  }, [phase]);
 
   useEffect(() => {
     if (!loading) return;
 
+    const total =
+      phase === 'letter' ? LOADING_MESSAGES_LETTER.length : LOADING_MESSAGES_ANALYSIS.length;
     const messageInterval = setInterval(() => {
-      setLoadingStep((prev) => (prev + 1) % LOADING_MESSAGES.length);
+      setLoadingStep((prev) => (prev + 1) % total);
     }, 1800);
 
     return () => clearInterval(messageInterval);
-  }, [loading]);
+  }, [loading, phase]);
+
+  // если поллинг письма завершился ошибкой — кидаем тост, чтобы пользователь понял, почему вкладка с письмом не появилась
+  useEffect(() => {
+    if (letterStatus === 'failed' && letterError) {
+      toast.error(letterError);
+    }
+  }, [letterStatus, letterError]);
 
   const LETTER_OPTION = LETTER_CATEGORY;
 
@@ -109,7 +135,11 @@ function ResultsPage() {
     return result[activeTab] || 'Нет данных';
   };
 
-  const loadingMessage = useMemo(() => LOADING_MESSAGES[loadingStep], [loadingStep]);
+  const loadingMessage = useMemo(() => {
+    const messages =
+      phase === 'letter' ? LOADING_MESSAGES_LETTER : LOADING_MESSAGES_ANALYSIS;
+    return messages[loadingStep % messages.length];
+  }, [loadingStep, phase]);
 
   const currentOption = useMemo(() => {
     if (activeTab === 'letter') return LETTER_OPTION;
@@ -146,14 +176,20 @@ function ResultsPage() {
   }
 
   if (loading) {
+    const loadingTitle =
+      phase === 'letter' ? 'Готовим сопроводительное письмо...' : 'Анализируем резюме...';
+    const loadingHint =
+      phase === 'letter'
+        ? 'Письмо готовится после анализа, это может занять до минуты'
+        : 'Обычно это занимает 5–10 секунд';
     return (
       <div className={styles.loadingScreen}>
         <div className={styles.loadingContent}>
           <p className={styles.loadingKicker}>ResumeIQ</p>
-          <h2 className={styles.loadingTitle}>Анализируем резюме...</h2>
+          <h2 className={styles.loadingTitle}>{loadingTitle}</h2>
           <p className={styles.loadingSubtitle}>{loadingMessage}</p>
           <Loader />
-          <p className={styles.loadingHint}>Обычно это занимает 5–10 секунд</p>
+          <p className={styles.loadingHint}>{loadingHint}</p>
         </div>
       </div>
     );

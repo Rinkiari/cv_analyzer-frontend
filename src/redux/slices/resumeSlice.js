@@ -3,7 +3,9 @@ import { API_URL } from '../../config/api';
 import { logout } from './authSlice';
 
 const GENERATED_LETTER_KEY = 'analysis_generated_letter';
+const PENDING_LETTER_KEY = 'analysis_pending_letter';
 const CV_ID_KEY = 'cvId';
+const LETTER_POLL_INTERVAL_MS = 2500;
 
 function canUseStorage() {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
@@ -63,6 +65,27 @@ function clearStoredGeneratedLetter() {
   localStorage.removeItem(GENERATED_LETTER_KEY);
 }
 
+function readStoredPendingLetter() {
+  if (!canUseStorage()) return null;
+  const raw = localStorage.getItem(PENDING_LETTER_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed?.letterId || !parsed?.analysisId) return null;
+    return { analysisId: String(parsed.analysisId), letterId: String(parsed.letterId) };
+  } catch {
+    return null;
+  }
+}
+function persistPendingLetter(payload) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(PENDING_LETTER_KEY, JSON.stringify(payload));
+}
+function clearStoredPendingLetter() {
+  if (!canUseStorage()) return;
+  localStorage.removeItem(PENDING_LETTER_KEY);
+}
+
 async function parseErrorMessage(response, fallbackPrefix = 'Ошибка') {
   const fallback = `${fallbackPrefix} (${response.status})`;
   try {
@@ -79,17 +102,51 @@ async function parseErrorMessage(response, fallbackPrefix = 'Ошибка') {
   }
 }
 
-async function parseLetterResponse(response) {
+async function parseLetterIdResponse(response) {
   const contentType = response.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {
     const data = await response.json();
-    if (typeof data === 'string') return data;
-    if (data?.text) return String(data.text);
-    if (data?.letter?.text) return String(data.letter.text);
-    if (data?.content) return String(data.content);
-    return JSON.stringify(data, null, 2);
+    if (typeof data === 'string') return data.trim() || null;
+    if (data?.id) return String(data.id);
+    if (data?.letterId) return String(data.letterId);
+    return null;
   }
-  return response.text();
+  // backend may return a quoted JSON string or a bare uuid
+  const raw = (await response.text()).trim();
+  if (!raw) return null;
+  return raw.replace(/^"(.*)"$/s, '$1') || null;
+}
+
+async function pollLetterUntilReady({ letterId, token, signal }) {
+  // 200 — готово, 202 — продолжаем поллить, 404/500 — ошибка.
+  // backend начинает генерацию письма только после готовности результата анализа,
+  // поэтому первые ответы могут долго быть 202.
+  while (true) {
+    if (signal?.aborted) {
+      const abortErr = new Error('Генерация прервана');
+      abortErr.name = 'AbortError';
+      throw abortErr;
+    }
+    const response = await fetch(
+      `${API_URL}/letters?letterId=${encodeURIComponent(letterId)}`,
+      { method: 'GET', headers: buildHeaders(token), signal },
+    );
+    if (response.status === 200) {
+      const data = await response.json();
+      return String(data?.text || '').trim();
+    }
+    if (response.status === 202) {
+      await new Promise((resolve) => setTimeout(resolve, LETTER_POLL_INTERVAL_MS));
+      continue;
+    }
+    if (response.status === 404) {
+      throw new Error('Письмо не найдено');
+    }
+    if (response.status === 500) {
+      throw new Error('Внутренняя ошибка сервера при генерации письма');
+    }
+    throw new Error(await parseErrorMessage(response, 'Ошибка получения письма'));
+  }
 }
 
 export const uploadResume = createAsyncThunk(
@@ -185,7 +242,7 @@ export const startAnalysis = createAsyncThunk(
 
 export const generateLetter = createAsyncThunk(
   'resume/generateLetter',
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState, dispatch, rejectWithValue, signal }) => {
     try {
       const analysisId = getCurrentAnalysisId(getState);
       if (!analysisId) return rejectWithValue('Отсутствует analysisId');
@@ -194,27 +251,45 @@ export const generateLetter = createAsyncThunk(
       if (!token)
         return rejectWithValue('Для генерации сопроводительного письма нужно войти в аккаунт');
 
-      const response = await fetch(
-        `${API_URL}/letters?analysisId=${encodeURIComponent(analysisId)}`,
-        { method: 'POST', headers: buildHeaders(token) },
-      );
+      // переиспользуем letterId, если есть незавершённое поллинг-задание для этого же анализа
+      const stored = getState().resume.pendingLetter || readStoredPendingLetter();
+      let letterId = stored && stored.analysisId === analysisId ? stored.letterId : null;
 
-      if (!response.ok) {
-        return rejectWithValue(await parseErrorMessage(response, 'Ошибка генерации письма'));
+      if (!letterId) {
+        const response = await fetch(
+          `${API_URL}/letters?analysisId=${encodeURIComponent(analysisId)}`,
+          { method: 'POST', headers: buildHeaders(token), signal },
+        );
+
+        if (!response.ok) {
+          return rejectWithValue(await parseErrorMessage(response, 'Ошибка генерации письма'));
+        }
+
+        letterId = await parseLetterIdResponse(response);
+        if (!letterId) return rejectWithValue('Сервер не вернул идентификатор письма');
+
+        const pending = { analysisId, letterId };
+        persistPendingLetter(pending);
+        dispatch(setPendingLetter(pending));
       }
 
-      const letterRaw = await parseLetterResponse(response);
-      const letterText = String(letterRaw || '').trim() || 'Сопроводительное письмо не получено';
-      persistGeneratedLetter({ analysisId, text: letterText });
+      const letterText = await pollLetterUntilReady({ letterId, token, signal });
+      const text = letterText || 'Сопроводительное письмо не получено';
 
-      return { analysisId, text: letterText };
+      persistGeneratedLetter({ analysisId, text });
+      clearStoredPendingLetter();
+
+      return { analysisId, letterId, text };
     } catch (err) {
+      clearStoredPendingLetter();
+      if (err?.name === 'AbortError') return rejectWithValue('Генерация прервана');
       return rejectWithValue(err.message || 'Network error');
     }
   },
 );
 
 const storedGeneratedLetter = readStoredGeneratedLetter();
+const storedPendingLetter = readStoredPendingLetter();
 
 const resumeSlice = createSlice({
   name: 'resume',
@@ -224,6 +299,9 @@ const resumeSlice = createSlice({
     analysisResult: null,
     responseText: null,
     generatedLetter: storedGeneratedLetter,
+    pendingLetter: storedPendingLetter,
+    letterStatus: 'idle',
+    letterError: null,
     status: 'idle',
     error: null,
     vacancyInput: {
@@ -245,12 +323,16 @@ const resumeSlice = createSlice({
     clearResumeState(state) {
       clearStoredCvId();
       clearStoredGeneratedLetter();
+      clearStoredPendingLetter();
       if (canUseStorage()) localStorage.removeItem('analysisId');
       state.cvId = null;
       state.analysisId = null;
       state.analysisResult = null;
       state.responseText = null;
       state.generatedLetter = null;
+      state.pendingLetter = null;
+      state.letterStatus = 'idle';
+      state.letterError = null;
       state.status = 'idle';
       state.error = null;
       state.vacancyInput = { mode: 'link', link: '', text: '' };
@@ -273,6 +355,13 @@ const resumeSlice = createSlice({
     },
     clearGeneratedLetter(state) {
       state.generatedLetter = null;
+    },
+    setPendingLetter(state, action) {
+      state.pendingLetter = action.payload || null;
+    },
+    clearPendingLetter(state) {
+      clearStoredPendingLetter();
+      state.pendingLetter = null;
     },
   },
 
@@ -304,21 +393,44 @@ const resumeSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(startAnalysis.fulfilled, (state, action) => {
+        clearStoredPendingLetter();
         state.analysisId = action.payload;
         state.generatedLetter = null;
+        state.pendingLetter = null;
+        state.letterStatus = 'idle';
+        state.letterError = null;
+      })
+      .addCase(generateLetter.pending, (state) => {
+        state.letterStatus = 'pending';
+        state.letterError = null;
       })
       .addCase(generateLetter.fulfilled, (state, action) => {
-        state.generatedLetter = action.payload;
+        state.generatedLetter = {
+          analysisId: action.payload.analysisId,
+          text: action.payload.text,
+        };
+        state.pendingLetter = null;
+        state.letterStatus = 'succeeded';
+        state.letterError = null;
+      })
+      .addCase(generateLetter.rejected, (state, action) => {
+        state.pendingLetter = null;
+        state.letterStatus = 'failed';
+        state.letterError = action.payload || action.error?.message || 'Ошибка генерации письма';
       })
       .addCase(logout, (state) => {
         clearStoredCvId();
         clearStoredGeneratedLetter();
+        clearStoredPendingLetter();
         if (canUseStorage()) localStorage.removeItem('analysisId');
         state.cvId = null;
         state.analysisId = null;
         state.analysisResult = null;
         state.responseText = null;
         state.generatedLetter = null;
+        state.pendingLetter = null;
+        state.letterStatus = 'idle';
+        state.letterError = null;
         state.status = 'idle';
         state.error = null;
         state.vacancyInput = { mode: 'link', link: '', text: '' };
@@ -334,7 +446,13 @@ const resumeSlice = createSlice({
   },
 });
 
-export const { clearResumeState, updateManualField, updateVacancyInput, clearGeneratedLetter } =
-  resumeSlice.actions;
+export const {
+  clearResumeState,
+  updateManualField,
+  updateVacancyInput,
+  clearGeneratedLetter,
+  setPendingLetter,
+  clearPendingLetter,
+} = resumeSlice.actions;
 
 export default resumeSlice.reducer;

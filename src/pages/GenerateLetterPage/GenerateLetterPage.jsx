@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
@@ -14,12 +14,29 @@ const GenerateLetterPage = () => {
   const auth = useSelector(selectAuth);
   const analysisId =
     useSelector((state) => state.resume.analysisId) || localStorage.getItem('analysisId');
+  const pendingLetter = useSelector((state) => state.resume.pendingLetter);
+  const letterStatus = useSelector((state) => state.resume.letterStatus);
 
-  const [isLoading, setIsLoading] = useState(false);
-
+  const isLoading = letterStatus === 'pending';
   const isLoggedIn = Boolean(auth?.isAuthenticated && auth?.accessToken);
 
-  const handleGenerate = async () => {
+  // если для текущего analysisId уже идёт (или висит после обновления) генерация письма —
+  // сразу уходим на /resultspage, лоадер крутится там
+  const resumedRef = useRef(false);
+  useEffect(() => {
+    if (resumedRef.current) return;
+    if (!analysisId) return;
+    const hasPending = pendingLetter && pendingLetter.analysisId === analysisId;
+    if (letterStatus === 'pending' || hasPending) {
+      resumedRef.current = true;
+      if (letterStatus !== 'pending' && hasPending && isLoggedIn) {
+        dispatch(generateLetter());
+      }
+      navigate('/resultspage', { replace: true });
+    }
+  }, [analysisId, pendingLetter, letterStatus, isLoggedIn, dispatch, navigate]);
+
+  const handleGenerate = () => {
     if (!analysisId) {
       toast.error('Не найден analysisId. Сначала запустите анализ заново.');
       return;
@@ -29,17 +46,10 @@ const GenerateLetterPage = () => {
       navigate('/login');
       return;
     }
-    setIsLoading(true);
-    try {
-      await dispatch(generateLetter()).unwrap();
-      navigate('/resultspage', { replace: true });
-    } catch (error) {
-      toast.error(
-        typeof error === 'string' ? error : error?.message || 'Не удалось сгенерировать письмо',
-      );
-    } finally {
-      setIsLoading(false);
-    }
+    // запускаем POST + поллинг письма в фоне и сразу уходим на страницу результатов —
+    // там общий лоадер дождётся и анализ, и письмо
+    dispatch(generateLetter());
+    navigate('/resultspage', { replace: true });
   };
 
   const handleSkip = () => {
@@ -127,7 +137,7 @@ const GenerateLetterPage = () => {
               {isLoading ? (
                 <>
                   <Spinner size="sm" thickness="3px" speed="0.65s" mr="8px" />
-                  Генерируем...
+                  Готовим письмо...
                 </>
               ) : (
                 'Сгенерировать'
