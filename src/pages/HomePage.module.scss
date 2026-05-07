@@ -24,6 +24,131 @@
   line-height: 1.1;
 }
 
+// === RESUME BANNER (returning users) ===
+.resumeBanner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px;
+  border-radius: 18px;
+  background: #fffaf4;
+  border: 1px solid rgba(251, 192, 45, 0.32);
+  box-shadow: 0 4px 16px rgba(251, 192, 45, 0.08);
+}
+
+.resumeBannerIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(251, 192, 45, 0.2);
+  color: #8b6800;
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.resumeBannerText {
+  flex: 1;
+  min-width: 0;
+}
+
+.resumeBannerKicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6800;
+  margin: 0 0 4px;
+}
+
+.resumeBannerTitle {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.85);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.resumeBannerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.resumeBannerReset {
+  background: transparent;
+  border: none;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: #000;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(251, 192, 45, 0.6);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+.resumeBannerCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  background: #000;
+  color: #fbc02d !important;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    opacity: 0.88;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 720px) {
+  .resumeBanner {
+    flex-wrap: wrap;
+    padding: 16px 18px;
+  }
+
+  .resumeBannerActions {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 4px;
+  }
+
+  .resumeBannerCta {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
 // === HERO ===
 .hero {
   display: grid;

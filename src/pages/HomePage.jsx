@@ -1,7 +1,9 @@
 import styles from './HomePage.module.scss';
 import { Link } from 'react-router';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ANALYSIS_CATEGORIES } from '../config/analysisCategories';
+import { clearResumeState } from '../redux/slices/resumeSlice';
 import folderpic from '../assets/folder.png';
 import servicepic from '../assets/service.png';
 import dashboardpic from '../assets/dashboard.png';
@@ -55,8 +57,60 @@ const FAQ_ITEMS = [
 ];
 
 const HomePage = () => {
+  const dispatch = useDispatch();
+  const cvId = useSelector((s) => s.resume.cvId);
+  const analysisId = useSelector((s) => s.resume.analysisId);
+
+  // analysisId важнее: если запущен анализ — ведём в отчёт;
+  // иначе если есть только cvId — на шаг с вакансией.
+  const resumeProgress = analysisId
+    ? {
+        to: '/resultspage',
+        kicker: 'Анализ запущен',
+        title: 'Вернитесь к отчёту — мы сохранили ваш анализ',
+        cta: 'Перейти к отчёту',
+      }
+    : cvId
+    ? {
+        to: '/uploadvacancy',
+        kicker: 'Резюме загружено',
+        title: 'Продолжите проверку — резюме уже у нас',
+        cta: 'Продолжить',
+      }
+    : null;
+
   return (
     <main className={styles.page}>
+      {resumeProgress && (
+        <section className={styles.resumeBanner}>
+          <span className={styles.resumeBannerIcon} aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+          </span>
+          <div className={styles.resumeBannerText}>
+            <p className={styles.resumeBannerKicker}>{resumeProgress.kicker}</p>
+            <p className={styles.resumeBannerTitle}>{resumeProgress.title}</p>
+          </div>
+          <div className={styles.resumeBannerActions}>
+            <button
+              type="button"
+              className={styles.resumeBannerReset}
+              onClick={() => dispatch(clearResumeState())}>
+              Начать заново
+            </button>
+            <Link to={resumeProgress.to} className={styles.resumeBannerCta}>
+              {resumeProgress.cta}
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+      )}
+
       {/* === HERO === */}
       <section className={styles.hero}>
         <div className={styles.titleBlock}>
