@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
 import styles from './AuthPage.module.scss';
@@ -15,8 +15,14 @@ export default function AuthPage() {
   const dispatch = useDispatch();
   const auth = useSelector(selectAuth);
 
+  // Стартовый таб берём из ?mode=register|login — это позволяет шапке вести
+  // отдельные ссылки "Регистрация" и "Войти" на одну и ту же страницу,
+  // открывая её в нужном табе. При неизвестном/отсутствующем значении — login.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialMode = searchParams.get('mode') === 'register' ? 'register' : 'login';
+
   const [isAnimating, setIsAnimating] = useState(false);
-  const [mode, setMode] = useState('login');
+  const [mode, setMode] = useState(initialMode);
   const [loginForm, setLoginForm] = useState(initialLoginForm);
   const [registerForm, setRegisterForm] = useState(initialRegisterForm);
 
@@ -29,6 +35,11 @@ export default function AuthPage() {
       setMode(nextMode);
       dispatch(clearAuthError());
       setIsAnimating(false);
+      // держим URL в синке — чтобы перезагрузка / sharing ссылки сохраняли таб
+      setSearchParams(
+        nextMode === 'register' ? { mode: 'register' } : {},
+        { replace: true },
+      );
     }, 200);
   };
 
