@@ -19,7 +19,7 @@ const UploadVacancyPage = () => {
       return 'Введите ссылку на вакансию';
     }
     if (!HH_VACANCY_REGEX.test(link.trim())) {
-      return 'Ссылка должна быть с hh.ru или hh.kz и вести на вакансию (например: https://hh.ru/vacancy/123456)';
+      return 'Ссылка должна быть с hh.ru или hh.kz и вести на вакансию.';
     }
     return null;
   }

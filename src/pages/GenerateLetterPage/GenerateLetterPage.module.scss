@@ -87,17 +87,59 @@
 
 .statusBlock {
   display: grid;
-  gap: 8px;
+  gap: 14px;
 }
 
-.statusValue {
-  font-size: 22px;
-  font-weight: 600;
-  color: #000;
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
 }
 
-.statusWarning {
-  color: #a66200;
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.checkOk {
+  .checkIcon {
+    background: rgba(46, 172, 120, 0.14);
+    color: #2eac78;
+  }
+
+  .checkLabel {
+    color: rgba(0, 0, 0, 0.78);
+  }
+}
+
+.checkBad {
+  .checkIcon {
+    background: rgba(251, 146, 60, 0.16);
+    color: #a66200;
+  }
+
+  .checkLabel {
+    color: #a66200;
+    font-weight: 500;
+  }
 }
 
 .analysisHint {

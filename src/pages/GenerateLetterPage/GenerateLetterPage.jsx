@@ -16,9 +16,12 @@ const GenerateLetterPage = () => {
     useSelector((state) => state.resume.analysisId) || localStorage.getItem('analysisId');
   const pendingLetter = useSelector((state) => state.resume.pendingLetter);
   const letterStatus = useSelector((state) => state.resume.letterStatus);
+  const analysisHasVacancy = useSelector((state) => state.resume.analysisHasVacancy);
 
   const isLoading = letterStatus === 'pending';
   const isLoggedIn = Boolean(auth?.isAuthenticated && auth?.accessToken);
+  // null трактуем как «не уверены» (например, старый анализ в localStorage без флага) — лучше перестраховаться и попросить указать вакансию
+  const hasVacancy = analysisHasVacancy === true;
 
   // если для текущего analysisId уже идёт (или висит после обновления) генерация письма —
   // сразу уходим на /resultspage, лоадер крутится там
@@ -41,6 +44,11 @@ const GenerateLetterPage = () => {
       toast.error('Не найден analysisId. Сначала запустите анализ заново.');
       return;
     }
+    if (!hasVacancy) {
+      toast.warn('Сначала укажите ссылку на вакансию');
+      navigate('/uploadvacancy');
+      return;
+    }
     if (!isLoggedIn) {
       toast.warn('Сначала войдите в аккаунт');
       navigate('/login');
@@ -54,6 +62,14 @@ const GenerateLetterPage = () => {
 
   const handleSkip = () => {
     navigate('/resultspage', { replace: true });
+  };
+
+  const handleAddVacancy = () => {
+    navigate('/uploadvacancy');
+  };
+
+  const handleGoLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -91,13 +107,30 @@ const GenerateLetterPage = () => {
           <div>
             <div className={styles.statusBlock}>
               <p className={styles.statusLabel}>Статус</p>
-              {isLoggedIn ? (
-                <p className={styles.statusValue}>Вы вошли в аккаунт</p>
-              ) : (
-                <p className={`${styles.statusValue} ${styles.statusWarning}`}>
-                  Генерация доступна только зарегистрированным пользователям
-                </p>
-              )}
+              <ul className={styles.checklist}>
+                <li
+                  className={`${styles.checkItem} ${
+                    hasVacancy ? styles.checkOk : styles.checkBad
+                  }`}>
+                  <span className={styles.checkIcon} aria-hidden="true">
+                    {hasVacancy ? '✓' : '✕'}
+                  </span>
+                  <span className={styles.checkLabel}>
+                    {hasVacancy ? 'Вакансия указана' : 'Укажите вакансию на предыдущем шаге'}
+                  </span>
+                </li>
+                <li
+                  className={`${styles.checkItem} ${
+                    isLoggedIn ? styles.checkOk : styles.checkBad
+                  }`}>
+                  <span className={styles.checkIcon} aria-hidden="true">
+                    {isLoggedIn ? '✓' : '✕'}
+                  </span>
+                  <span className={styles.checkLabel}>
+                    {isLoggedIn ? 'Вы вошли в аккаунт' : 'Войдите в аккаунт'}
+                  </span>
+                </li>
+              </ul>
               {analysisId ? (
                 <p className={styles.analysisHint}>
                   Анализ: <span>{String(analysisId).slice(0, 8)}...</span>
@@ -124,25 +157,51 @@ const GenerateLetterPage = () => {
           </div>
 
           <div className={styles.buttonsRow}>
-            <Button
-              onClick={handleGenerate}
-              isDisabled={isLoading || !analysisId}
-              height="50px"
-              borderRadius="16px"
-              bg="#000"
-              color="#FBC02D"
-              fontSize="18px"
-              _hover={{ bg: '#161616' }}
-              width="100%">
-              {isLoading ? (
-                <>
-                  <Spinner size="sm" thickness="3px" speed="0.65s" mr="8px" />
-                  Готовим письмо...
-                </>
-              ) : (
-                'Сгенерировать'
-              )}
-            </Button>
+            {!hasVacancy ? (
+              <Button
+                onClick={handleAddVacancy}
+                height="50px"
+                borderRadius="16px"
+                bg="#000"
+                color="#FBC02D"
+                fontSize="18px"
+                _hover={{ bg: '#161616' }}
+                width="100%">
+                Указать вакансию
+              </Button>
+            ) : !isLoggedIn ? (
+              <Button
+                onClick={handleGoLogin}
+                height="50px"
+                borderRadius="16px"
+                bg="#000"
+                color="#FBC02D"
+                fontSize="18px"
+                _hover={{ bg: '#161616' }}
+                width="100%">
+                Войти в аккаунт
+              </Button>
+            ) : (
+              <Button
+                onClick={handleGenerate}
+                isDisabled={isLoading || !analysisId}
+                height="50px"
+                borderRadius="16px"
+                bg="#000"
+                color="#FBC02D"
+                fontSize="18px"
+                _hover={{ bg: '#161616' }}
+                width="100%">
+                {isLoading ? (
+                  <>
+                    <Spinner size="sm" thickness="3px" speed="0.65s" mr="8px" />
+                    Готовим письмо...
+                  </>
+                ) : (
+                  'Сгенерировать'
+                )}
+              </Button>
+            )}
             <Button
               onClick={handleSkip}
               height="50px"

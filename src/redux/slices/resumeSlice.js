@@ -4,6 +4,7 @@ import { logout } from './authSlice';
 
 const GENERATED_LETTER_KEY = 'analysis_generated_letter';
 const PENDING_LETTER_KEY = 'analysis_pending_letter';
+const ANALYSIS_HAS_VACANCY_KEY = 'analysis_has_vacancy';
 const CV_ID_KEY = 'cvId';
 const LETTER_POLL_INTERVAL_MS = 2500;
 
@@ -63,6 +64,22 @@ function persistGeneratedLetter(payload) {
 function clearStoredGeneratedLetter() {
   if (!canUseStorage()) return;
   localStorage.removeItem(GENERATED_LETTER_KEY);
+}
+
+function readStoredAnalysisHasVacancy() {
+  if (!canUseStorage()) return null;
+  const raw = localStorage.getItem(ANALYSIS_HAS_VACANCY_KEY);
+  if (raw === 'true') return true;
+  if (raw === 'false') return false;
+  return null;
+}
+function persistAnalysisHasVacancy(value) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(ANALYSIS_HAS_VACANCY_KEY, String(Boolean(value)));
+}
+function clearStoredAnalysisHasVacancy() {
+  if (!canUseStorage()) return;
+  localStorage.removeItem(ANALYSIS_HAS_VACANCY_KEY);
 }
 
 function readStoredPendingLetter() {
@@ -290,12 +307,14 @@ export const generateLetter = createAsyncThunk(
 
 const storedGeneratedLetter = readStoredGeneratedLetter();
 const storedPendingLetter = readStoredPendingLetter();
+const storedAnalysisHasVacancy = readStoredAnalysisHasVacancy();
 
 const resumeSlice = createSlice({
   name: 'resume',
   initialState: {
     cvId: readStoredCvId(),
     analysisId: null,
+    analysisHasVacancy: storedAnalysisHasVacancy,
     analysisResult: null,
     responseText: null,
     generatedLetter: storedGeneratedLetter,
@@ -324,9 +343,11 @@ const resumeSlice = createSlice({
       clearStoredCvId();
       clearStoredGeneratedLetter();
       clearStoredPendingLetter();
+      clearStoredAnalysisHasVacancy();
       if (canUseStorage()) localStorage.removeItem('analysisId');
       state.cvId = null;
       state.analysisId = null;
+      state.analysisHasVacancy = null;
       state.analysisResult = null;
       state.responseText = null;
       state.generatedLetter = null;
@@ -393,8 +414,11 @@ const resumeSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(startAnalysis.fulfilled, (state, action) => {
+        const hasVacancy = Boolean(action.meta.arg?.link);
         clearStoredPendingLetter();
+        persistAnalysisHasVacancy(hasVacancy);
         state.analysisId = action.payload;
+        state.analysisHasVacancy = hasVacancy;
         state.generatedLetter = null;
         state.pendingLetter = null;
         state.letterStatus = 'idle';
@@ -422,9 +446,11 @@ const resumeSlice = createSlice({
         clearStoredCvId();
         clearStoredGeneratedLetter();
         clearStoredPendingLetter();
+        clearStoredAnalysisHasVacancy();
         if (canUseStorage()) localStorage.removeItem('analysisId');
         state.cvId = null;
         state.analysisId = null;
+        state.analysisHasVacancy = null;
         state.analysisResult = null;
         state.responseText = null;
         state.generatedLetter = null;
