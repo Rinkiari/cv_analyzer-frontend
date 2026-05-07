@@ -2,12 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { API_URL } from '../../config/api';
 import { Button, Spinner } from '@chakra-ui/react';
 import ReactMarkdown from 'react-markdown';
 import styles from './MyProfilePage.module.scss';
 import { fetchAnalysesHistory, selectProfile } from '../../redux/slices/profileSlice';
-import { selectAuth } from '../../redux/slices/authSlice';
+import { fetchUserInfo, selectAuth } from '../../redux/slices/authSlice';
 import { ANALYSIS_CATEGORIES, LETTER_CATEGORY } from '../../config/analysisCategories';
 
 function getStoredUserId() {
@@ -78,28 +77,16 @@ export default function MyProfilePage() {
   const userId = auth?.userId || storedUserId;
   const isLoggedIn = Boolean((auth?.accessToken || storedAccessToken) && userId);
   const userLabel = useMemo(() => userId || 'Гость', [userId]);
+  const firstName = auth?.firstName;
 
-  const [name, setName] = useState({});
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('structure');
 
   useEffect(() => {
-    if (!userId) return;
-    const fetchNameInfo = async () => {
-      try {
-        const res = await fetch(`${API_URL}/users?userId=${userId}`, {
-          headers: { Authorization: `Bearer ${getStoredAccessToken()}` },
-        });
-        if (res.status === 200) {
-          const data = await res.json();
-          setName(data);
-        }
-      } catch (e) {
-        console.log('e:', e);
-      }
-    };
-    fetchNameInfo();
-  }, [userId]);
+    if (isLoggedIn && !firstName && auth.userInfoStatus === 'idle') {
+      dispatch(fetchUserInfo());
+    }
+  }, [dispatch, isLoggedIn, firstName, auth.userInfoStatus]);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -180,12 +167,12 @@ export default function MyProfilePage() {
         <div className={styles.profileCard}>
           <div className={styles.profileHeader}>
             <div className={styles.profileAvatar}>
-              {(name?.firstName?.[0] || 'U').toUpperCase()}
+              {(firstName?.[0] || 'U').toUpperCase()}
             </div>
             <div>
               <p className={styles.cardLabel}>Пользователь</p>
               <h2 className={styles.profileName}>
-                {name?.firstName || 'Без имени'}
+                {firstName || 'Без имени'}
               </h2>
               <p className={styles.profileId}>ID: {userLabel}</p>
             </div>

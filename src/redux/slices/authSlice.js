@@ -135,6 +135,29 @@ export const registerUser = createAsyncThunk(
   },
 );
 
+export const fetchUserInfo = createAsyncThunk(
+  'auth/fetchUserInfo',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { userId, accessToken } = getState().auth;
+      if (!userId) return rejectWithValue('Отсутствует userId');
+
+      const response = await fetch(`${API_URL}/users?userId=${encodeURIComponent(userId)}`, {
+        method: 'GET',
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+      });
+
+      if (!response.ok) {
+        throw new Error(await parseErrorMessage(response));
+      }
+
+      return response.json();
+    } catch (error) {
+      return rejectWithValue(error.message || 'Не удалось загрузить пользователя');
+    }
+  },
+);
+
 export const refreshTokens = createAsyncThunk(
   'auth/refreshTokens',
   async (_, { getState, rejectWithValue }) => {
@@ -165,6 +188,9 @@ const initialState = {
   refreshToken: storedAuth.refreshToken,
   accessTokenExpiresAt: storedAuth.accessTokenExpiresAt,
   refreshTokenExpiresAt: storedAuth.refreshTokenExpiresAt,
+  firstName: null,
+  lastName: null,
+  userInfoStatus: 'idle',
   status: 'idle',
   error: null,
   isAuthenticated: Boolean(storedAuth.accessToken && storedAuth.refreshToken),
@@ -180,6 +206,9 @@ const authSlice = createSlice({
       state.refreshToken = null;
       state.accessTokenExpiresAt = null;
       state.refreshTokenExpiresAt = null;
+      state.firstName = null;
+      state.lastName = null;
+      state.userInfoStatus = 'idle';
       state.status = 'idle';
       state.error = null;
       state.isAuthenticated = false;
@@ -209,6 +238,10 @@ const authSlice = createSlice({
       state.status = 'succeeded';
       state.error = null;
       state.isAuthenticated = true;
+      // userId сменился — старое имя больше не релевантно, пусть подгрузится заново
+      state.firstName = null;
+      state.lastName = null;
+      state.userInfoStatus = 'idle';
     };
 
     builder
@@ -220,7 +253,18 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, rejected)
       .addCase(refreshTokens.pending, pending)
       .addCase(refreshTokens.fulfilled, fulfilled)
-      .addCase(refreshTokens.rejected, rejected);
+      .addCase(refreshTokens.rejected, rejected)
+      .addCase(fetchUserInfo.pending, (state) => {
+        state.userInfoStatus = 'loading';
+      })
+      .addCase(fetchUserInfo.fulfilled, (state, action) => {
+        state.firstName = action.payload?.firstName || null;
+        state.lastName = action.payload?.lastName || null;
+        state.userInfoStatus = 'succeeded';
+      })
+      .addCase(fetchUserInfo.rejected, (state) => {
+        state.userInfoStatus = 'failed';
+      });
   },
 });
 

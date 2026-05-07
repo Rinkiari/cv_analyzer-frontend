@@ -1,9 +1,11 @@
 import styles from './HomePage.module.scss';
 import { Link } from 'react-router';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ANALYSIS_CATEGORIES } from '../config/analysisCategories';
 import { clearResumeState } from '../redux/slices/resumeSlice';
+import { fetchUserInfo, selectAuth } from '../redux/slices/authSlice';
 import folderpic from '../assets/folder.png';
 import servicepic from '../assets/service.png';
 import dashboardpic from '../assets/dashboard.png';
@@ -60,6 +62,14 @@ const HomePage = () => {
   const dispatch = useDispatch();
   const cvId = useSelector((s) => s.resume.cvId);
   const analysisId = useSelector((s) => s.resume.analysisId);
+  const { isAuthenticated, firstName, userInfoStatus } = useSelector(selectAuth);
+
+  // подгружаем имя один раз после логина
+  useEffect(() => {
+    if (isAuthenticated && !firstName && userInfoStatus === 'idle') {
+      dispatch(fetchUserInfo());
+    }
+  }, [isAuthenticated, firstName, userInfoStatus, dispatch]);
 
   // analysisId важнее: если запущен анализ — ведём в отчёт;
   // иначе если есть только cvId — на шаг с вакансией.
@@ -114,7 +124,18 @@ const HomePage = () => {
       {/* === HERO === */}
       <section className={styles.hero}>
         <div className={styles.titleBlock}>
-          <p className={styles.kicker}>Сервис анализа резюме</p>
+          {isAuthenticated ? (
+            <p className={styles.greeting}>
+              С возвращением
+              {firstName ? (
+                <>
+                  ,&nbsp;<span className={styles.greetingName}>{firstName}</span>
+                </>
+              ) : null}
+            </p>
+          ) : (
+            <p className={styles.kicker}>Сервис анализа резюме</p>
+          )}
           <h1 className={styles.heroTitle}>
             Проверь своё резюме перед&nbsp;отправкой работодателю
           </h1>
@@ -123,13 +144,26 @@ const HomePage = () => {
             письмо за ~10 секунд.
           </p>
 
+          {isAuthenticated ? (
+            <p className={styles.perkLine}>
+              <span className={styles.perkCheck} aria-hidden="true">✓</span>
+              Сопроводительное письмо включено в ваш отчёт
+            </p>
+          ) : null}
+
           <div className={styles.ctaRow}>
             <Link to="/uploadresume" className={styles.btnPrimary}>
               Проверить резюме
             </Link>
-            <a href="#how-it-works" className={styles.btnGhost}>
-              Как это работает
-            </a>
+            {isAuthenticated ? (
+              <Link to="/myprofile" className={styles.btnGhost}>
+                Мой профиль
+              </Link>
+            ) : (
+              <a href="#how-it-works" className={styles.btnGhost}>
+                Как это работает
+              </a>
+            )}
           </div>
 
           <div className={styles.heroStats}>
