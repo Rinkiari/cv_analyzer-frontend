@@ -3,7 +3,7 @@
   padding-bottom: 48px;
   display: flex;
   flex-direction: column;
-  gap: 56px;
+  gap: 40px;
 }
 
 // === SHARED ===
@@ -170,6 +170,16 @@
   padding: 36px 36px 32px;
   display: flex;
   flex-direction: column;
+  // три семантические секции (head / benefits / foot) распределяются равномерно,
+  // когда правая превью-карточка делает блок выше его естественной высоты
+  justify-content: space-between;
+  gap: 28px;
+}
+
+// верхняя секция блока — kicker/greeting + H1 + subtitle, без gap внутри (свои margin'ы)
+.titleHead {
+  display: flex;
+  flex-direction: column;
 }
 
 .heroTitle {
@@ -195,14 +205,15 @@
   font-weight: 600;
 }
 
-// подсказка про сопроводительное письмо для залогиненных
+// зелёная "лента перков" — показывается только авторизованным сразу под greeting'ом.
+// делает auth-шапку визуально богаче гостевой и возвращает зелёный акцент в hero.
 .perkLine {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   align-self: flex-start;
-  margin: 0 0 24px;
-  padding: 7px 14px;
+  margin: 0 0 14px;
+  padding: 6px 12px;
   border-radius: 999px;
   background: rgba(46, 172, 120, 0.1);
   border: 1px solid rgba(46, 172, 120, 0.22);
@@ -230,8 +241,57 @@
   font-size: 17px;
   color: rgba(0, 0, 0, 0.65);
   line-height: 1.55;
-  margin: 0 0 28px;
+  margin: 0;
   max-width: 540px;
+}
+
+// === BENEFITS — наполняет середину блока смыслом, а не воздухом ===
+.benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.benefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgba(0, 0, 0, 0.72);
+
+  b {
+    color: #000;
+    font-weight: 600;
+  }
+}
+
+.benefitCheck {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border-radius: 50%;
+  background: rgba(251, 192, 45, 0.18);
+  color: #8b6800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+// нижняя секция — CTA + компактная trust-строка
+.titleFoot {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .ctaRow {
@@ -269,56 +329,44 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
-  padding: 0 22px;
+  height: 44px;
+  padding: 0 14px;
   background: transparent;
-  color: rgba(0, 0, 0, 0.75) !important;
-  border: 1.5px solid rgba(0, 0, 0, 0.15);
-  border-radius: 14px;
-  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6) !important;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 16px;
   cursor: pointer;
   text-decoration: none;
-  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.4);
     color: #000 !important;
-    background: rgba(0, 0, 0, 0.03);
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(0, 0, 0, 0.25);
+    outline-offset: 2px;
   }
 }
 
-.heroStats {
-  margin-top: auto;
-  padding-top: 32px;
+// тонкая trust-строка под CTA — не претендует на самостоятельный блок,
+// просто сообщает ключевые факты одной строкой
+.trustLine {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
-}
-
-.statItem {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.statValue {
-  font-size: 20px;
-  font-weight: 600;
-  color: #000;
+  gap: 8px;
   margin: 0;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.55);
   line-height: 1;
 }
 
-.statLabel {
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.55);
-  margin: 0;
-}
-
-.statDivider {
-  width: 1px;
-  height: 28px;
-  background: rgba(0, 0, 0, 0.1);
+.trustDot {
+  color: rgba(0, 0, 0, 0.3);
 }
 
 // --- preview-карточка (mock результата) ---
@@ -330,7 +378,7 @@
   background: #f7f5f1;
 }
 
-.previewHeader {
+.previewWindowBar {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -345,11 +393,52 @@
   border-radius: 50%;
 }
 
-.previewTitle {
-  margin-left: 12px;
+// большой заголовок превью — тянет внимание пользователя на демо
+.previewIntro {
+  padding: 22px 22px 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #fbc02d 8%, transparent) 0%,
+    transparent 100%
+  );
+}
+
+.previewIntroKicker {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8b6800;
+  margin: 0 0 8px;
+}
+
+.previewIntroTitle {
+  font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+  font-size: 24px;
+  font-weight: 500;
+  color: #000 !important;
+  margin: 0 0 6px;
+  line-height: 1.15;
+}
+
+.previewIntroHint {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  line-height: 1.4;
+}
+
+// описание категории внутри контентной панели — над strengths/improvements
+.previewDescription {
   font-size: 12px;
-  color: rgba(0, 0, 0, 0.55);
-  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.65);
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
+  border-left: 3px solid var(--accent);
 }
 
 .previewBody {
@@ -516,6 +605,8 @@
 // === SECTIONS (How it works / What we check) ===
 .section {
   // секции — без обёртки-карточки, кикер + заголовок + сетка
+  // отступ для якорной прокрутки (#how-it-works), чтобы не упираться в самый верх
+  scroll-margin-top: 80px;
 }
 
 // --- step-cards ---
@@ -584,63 +675,6 @@
 .stepText {
   font-size: 15px;
   color: rgba(0, 0, 0, 0.65);
-  line-height: 1.5;
-  margin: 0;
-}
-
-// --- features grid ---
-.featuresGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-
-.featureCard {
-  --accent: #fbc02d;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 22px;
-  padding: 24px 24px 22px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.07);
-    border-color: color-mix(in srgb, var(--accent) 30%, rgba(0, 0, 0, 0.08));
-  }
-}
-
-.featureIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-
-  svg {
-    width: 22px;
-    height: 22px;
-  }
-}
-
-.featureTitle {
-  font-size: 17px;
-  font-weight: 600;
-  color: #000 !important;
-  margin: 0 0 6px;
-  line-height: 1.25;
-}
-
-.featureText {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.62);
   line-height: 1.5;
   margin: 0;
 }
@@ -799,10 +833,6 @@
   .heroTitle {
     font-size: 36px;
   }
-
-  .featuresGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (max-width: 980px) {
@@ -811,10 +841,6 @@
   }
 
   .stepsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .featuresGrid {
     grid-template-columns: 1fr;
   }
 
@@ -836,12 +862,13 @@
 }
 
 @media (max-width: 560px) {
-  .heroStats {
-    gap: 14px;
+  .trustLine {
+    font-size: 12px;
+    gap: 6px;
   }
 
-  .statValue {
-    font-size: 17px;
+  .benefitItem {
+    font-size: 14px;
   }
 
   .ctaRow {
