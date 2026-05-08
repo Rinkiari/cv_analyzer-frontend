@@ -9,13 +9,14 @@ import { routeSteps, routeBackTargets } from '../../config/routeSteps';
 import accountpic from '../../assets/portrait2.png';
 
 // ----- nav -----
-// `to` — навигация через react-router (отдельная страница);
+// `to` — навигация через react-router (страница или страница+якорь);
 // `href` — обычный якорь в текущей странице. FAQ живёт на /about,
-// поэтому ведём в /about#faq — useLocation().hash в AboutPage скроллит дальше.
+// контакты — на главной (#contacts). useLocation().hash в HomePage и
+// AboutPage сам скроллит к нужной секции — react-router этого не делает.
 const NAV_ITEMS = [
   { label: 'О сервисе', to: '/about' },
   { label: 'FAQ', to: '/about#faq' },
-  { label: 'Контакты', href: '#contacts' },
+  { label: 'Контакты', to: '/#contacts' },
 ];
 
 // ----- step labels (для контекстной полосы внутри потока) -----

@@ -698,28 +698,77 @@
   font-size: 32px;
   font-weight: 500;
   color: #fff !important;
-  margin: 0 0 12px;
+  // увеличенный нижний отступ — раньше под title шла подпись и кнопка,
+  // теперь идёт сетка контактов, ей нужно больше воздуха
+  margin: 0 0 36px;
   line-height: 1.15;
 }
 
-.finalSubtitle {
-  font-size: 16px;
-  color: rgba(255, 255, 255, 0.65);
-  margin: 0 0 28px;
-  line-height: 1.5;
+// === CONTACTS GRID (внутри .finalCta) ===
+// Две карточки: Frontend / Backend. На чёрном фоне — белый текст с
+// прозрачностью, hover подсвечивает в фирменный жёлтый.
+.contactsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  width: 100%;
 }
 
-.finalCta .btnPrimary {
-  background: #fbc02d;
-  color: #000 !important;
-  height: 54px;
-  padding: 0 36px;
-  font-size: 19px;
-  font-weight: 600;
+.contactCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+}
+
+.contactRole {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.contactLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.contactLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 15px;
+  line-height: 1.2;
+  transition: color 0.18s ease, transform 0.18s ease;
+
+  // svg внутри ссылки наследует currentColor — работает и для outline mail,
+  // и для filled github-mark
+  svg {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.55);
+    transition: color 0.18s ease;
+  }
 
   &:hover {
-    opacity: 0.92;
-    background: #ffd468;
+    color: #fbc02d;
+    transform: translateY(-1px);
+
+    svg {
+      color: #fbc02d;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(251, 192, 45, 0.7);
+    outline-offset: 4px;
+    border-radius: 4px;
   }
 }
 
@@ -753,6 +802,13 @@
 
   .finalCta {
     padding: 44px 24px;
+  }
+
+  // на ≤980px карточки контактов складываются в одну колонку,
+  // чтобы каждая занимала всю ширину и не сжималась
+  .contactsGrid {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 }
 

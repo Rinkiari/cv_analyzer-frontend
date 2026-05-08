@@ -1,6 +1,6 @@
 import styles from './HomePage.module.scss';
-import { Link } from 'react-router';
-import { useState } from 'react';
+import { Link, useLocation } from 'react-router';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 import { ANALYSIS_CATEGORIES } from '../config/analysisCategories';
@@ -65,6 +65,47 @@ const PREVIEW_CONTENT = {
 // FAQ_ITEMS уехал на AboutPage (/about#faq) — на главной он дублировал
 // дисклеймер и trustLine.
 
+// Контактная карточка в финальной секции. Якорь #contacts связан с пунктом
+// "Контакты" в Header (`to: '/#contacts'`) — клик из любой страницы
+// приземляется сюда (см. useEffect ниже, который скроллит к якорю).
+const AUTHORS = [
+  {
+    role: 'Frontend',
+    email: 'hitoasds@yandex.ru',
+    github: 'https://github.com/Rinkiari',
+    githubLabel: 'github.com/Rinkiari',
+  },
+  {
+    role: 'Backend',
+    email: 'ekaterinaryzhenkova@gmail.com',
+    github: 'https://github.com/ekaterinaryzhenkova',
+    githubLabel: 'github.com/ekaterinaryzhenkova',
+  },
+];
+
+const MailIcon = () => (
+  <svg
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true">
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="M2 6l10 7 10-7" />
+  </svg>
+);
+
+const GithubIcon = () => (
+  // официальный mark GitHub — заполненная иконка, наследует currentColor
+  <svg width="18" height="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+  </svg>
+);
+
 const HomePage = () => {
   // greeting и подгрузка имени теперь живут в Header — здесь хватает isAuthenticated
   // для условного рендера auth-only элементов (perkLine + ссылка в профиль).
@@ -83,6 +124,19 @@ const HomePage = () => {
     const el = document.getElementById('how-it-works');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
+
+  // Если на главную пришли по ссылке из шапки `/#contacts` (с другой страницы),
+  // react-router сам не скроллит к якорю — делаем это вручную.
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.hash) return;
+    const id = location.hash.replace(/^#/, '');
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+    return () => window.clearTimeout(t);
+  }, [location.hash]);
 
   return (
     <main className={styles.page}>
@@ -266,17 +320,35 @@ const HomePage = () => {
 
       {/* FAQ перенесён на /about#faq — здесь не дублируем */}
 
-      {/* === FINAL CTA === */}
-      <section className={styles.finalCta}>
+      {/* === CONTACTS (бывшая FINAL CTA) ===
+          Сохраняем визуал — чёрная карточка с жёлтым radial-gradient — но
+          по смыслу это контактный блок. id="contacts" подцепляет якорь из
+          Header nav (`to: '/#contacts'`). */}
+      <section className={styles.finalCta} id="contacts">
         <div className={styles.finalCtaInner}>
-          <p className={styles.finalKicker}>Готовы начать?</p>
-          <h2 className={styles.finalTitle}>Загрузите резюме — получите отчёт через минуту</h2>
-          <p className={styles.finalSubtitle}>
-            Без регистрации, без оплаты, без долгих форм.
-          </p>
-          <Link to="/uploadresume" className={styles.btnPrimary}>
-            Загрузить резюме
-          </Link>
+          <p className={styles.finalKicker}>Контакты</p>
+          <h2 className={styles.finalTitle}>Связаться с авторами</h2>
+          <div className={styles.contactsGrid}>
+            {AUTHORS.map((a) => (
+              <div key={a.role} className={styles.contactCard}>
+                <p className={styles.contactRole}>{a.role}</p>
+                <div className={styles.contactLinks}>
+                  <a className={styles.contactLink} href={`mailto:${a.email}`}>
+                    <MailIcon />
+                    <span>{a.email}</span>
+                  </a>
+                  <a
+                    className={styles.contactLink}
+                    href={a.github}
+                    target="_blank"
+                    rel="noreferrer noopener">
+                    <GithubIcon />
+                    <span>{a.githubLabel}</span>
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </main>
