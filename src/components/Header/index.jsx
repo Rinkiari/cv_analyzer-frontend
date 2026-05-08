@@ -4,7 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './Header.module.scss';
 import { logout, selectAuth, fetchUserInfo } from '../../redux/slices/authSlice';
-import { clearGeneratedLetter } from '../../redux/slices/resumeSlice';
+import {
+  clearGeneratedLetter,
+  clearStoredGeneratedLetter,
+  dismissAnalysisCta,
+} from '../../redux/slices/resumeSlice';
 import { routeSteps, routeBackTargets } from '../../config/routeSteps';
 import accountpic from '../../assets/portrait2.png';
 
@@ -46,6 +50,7 @@ function chooseContext({
   cvId,
   analysisId,
   analysisViewed,
+  analysisCtaDismissed,
 }) {
   // 1. Внутри потока (1/5 … 5/5) — прогресс-бар + back
   if (FLOW_ROUTES.has(pathname)) {
@@ -68,11 +73,15 @@ function chooseContext({
     // готовому отчёту. Сбрасывается через uploadResume/clearResumeState/logout.
     //
     // Копия разведена по статусу авторизации, чтобы не противоречить hero
-    // trustLine: для гостя отчёт лежит только в localStorage этого браузера
-    // и к аккаунту не привязан — слово "сохранён" звучало бы как обещание,
+    // trustLine: для гостя отчёт лежит только в sessionStorage этой вкладки
+    // и исчезнет при её закрытии — слово "сохранён" звучало бы как обещание,
     // которого мы не даём. Для авторизованного — наоборот, отчёт реально
     // привязан к его истории.
     if (analysisId && analysisViewed) {
+      // Пользователь скрыл крестиком — на главной нижнюю строку вообще не
+      // рисуем, иначе следующая ветка (cvId → "Продолжите проверку") дала бы
+      // чужеродный CTA сразу после явного "скрыть".
+      if (analysisCtaDismissed) return null;
       return {
         kind: 'cta',
         tone: 'analysis',
@@ -82,6 +91,7 @@ function chooseContext({
           : 'Вернитесь к последнему отчёту',
         ctaTo: '/resultspage',
         ctaLabel: 'Открыть отчёт',
+        dismissable: true,
       };
     }
     // Mid-flow: резюме и вакансия уже отправлены (analysisId есть), но
@@ -168,6 +178,22 @@ const LogoMark = () => (
   </span>
 );
 
+const CloseX = ({ size = 14 }) => (
+  <svg
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true">
+    <line x1="6" y1="6" x2="18" y2="18" />
+    <line x1="6" y1="18" x2="18" y2="6" />
+  </svg>
+);
+
 const ArrowRight = ({ size = 14 }) => (
   <svg
     viewBox="0 0 24 24"
@@ -235,7 +261,7 @@ const ProgressContext = ({ step, total, label, backTo }) => {
   );
 };
 
-const CtaContext = ({ kicker, title, ctaTo, ctaLabel, tone }) => (
+const CtaContext = ({ kicker, title, ctaTo, ctaLabel, tone, onDismiss }) => (
   <>
     <div className={styles.ctxLeft}>
       <span
@@ -252,6 +278,15 @@ const CtaContext = ({ kicker, title, ctaTo, ctaLabel, tone }) => (
         {ctaLabel}
         <ArrowRight />
       </Link>
+      {onDismiss ? (
+        <button
+          type="button"
+          className={styles.ctxClose}
+          onClick={onDismiss}
+          aria-label="Скрыть напоминание">
+          <CloseX />
+        </button>
+      ) : null}
     </div>
   </>
 );
@@ -291,6 +326,7 @@ const Header = () => {
   const cvId = useSelector((s) => s.resume?.cvId);
   const analysisId = useSelector((s) => s.resume?.analysisId);
   const analysisViewed = useSelector((s) => s.resume?.analysisViewed);
+  const analysisCtaDismissed = useSelector((s) => s.resume?.analysisCtaDismissed);
 
   const scrolled = useScrolled(12);
 
@@ -310,6 +346,7 @@ const Header = () => {
         cvId,
         analysisId,
         analysisViewed,
+        analysisCtaDismissed,
       }),
     [
       location.pathname,
@@ -318,13 +355,12 @@ const Header = () => {
       cvId,
       analysisId,
       analysisViewed,
+      analysisCtaDismissed,
     ],
   );
 
   const handleLogout = () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('analysis_generated_letter');
-    }
+    clearStoredGeneratedLetter();
     dispatch(clearGeneratedLetter());
     dispatch(logout());
     navigate('/', { replace: true });
@@ -401,7 +437,14 @@ const Header = () => {
             className={`${styles.contextRow} ${collapsed ? styles.contextRowCollapsed : ''}`}
             data-kind={ctx.kind}>
             {ctx.kind === 'progress' && <ProgressContext {...ctx} />}
-            {ctx.kind === 'cta' && <CtaContext {...ctx} />}
+            {ctx.kind === 'cta' && (
+              <CtaContext
+                {...ctx}
+                onDismiss={
+                  ctx.dismissable ? () => dispatch(dismissAnalysisCta()) : undefined
+                }
+              />
+            )}
             {ctx.kind === 'greeting' && <GreetingContext {...ctx} />}
           </div>
         )}

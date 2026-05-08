@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
 import { API_URL } from '../../config/api';
 import { ANALYSIS_CATEGORIES, LETTER_CATEGORY } from '../../config/analysisCategories';
-import { markAnalysisViewed } from '../../redux/slices/resumeSlice';
+import { markAnalysisViewed, readStoredAnalysisId } from '../../redux/slices/resumeSlice';
 
 // минус базовый markdown-синтаксис, только читаемый plain text
 const stripMarkdown = (md) =>
@@ -52,7 +52,7 @@ function ResultsPage() {
     dispatch(markAnalysisViewed());
   }, [dispatch]);
 
-  const analysisId = reduxAnalysisId || localStorage.getItem('analysisId');
+  const analysisId = reduxAnalysisId || readStoredAnalysisId();
   const generatedLetter =
     reduxGeneratedLetter?.analysisId === analysisId ? reduxGeneratedLetter?.text : null;
 

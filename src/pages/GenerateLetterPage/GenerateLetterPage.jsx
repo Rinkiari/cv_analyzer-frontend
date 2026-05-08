@@ -5,7 +5,7 @@ import { Button, Spinner } from '@chakra-ui/react';
 import styles from './GenerateLetterPage.module.scss';
 import { toast } from 'react-toastify';
 import letterIcon from '../../assets/letter.png';
-import { generateLetter } from '../../redux/slices/resumeSlice';
+import { generateLetter, readStoredAnalysisId } from '../../redux/slices/resumeSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
 
 const GenerateLetterPage = () => {
@@ -13,7 +13,7 @@ const GenerateLetterPage = () => {
   const dispatch = useDispatch();
   const auth = useSelector(selectAuth);
   const analysisId =
-    useSelector((state) => state.resume.analysisId) || localStorage.getItem('analysisId');
+    useSelector((state) => state.resume.analysisId) || readStoredAnalysisId();
   const pendingLetter = useSelector((state) => state.resume.pendingLetter);
   const letterStatus = useSelector((state) => state.resume.letterStatus);
   const analysisHasVacancy = useSelector((state) => state.resume.analysisHasVacancy);

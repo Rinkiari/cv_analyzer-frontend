@@ -6,38 +6,87 @@ const GENERATED_LETTER_KEY = 'analysis_generated_letter';
 const PENDING_LETTER_KEY = 'analysis_pending_letter';
 const ANALYSIS_HAS_VACANCY_KEY = 'analysis_has_vacancy';
 const ANALYSIS_VIEWED_KEY = 'analysis_viewed';
+const ANALYSIS_CTA_DISMISSED_KEY = 'analysis_cta_dismissed';
 const CV_ID_KEY = 'cvId';
+const ANALYSIS_ID_KEY = 'analysisId';
+const AUTH_ACCESS_TOKEN_KEY = 'auth_accessToken';
 const LETTER_POLL_INTERVAL_MS = 2500;
 
 function canUseStorage() {
-  return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.localStorage !== 'undefined' &&
+    typeof window.sessionStorage !== 'undefined'
+  );
 }
 
-function readStoredCvId() {
+// Гостевое состояние мастера (cvId, analysisId, флаги анализа, письмо) живёт в
+// sessionStorage — оно исчезает при закрытии вкладки. У залогиненных
+// пользователей — в localStorage, чтобы переживать перезапуск браузера и
+// логично сочеталось с историей анализов в /myprofile.
+//
+// Признак авторизации читаем синхронно из localStorage: authSlice сохраняет
+// токен туда до того, как любой код этого слайса обращается к storage,
+// поэтому проверка надёжна и при init слайса, и при последующих read/write.
+function isAuthenticatedSync() {
+  if (!canUseStorage()) return false;
+  return Boolean(window.localStorage.getItem(AUTH_ACCESS_TOKEN_KEY));
+}
+
+function getResumeStorage() {
   if (!canUseStorage()) return null;
-  return localStorage.getItem(CV_ID_KEY) || null;
+  return isAuthenticatedSync() ? window.localStorage : window.sessionStorage;
+}
+
+// Удаляем из обеих storage сразу. Это нужно потому, что момент очистки может
+// прийтись либо до, либо после смены auth_accessToken (clearResumeState
+// дёргается из loginUser ПОСЛЕ persistAuth, а logout extra-reducer — ПОСЛЕ
+// clearStoredAuth). Чтобы не оставить хвостов «не в той» storage, чистим везде.
+function removeFromBothStorages(key) {
+  if (!canUseStorage()) return;
+  window.localStorage.removeItem(key);
+  window.sessionStorage.removeItem(key);
+}
+
+export function readStoredCvId() {
+  const storage = getResumeStorage();
+  if (!storage) return null;
+  return storage.getItem(CV_ID_KEY) || null;
 }
 function persistCvId(cvId) {
-  if (!canUseStorage()) return;
-  localStorage.setItem(CV_ID_KEY, String(cvId));
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(CV_ID_KEY, String(cvId));
 }
 function clearStoredCvId() {
-  if (!canUseStorage()) return;
-  localStorage.removeItem(CV_ID_KEY);
+  removeFromBothStorages(CV_ID_KEY);
+}
+
+export function readStoredAnalysisId() {
+  const storage = getResumeStorage();
+  if (!storage) return null;
+  return storage.getItem(ANALYSIS_ID_KEY) || null;
+}
+export function persistAnalysisId(analysisId) {
+  const storage = getResumeStorage();
+  if (!storage || !analysisId) return;
+  storage.setItem(ANALYSIS_ID_KEY, String(analysisId));
+}
+function clearStoredAnalysisId() {
+  removeFromBothStorages(ANALYSIS_ID_KEY);
 }
 
 const getAccessToken = (getState) => {
   const tokenFromRedux = getState()?.auth?.accessToken;
   if (tokenFromRedux) return tokenFromRedux;
-  if (canUseStorage()) return localStorage.getItem('auth_accessToken') || null;
+  if (canUseStorage()) return window.localStorage.getItem(AUTH_ACCESS_TOKEN_KEY) || null;
   return null;
 };
 
 const getCurrentAnalysisId = (getState) => {
   const analysisIdFromRedux = getState()?.resume?.analysisId;
   if (analysisIdFromRedux) return analysisIdFromRedux;
-  if (canUseStorage()) return localStorage.getItem('analysisId') || null;
-  return null;
+  return readStoredAnalysisId();
 };
 
 const buildHeaders = (token, extraHeaders = {}) => {
@@ -47,8 +96,9 @@ const buildHeaders = (token, extraHeaders = {}) => {
 };
 
 function readStoredGeneratedLetter() {
-  if (!canUseStorage()) return null;
-  const raw = localStorage.getItem(GENERATED_LETTER_KEY);
+  const storage = getResumeStorage();
+  if (!storage) return null;
+  const raw = storage.getItem(GENERATED_LETTER_KEY);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
@@ -59,49 +109,71 @@ function readStoredGeneratedLetter() {
   }
 }
 function persistGeneratedLetter(payload) {
-  if (!canUseStorage()) return;
-  localStorage.setItem(GENERATED_LETTER_KEY, JSON.stringify(payload));
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(GENERATED_LETTER_KEY, JSON.stringify(payload));
 }
-function clearStoredGeneratedLetter() {
-  if (!canUseStorage()) return;
-  localStorage.removeItem(GENERATED_LETTER_KEY);
+export function clearStoredGeneratedLetter() {
+  removeFromBothStorages(GENERATED_LETTER_KEY);
 }
 
 function readStoredAnalysisHasVacancy() {
-  if (!canUseStorage()) return null;
-  const raw = localStorage.getItem(ANALYSIS_HAS_VACANCY_KEY);
+  const storage = getResumeStorage();
+  if (!storage) return null;
+  const raw = storage.getItem(ANALYSIS_HAS_VACANCY_KEY);
   if (raw === 'true') return true;
   if (raw === 'false') return false;
   return null;
 }
 function persistAnalysisHasVacancy(value) {
-  if (!canUseStorage()) return;
-  localStorage.setItem(ANALYSIS_HAS_VACANCY_KEY, String(Boolean(value)));
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(ANALYSIS_HAS_VACANCY_KEY, String(Boolean(value)));
 }
 
 // флаг "пользователь уже видел готовый анализ" — нужен шапке,
 // чтобы CTA "Анализ готов" исчезал после первого визита на /resultspage
 function readStoredAnalysisViewed() {
-  if (!canUseStorage()) return false;
-  return localStorage.getItem(ANALYSIS_VIEWED_KEY) === 'true';
+  const storage = getResumeStorage();
+  if (!storage) return false;
+  return storage.getItem(ANALYSIS_VIEWED_KEY) === 'true';
 }
 function persistAnalysisViewed(value) {
-  if (!canUseStorage()) return;
-  localStorage.setItem(ANALYSIS_VIEWED_KEY, String(Boolean(value)));
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(ANALYSIS_VIEWED_KEY, String(Boolean(value)));
 }
 function clearStoredAnalysisViewed() {
-  if (!canUseStorage()) return;
-  localStorage.removeItem(ANALYSIS_VIEWED_KEY);
+  removeFromBothStorages(ANALYSIS_VIEWED_KEY);
+}
+
+// флаг "пользователь скрыл CTA 'Анализ готов' крестиком" — отдельный от
+// analysisViewed, потому что обнуление analysisViewed уведёт пользователя на
+// другую CTA ("Продолжите проверку"), а нам нужно именно скрыть подсказку.
+// Сбрасывается при старте нового анализа / clearResumeState / logout /
+// загрузке нового резюме (resetAnalysisDerivedState).
+function readStoredAnalysisCtaDismissed() {
+  const storage = getResumeStorage();
+  if (!storage) return false;
+  return storage.getItem(ANALYSIS_CTA_DISMISSED_KEY) === 'true';
+}
+function persistAnalysisCtaDismissed(value) {
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(ANALYSIS_CTA_DISMISSED_KEY, String(Boolean(value)));
+}
+function clearStoredAnalysisCtaDismissed() {
+  removeFromBothStorages(ANALYSIS_CTA_DISMISSED_KEY);
 }
 
 function clearStoredAnalysisHasVacancy() {
-  if (!canUseStorage()) return;
-  localStorage.removeItem(ANALYSIS_HAS_VACANCY_KEY);
+  removeFromBothStorages(ANALYSIS_HAS_VACANCY_KEY);
 }
 
 function readStoredPendingLetter() {
-  if (!canUseStorage()) return null;
-  const raw = localStorage.getItem(PENDING_LETTER_KEY);
+  const storage = getResumeStorage();
+  if (!storage) return null;
+  const raw = storage.getItem(PENDING_LETTER_KEY);
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
@@ -112,12 +184,12 @@ function readStoredPendingLetter() {
   }
 }
 function persistPendingLetter(payload) {
-  if (!canUseStorage()) return;
-  localStorage.setItem(PENDING_LETTER_KEY, JSON.stringify(payload));
+  const storage = getResumeStorage();
+  if (!storage) return;
+  storage.setItem(PENDING_LETTER_KEY, JSON.stringify(payload));
 }
 function clearStoredPendingLetter() {
-  if (!canUseStorage()) return;
-  localStorage.removeItem(PENDING_LETTER_KEY);
+  removeFromBothStorages(PENDING_LETTER_KEY);
 }
 
 async function parseErrorMessage(response, fallbackPrefix = 'Ошибка') {
@@ -331,9 +403,11 @@ function resetAnalysisDerivedState(state) {
   clearStoredGeneratedLetter();
   clearStoredAnalysisHasVacancy();
   clearStoredAnalysisViewed();
-  if (canUseStorage()) localStorage.removeItem('analysisId');
+  clearStoredAnalysisCtaDismissed();
+  clearStoredAnalysisId();
   state.analysisId = null;
   state.analysisViewed = false;
+  state.analysisCtaDismissed = false;
   state.analysisHasVacancy = null;
   state.analysisResult = null;
   state.generatedLetter = null;
@@ -350,8 +424,12 @@ const resumeSlice = createSlice({
   name: 'resume',
   initialState: {
     cvId: readStoredCvId(),
-    analysisId: null,
+    // Раньше тут стоял хардкод null, из-за чего после перезагрузки шапка не
+    // видела "сохранённый" анализ (analysisViewed подгружался, а analysisId — нет)
+    // и CTA "Анализ готов" пропадал. Теперь читаем из storage синхронно.
+    analysisId: readStoredAnalysisId(),
     analysisViewed: readStoredAnalysisViewed(),
+    analysisCtaDismissed: readStoredAnalysisCtaDismissed(),
     analysisHasVacancy: storedAnalysisHasVacancy,
     analysisResult: null,
     responseText: null,
@@ -383,10 +461,12 @@ const resumeSlice = createSlice({
       clearStoredPendingLetter();
       clearStoredAnalysisHasVacancy();
       clearStoredAnalysisViewed();
-      if (canUseStorage()) localStorage.removeItem('analysisId');
+      clearStoredAnalysisCtaDismissed();
+      clearStoredAnalysisId();
       state.cvId = null;
       state.analysisId = null;
       state.analysisViewed = false;
+      state.analysisCtaDismissed = false;
       state.analysisHasVacancy = null;
       state.analysisResult = null;
       state.responseText = null;
@@ -431,6 +511,14 @@ const resumeSlice = createSlice({
       state.analysisViewed = true;
       persistAnalysisViewed(true);
     },
+    // Пользователь скрыл крестиком CTA "Анализ готов" в шапке.
+    // Флаг живёт до старта нового анализа / выхода из аккаунта /
+    // загрузки нового резюме — там он сбрасывается.
+    dismissAnalysisCta(state) {
+      if (state.analysisCtaDismissed) return;
+      state.analysisCtaDismissed = true;
+      persistAnalysisCtaDismissed(true);
+    },
   },
 
   extraReducers: (builder) => {
@@ -471,11 +559,15 @@ const resumeSlice = createSlice({
       .addCase(startAnalysis.fulfilled, (state, action) => {
         const hasVacancy = Boolean(action.meta.arg?.link);
         clearStoredPendingLetter();
+        persistAnalysisId(action.payload);
         persistAnalysisHasVacancy(hasVacancy);
         // новый анализ — снова требуется "познакомить" пользователя с готовым отчётом
         persistAnalysisViewed(false);
+        // и снова показываем CTA в шапке, даже если предыдущий был скрыт крестиком
+        persistAnalysisCtaDismissed(false);
         state.analysisId = action.payload;
         state.analysisViewed = false;
+        state.analysisCtaDismissed = false;
         state.analysisHasVacancy = hasVacancy;
         state.generatedLetter = null;
         state.pendingLetter = null;
@@ -506,10 +598,12 @@ const resumeSlice = createSlice({
         clearStoredPendingLetter();
         clearStoredAnalysisHasVacancy();
         clearStoredAnalysisViewed();
-        if (canUseStorage()) localStorage.removeItem('analysisId');
+        clearStoredAnalysisCtaDismissed();
+        clearStoredAnalysisId();
         state.cvId = null;
         state.analysisId = null;
         state.analysisViewed = false;
+        state.analysisCtaDismissed = false;
         state.analysisHasVacancy = null;
         state.analysisResult = null;
         state.responseText = null;
@@ -540,6 +634,7 @@ export const {
   setPendingLetter,
   clearPendingLetter,
   markAnalysisViewed,
+  dismissAnalysisCta,
 } = resumeSlice.actions;
 
 export default resumeSlice.reducer;

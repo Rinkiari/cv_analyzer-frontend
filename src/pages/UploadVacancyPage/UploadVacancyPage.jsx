@@ -49,8 +49,7 @@ const UploadVacancyPage = () => {
         }
       }
 
-      const result = await dispatch(startAnalysis({ cvId, link: link || undefined })).unwrap();
-      localStorage.setItem('analysisId', result);
+      await dispatch(startAnalysis({ cvId, link: link || undefined })).unwrap();
       navigate('/generateletter');
     } catch (e) {
       console.error(e);
@@ -64,8 +63,7 @@ const UploadVacancyPage = () => {
         toast.warn('Сначала загрузите резюме');
         return;
       }
-      const result = await dispatch(startAnalysis({ cvId })).unwrap();
-      localStorage.setItem('analysisId', result);
+      await dispatch(startAnalysis({ cvId })).unwrap();
       navigate('/generateletter');
     } catch (e) {
       console.error(e);

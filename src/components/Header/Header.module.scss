@@ -474,6 +474,37 @@ $success-deep: #1f7a55;
   }
 }
 
+// крестик "скрыть напоминание" — рисуется только рядом с CTA "Анализ готов".
+// Намеренно неброский, чтобы не конкурировать с основной кнопкой по весу.
+.ctxClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: rgba(0, 0, 0, 0.85);
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
+  }
+}
+
 // тонкая текстовая ссылка с шевроном — для greeting-состояния,
 // где CTA-кнопка избыточна
 .ctxLink {
