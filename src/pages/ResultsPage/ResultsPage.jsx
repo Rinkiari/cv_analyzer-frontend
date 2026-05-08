@@ -60,7 +60,8 @@ function ResultsPage() {
   const [errorState, setErrorState] = useState(null);
   const [activeTab, setActiveTab] = useState('structure');
   const [loadingStep, setLoadingStep] = useState(0);
-  const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
+  const [exporting, setExporting] = useState(null); // анализ: 'pdf' | 'docx' | null
+  const [letterExporting, setLetterExporting] = useState(null); // письмо: 'txt' | 'pdf' | 'docx' | null
 
   const analysisLoading = Boolean(analysisId) && !result && !errorState;
   const letterLoading = letterStatus === 'pending';
@@ -155,18 +156,34 @@ function ResultsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  const handleDownloadLetter = () => {
-    if (!generatedLetter) return;
-    const text = stripMarkdown(generatedLetter);
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `cover-letter-${String(analysisId).slice(0, 8)}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const handleDownloadLetter = async (format) => {
+    if (!generatedLetter || letterExporting) return;
+    setLetterExporting(format);
+    try {
+      if (format === 'txt') {
+        const text = stripMarkdown(generatedLetter);
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `cover-letter-${String(analysisId).slice(0, 8)}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        const mod =
+          format === 'pdf'
+            ? await import('../../utils/exportLetterPdf')
+            : await import('../../utils/exportLetterDocx');
+        const exporter = format === 'pdf' ? mod.exportLetterPdf : mod.exportLetterDocx;
+        await exporter({ letterText: generatedLetter, analysisId });
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Не удалось сформировать файл');
+    } finally {
+      setLetterExporting(null);
+    }
   };
 
   const handleDownloadAnalysis = async (format) => {
@@ -365,25 +382,30 @@ function ResultsPage() {
                   </svg>
                   <span>Копировать</span>
                 </button>
-                <button
-                  className={styles.actionBtn}
-                  onClick={handleDownloadLetter}
-                  title="Скачать как .txt">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                    <polyline points="7 10 12 15 17 10" />
-                    <line x1="12" y1="15" x2="12" y2="3" />
-                  </svg>
-                  <span>Скачать</span>
-                </button>
+                {['txt', 'pdf', 'docx'].map((format) => (
+                  <button
+                    key={format}
+                    type="button"
+                    className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+                    onClick={() => handleDownloadLetter(format)}
+                    disabled={Boolean(letterExporting)}
+                    title={`Скачать письмо как .${format}`}>
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span>{letterExporting === format ? 'Готовим…' : format.toUpperCase()}</span>
+                  </button>
+                ))}
               </div>
             ) : null}
           </header>

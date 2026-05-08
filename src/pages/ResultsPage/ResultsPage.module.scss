@@ -236,6 +236,12 @@
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+  flex-wrap: wrap;
+
+  .actionBtn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
 }
 
 .actionBtn {

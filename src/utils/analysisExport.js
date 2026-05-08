@@ -108,3 +108,8 @@ export function buildAnalysisFilename(analysisId, ext) {
   const id = analysisId ? String(analysisId).slice(0, 8) : 'export';
   return `analysis-${id}.${ext}`;
 }
+
+export function buildLetterFilename(analysisId, ext) {
+  const id = analysisId ? String(analysisId).slice(0, 8) : 'letter';
+  return `cover-letter-${id}.${ext}`;
+}

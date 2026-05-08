@@ -1,9 +1,8 @@
 import { jsPDF } from 'jspdf';
 import {
-  buildAnalysisSections,
   parseMarkdownBlocks,
   triggerDownload,
-  buildAnalysisFilename,
+  buildLetterFilename,
 } from './analysisExport';
 import {
   loadRobotoFonts,
@@ -12,11 +11,9 @@ import {
   addPageNumbers,
 } from './pdfRenderHelpers';
 
-export async function exportAnalysisPdf({ result, analysisId, options }) {
-  const sections = buildAnalysisSections(result, options);
-  if (!sections.length) {
-    throw new Error('Нет данных анализа для экспорта');
-  }
+export async function exportLetterPdf({ letterText, analysisId }) {
+  const text = String(letterText || '').trim();
+  if (!text) throw new Error('Нет текста письма для экспорта');
 
   const fonts = await loadRobotoFonts();
   const doc = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -40,12 +37,12 @@ export async function exportAnalysisPdf({ result, analysisId, options }) {
   };
   const ctx = { ensureSpace };
 
-  // Заголовок документа
+  // Заголовок
   y = ensureSpace(y, 28);
   doc.setFont('Roboto', 'bold');
   doc.setFontSize(22);
   doc.setTextColor(0, 0, 0);
-  doc.text('Анализ резюме', marginX, y);
+  doc.text('Сопроводительное письмо', marginX, y);
   y += 28;
 
   const dateStr = new Date().toLocaleDateString('ru-RU', {
@@ -67,22 +64,11 @@ export async function exportAnalysisPdf({ result, analysisId, options }) {
   doc.line(marginX, y, marginX + contentW, y);
   y += 22;
 
-  for (const section of sections) {
-    y = ensureSpace(y, 24);
-    doc.setFont('Roboto', 'bold');
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text(section.label, marginX, y);
-    y += 22;
-
-    const blocks = parseMarkdownBlocks(section.markdown);
-    for (const block of blocks) {
-      y = renderBlock({ doc, block, x: marginX, y, maxWidth: contentW, ctx });
-    }
-
-    y += 14;
+  const blocks = parseMarkdownBlocks(text);
+  for (const block of blocks) {
+    y = renderBlock({ doc, block, x: marginX, y, maxWidth: contentW, ctx });
   }
 
   addPageNumbers(doc, marginX);
-  triggerDownload(doc.output('blob'), buildAnalysisFilename(analysisId, 'pdf'));
+  triggerDownload(doc.output('blob'), buildLetterFilename(analysisId, 'pdf'));
 }

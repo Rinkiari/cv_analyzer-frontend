@@ -1,68 +1,11 @@
-import {
-  Document,
-  Packer,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  AlignmentType,
-} from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } from 'docx';
 import {
   buildAnalysisSections,
   parseMarkdownBlocks,
   triggerDownload,
   buildAnalysisFilename,
 } from './analysisExport';
-
-// преобразуем массив runs в TextRun-ы docx, сохраняя bold/italic
-function runsToTextRuns(runs) {
-  return runs.map(
-    (r) =>
-      new TextRun({
-        text: r.text,
-        bold: Boolean(r.bold),
-        italics: Boolean(r.italic),
-      }),
-  );
-}
-
-// маппинг markdown-уровня заголовка на heading docx.
-// внутри секции мы и так оборачиваем её в HEADING_1, поэтому
-// markdown-овский "#" опускаем на HEADING_2, и т.д.
-function markdownHeadingLevel(level) {
-  switch (level) {
-    case 1:
-      return HeadingLevel.HEADING_2;
-    case 2:
-      return HeadingLevel.HEADING_3;
-    case 3:
-      return HeadingLevel.HEADING_4;
-    case 4:
-      return HeadingLevel.HEADING_5;
-    default:
-      return HeadingLevel.HEADING_6;
-  }
-}
-
-function blockToParagraph(block) {
-  if (block.type === 'heading') {
-    return new Paragraph({
-      heading: markdownHeadingLevel(block.level),
-      children: runsToTextRuns(block.runs),
-      spacing: { before: 200, after: 100 },
-    });
-  }
-  if (block.type === 'bullet') {
-    return new Paragraph({
-      bullet: { level: 0 },
-      children: runsToTextRuns(block.runs),
-      spacing: { after: 60 },
-    });
-  }
-  return new Paragraph({
-    children: runsToTextRuns(block.runs),
-    spacing: { after: 100 },
-  });
-}
+import { blockToParagraph } from './docxRenderHelpers';
 
 export async function exportAnalysisDocx({ result, analysisId, options }) {
   const sections = buildAnalysisSections(result, options);
@@ -111,7 +54,9 @@ export async function exportAnalysisDocx({ result, analysisId, options }) {
     );
     const blocks = parseMarkdownBlocks(section.markdown);
     for (const block of blocks) {
-      children.push(blockToParagraph(block));
+      // headingOffset=1 — markdown "#" внутри секции опускаем на HEADING_2,
+      // чтобы не конкурировал с названием секции
+      children.push(blockToParagraph(block, { headingOffset: 1 }));
     }
   }
 
