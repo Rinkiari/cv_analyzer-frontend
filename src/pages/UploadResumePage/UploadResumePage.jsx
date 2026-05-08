@@ -70,9 +70,9 @@ const UploadResumePage = () => {
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
-        {/* левый блок — описание шага */}
+        {/* левый блок — описание шага.
+            Номер шага рисует Header (контекстная полоса), здесь не дублируем. */}
         <div className={styles.titleBlock}>
-          <p className={styles.kicker}>Первый шаг</p>
           <h1 className={styles.cardTitle}>Загрузите ваше резюме</h1>
           <p className={styles.subtitle}>
             Загрузите готовый файл или заполните резюме вручную — мы разберём его и подготовим

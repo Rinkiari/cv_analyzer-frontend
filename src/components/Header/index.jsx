@@ -9,9 +9,12 @@ import { routeSteps, routeBackTargets } from '../../config/routeSteps';
 import accountpic from '../../assets/portrait2.png';
 
 // ----- nav -----
+// `to` — навигация через react-router (отдельная страница);
+// `href` — обычный якорь в текущей странице. FAQ живёт на /about,
+// поэтому ведём в /about#faq — useLocation().hash в AboutPage скроллит дальше.
 const NAV_ITEMS = [
-  { label: 'О сервисе', href: '#about' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'О сервисе', to: '/about' },
+  { label: 'FAQ', to: '/about#faq' },
   { label: 'Контакты', href: '#contacts' },
 ];
 
@@ -354,11 +357,17 @@ const Header = () => {
           </Link>
 
           <nav className={styles.nav} aria-label="Главное меню">
-            {NAV_ITEMS.map((item) => (
-              <a key={item.label} href={item.href} className={styles.navLink}>
-                {item.label}
-              </a>
-            ))}
+            {NAV_ITEMS.map((item) =>
+              item.to ? (
+                <Link key={item.label} to={item.to} className={styles.navLink}>
+                  {item.label}
+                </Link>
+              ) : (
+                <a key={item.label} href={item.href} className={styles.navLink}>
+                  {item.label}
+                </a>
+              ),
+            )}
           </nav>
 
           <div className={styles.actions}>

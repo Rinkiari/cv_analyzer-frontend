@@ -8,6 +8,7 @@ import GenerateLetterPage from './pages/GenerateLetterPage/GenerateLetterPage';
 import ResultsPage from './pages/ResultsPage/ResultsPage';
 import MyProfilePage from './pages/MyProfilePage/MyProfilePage';
 import AuthPage from './pages/AuthPage/AuthPage';
+import AboutPage from './pages/AboutPage/AboutPage';
 import Header from './components/Header';
 import { useTokenRefresh } from './hooks/Usetokenrefresh';
 
@@ -25,6 +26,7 @@ function App() {
           <Route path="generateletter" element={<GenerateLetterPage />} />
           <Route path="resultspage" element={<ResultsPage />} />
           <Route path="login" element={<AuthPage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="myprofile" element={<MyProfilePage />} />
           <Route path="*" element={<ErrorPage />} />
         </Route>

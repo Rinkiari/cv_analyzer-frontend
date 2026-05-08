@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import styles from './ResultsPage.module.scss';
 import attentionpng from '../../assets/attention.png';
@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import Loader from '../../components/Loader/Loader';
 import { API_URL } from '../../config/api';
 import { ANALYSIS_CATEGORIES, LETTER_CATEGORY } from '../../config/analysisCategories';
+import { markAnalysisViewed } from '../../redux/slices/resumeSlice';
 
 // минус базовый markdown-синтаксис, только читаемый plain text
 const stripMarkdown = (md) =>
@@ -40,10 +41,16 @@ const LOADING_MESSAGES_LETTER = [
 ];
 
 function ResultsPage() {
+  const dispatch = useDispatch();
   const reduxAnalysisId = useSelector((state) => state.resume.analysisId);
   const reduxGeneratedLetter = useSelector((state) => state.resume.generatedLetter);
   const letterStatus = useSelector((state) => state.resume.letterStatus);
   const letterError = useSelector((state) => state.resume.letterError);
+
+  // отмечаем что пользователь увидел готовый отчёт — шапка убирает CTA "Анализ готов"
+  useEffect(() => {
+    dispatch(markAnalysisViewed());
+  }, [dispatch]);
 
   const analysisId = reduxAnalysisId || localStorage.getItem('analysisId');
   const generatedLetter =

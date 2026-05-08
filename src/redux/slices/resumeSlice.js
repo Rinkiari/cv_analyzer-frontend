@@ -5,6 +5,7 @@ import { logout } from './authSlice';
 const GENERATED_LETTER_KEY = 'analysis_generated_letter';
 const PENDING_LETTER_KEY = 'analysis_pending_letter';
 const ANALYSIS_HAS_VACANCY_KEY = 'analysis_has_vacancy';
+const ANALYSIS_VIEWED_KEY = 'analysis_viewed';
 const CV_ID_KEY = 'cvId';
 const LETTER_POLL_INTERVAL_MS = 2500;
 
@@ -77,6 +78,22 @@ function persistAnalysisHasVacancy(value) {
   if (!canUseStorage()) return;
   localStorage.setItem(ANALYSIS_HAS_VACANCY_KEY, String(Boolean(value)));
 }
+
+// флаг "пользователь уже видел готовый анализ" — нужен шапке,
+// чтобы CTA "Анализ готов" исчезал после первого визита на /resultspage
+function readStoredAnalysisViewed() {
+  if (!canUseStorage()) return false;
+  return localStorage.getItem(ANALYSIS_VIEWED_KEY) === 'true';
+}
+function persistAnalysisViewed(value) {
+  if (!canUseStorage()) return;
+  localStorage.setItem(ANALYSIS_VIEWED_KEY, String(Boolean(value)));
+}
+function clearStoredAnalysisViewed() {
+  if (!canUseStorage()) return;
+  localStorage.removeItem(ANALYSIS_VIEWED_KEY);
+}
+
 function clearStoredAnalysisHasVacancy() {
   if (!canUseStorage()) return;
   localStorage.removeItem(ANALYSIS_HAS_VACANCY_KEY);
@@ -305,6 +322,26 @@ export const generateLetter = createAsyncThunk(
   },
 );
 
+// Сбрасывает всё, что было производным от старого analysisId, не трогая
+// сам cvId и vacancyInput. Используется в reducers, когда пользователь
+// загрузил новое резюме — старый анализ привязан к прошлой паре (cvId, link)
+// и больше не валиден.
+function resetAnalysisDerivedState(state) {
+  clearStoredPendingLetter();
+  clearStoredGeneratedLetter();
+  clearStoredAnalysisHasVacancy();
+  clearStoredAnalysisViewed();
+  if (canUseStorage()) localStorage.removeItem('analysisId');
+  state.analysisId = null;
+  state.analysisViewed = false;
+  state.analysisHasVacancy = null;
+  state.analysisResult = null;
+  state.generatedLetter = null;
+  state.pendingLetter = null;
+  state.letterStatus = 'idle';
+  state.letterError = null;
+}
+
 const storedGeneratedLetter = readStoredGeneratedLetter();
 const storedPendingLetter = readStoredPendingLetter();
 const storedAnalysisHasVacancy = readStoredAnalysisHasVacancy();
@@ -314,6 +351,7 @@ const resumeSlice = createSlice({
   initialState: {
     cvId: readStoredCvId(),
     analysisId: null,
+    analysisViewed: readStoredAnalysisViewed(),
     analysisHasVacancy: storedAnalysisHasVacancy,
     analysisResult: null,
     responseText: null,
@@ -344,9 +382,11 @@ const resumeSlice = createSlice({
       clearStoredGeneratedLetter();
       clearStoredPendingLetter();
       clearStoredAnalysisHasVacancy();
+      clearStoredAnalysisViewed();
       if (canUseStorage()) localStorage.removeItem('analysisId');
       state.cvId = null;
       state.analysisId = null;
+      state.analysisViewed = false;
       state.analysisHasVacancy = null;
       state.analysisResult = null;
       state.responseText = null;
@@ -384,6 +424,13 @@ const resumeSlice = createSlice({
       clearStoredPendingLetter();
       state.pendingLetter = null;
     },
+    // ResultsPage диспатчит это на mount — после первого визита
+    // шапка перестаёт показывать CTA "Анализ готов"
+    markAnalysisViewed(state) {
+      if (state.analysisViewed) return;
+      state.analysisViewed = true;
+      persistAnalysisViewed(true);
+    },
   },
 
   extraReducers: (builder) => {
@@ -396,6 +443,11 @@ const resumeSlice = createSlice({
         state.cvId = action.payload;
         state.status = 'succeeded';
         state.responseText = action.payload;
+        // новое резюме инвалидирует прошлый анализ: analysisId был привязан
+        // к предыдущей паре (cvId, link). Если этого не сбросить — шапка
+        // на главной решит, что и резюме, и вакансия уже у нас, хотя для
+        // нового cvId никакого анализа ещё не запускалось.
+        resetAnalysisDerivedState(state);
       })
       .addCase(uploadResume.rejected, (state, action) => {
         state.status = 'failed';
@@ -408,6 +460,9 @@ const resumeSlice = createSlice({
         state.cvId = action.payload;
         state.status = 'succeeded';
         state.responseText = action.payload;
+        // см. uploadResume.fulfilled — ручное резюме тоже инвалидирует
+        // предыдущий анализ
+        resetAnalysisDerivedState(state);
       })
       .addCase(uploadManualResume.rejected, (state, action) => {
         state.status = 'failed';
@@ -417,7 +472,10 @@ const resumeSlice = createSlice({
         const hasVacancy = Boolean(action.meta.arg?.link);
         clearStoredPendingLetter();
         persistAnalysisHasVacancy(hasVacancy);
+        // новый анализ — снова требуется "познакомить" пользователя с готовым отчётом
+        persistAnalysisViewed(false);
         state.analysisId = action.payload;
+        state.analysisViewed = false;
         state.analysisHasVacancy = hasVacancy;
         state.generatedLetter = null;
         state.pendingLetter = null;
@@ -447,9 +505,11 @@ const resumeSlice = createSlice({
         clearStoredGeneratedLetter();
         clearStoredPendingLetter();
         clearStoredAnalysisHasVacancy();
+        clearStoredAnalysisViewed();
         if (canUseStorage()) localStorage.removeItem('analysisId');
         state.cvId = null;
         state.analysisId = null;
+        state.analysisViewed = false;
         state.analysisHasVacancy = null;
         state.analysisResult = null;
         state.responseText = null;
@@ -479,6 +539,7 @@ export const {
   clearGeneratedLetter,
   setPendingLetter,
   clearPendingLetter,
+  markAnalysisViewed,
 } = resumeSlice.actions;
 
 export default resumeSlice.reducer;

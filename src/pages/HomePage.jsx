@@ -62,24 +62,8 @@ const PREVIEW_CONTENT = {
   },
 };
 
-const FAQ_ITEMS = [
-  {
-    q: 'Сохраняется ли моё резюме?',
-    a: 'Без авторизации файл обрабатывается анонимно и не привязывается к профилю — мы используем его только чтобы построить отчёт. Если вы вошли в аккаунт, анализ попадает в вашу историю, чтобы можно было вернуться к нему позже.',
-  },
-  {
-    q: 'Кто видит мои данные?',
-    a: 'Файл уходит только на наш сервер анализа. Мы не передаём резюме третьим лицам и не используем его для обучения сторонних моделей.',
-  },
-  {
-    q: 'Это правда бесплатно?',
-    a: 'Да. Сервис без оплаты и без скрытых лимитов на количество проверок. Аккаунт нужен только если хотите сохранять историю и генерировать сопроводительное письмо.',
-  },
-  {
-    q: 'Какие форматы поддерживаются?',
-    a: 'PDF и DOCX — или можно заполнить данные вручную, если файла под рукой нет. Текст вакансии добавляется ссылкой или копированием.',
-  },
-];
+// FAQ_ITEMS уехал на AboutPage (/about#faq) — на главной он дублировал
+// дисклеймер и trustLine.
 
 const HomePage = () => {
   // greeting и подгрузка имени теперь живут в Header — здесь хватает isAuthenticated
@@ -280,27 +264,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* === FAQ / TRUST === */}
-      <section className={styles.section}>
-        <p className={styles.kicker}>Часто спрашивают</p>
-        <h2 className={styles.sectionTitle}>Без скрытых условий</h2>
-
-        <div className={styles.faqList}>
-          {FAQ_ITEMS.map((item) => (
-            <details key={item.q} className={styles.faqItem}>
-              <summary className={styles.faqSummary}>
-                <span>{item.q}</span>
-                <span className={styles.faqChevron} aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </span>
-              </summary>
-              <p className={styles.faqAnswer}>{item.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
+      {/* FAQ перенесён на /about#faq — здесь не дублируем */}
 
       {/* === FINAL CTA === */}
       <section className={styles.finalCta}>

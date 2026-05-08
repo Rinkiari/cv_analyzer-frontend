@@ -1,0 +1,372 @@
+// AboutPage — отдельная страница "О сервисе".
+// Дизайн повторяет язык HomePage (kicker / sectionTitle / faq / btnPrimary),
+// но без hero-превью и без HOW-IT-WORKS — здесь смысл в тексте, а не в демо.
+
+// общая константа ширины колонки страницы — единая для hero и всех секций.
+// читается как длинный лонгрид: текст и карточки выстраиваются по одной
+// центральной оси, не разъезжаются вправо/влево.
+$column-width: 880px;
+
+.page {
+  padding-top: 16px;
+  padding-bottom: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; // центрируем все секции по горизонтали
+  gap: 56px;
+}
+
+// === SHARED (повторяют HomePage, чтобы AboutPage звучал в том же языке) ===
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.55);
+  margin: 0 0 10px;
+}
+
+.sectionTitle {
+  font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0 0 24px;
+  color: #000 !important;
+  line-height: 1.1;
+}
+
+.section {
+  // отступ для якорной прокрутки (#faq), чтобы заголовок не упирался в шапку
+  scroll-margin-top: 80px;
+  width: 100%;
+  max-width: $column-width;
+}
+
+.sectionLead {
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgba(0, 0, 0, 0.7);
+  margin: 0 0 24px;
+  max-width: 760px;
+}
+
+// === HERO ===
+// без декоративной карточки/рамки — это первое "сечение" лонгрида.
+// геометрически идентично остальным секциям, отличается только размером
+// заголовка и крупностью текста.
+.hero {
+  width: 100%;
+  max-width: $column-width;
+  scroll-margin-top: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 16px;
+}
+
+.heroTitle {
+  font-family: 'SF-Pro-Display-Medium', sans-serif !important;
+  font-size: 44px;
+  font-weight: 500;
+  margin: 0;
+  color: #000 !important;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.heroLead {
+  font-size: 17px;
+  line-height: 1.65;
+  color: rgba(0, 0, 0, 0.72);
+  margin: 0;
+  max-width: 720px;
+}
+
+.heroNote {
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.45);
+  margin: 8px 0 0;
+  letter-spacing: 0.01em;
+}
+
+// === PROSE BLOCK (для секций "зачем" и "self-hosting") ===
+.proseBlock {
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.65;
+    color: rgba(0, 0, 0, 0.72);
+  }
+
+  code {
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 14px;
+    padding: 1px 6px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    color: rgba(0, 0, 0, 0.82);
+  }
+}
+
+// === TECH STACK ===
+// карточки идут вертикально, а не сеткой 3-в-ряд: у Backend семь буллетов,
+// у AI один длинный — в трёх колонках бэкенд раздавал бы соседей. Стек одной
+// колонки читается как "оглавление", совпадает по ширине с прочими блоками.
+.techGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.techCard {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  padding: 22px 24px 20px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.03);
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 0 24px;
+  align-items: start;
+}
+
+.techCardTitle {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(0, 0, 0, 0.55);
+  margin: 4px 0 0;
+  font-weight: 500;
+}
+
+.techCardList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 0, 0, 0.78);
+
+  li {
+    position: relative;
+    padding-left: 16px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 9px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: rgba(251, 192, 45, 0.85);
+    }
+  }
+}
+
+// === DISCLAIMER LIST ===
+.disclaimerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 24px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  padding: 26px 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+}
+
+.disclaimerItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgba(0, 0, 0, 0.72);
+
+  b {
+    color: #000;
+    font-weight: 600;
+  }
+}
+
+.disclaimerCheck {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(46, 172, 120, 0.12);
+  color: #2eac78;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+// === FAQ (повторяет HomePage FAQ — чтобы перенос был визуально незаметен) ===
+.faqList {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.faqItem {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &[open] .faqChevron {
+    transform: rotate(180deg);
+    background: rgba(251, 192, 45, 0.18);
+    color: #8b6800;
+  }
+
+  &[open] .faqSummary {
+    color: #000;
+  }
+}
+
+.faqSummary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 26px;
+  font-size: 17px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  transition: background 0.18s ease, color 0.18s ease;
+  user-select: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(251, 192, 45, 0.6);
+    outline-offset: -2px;
+  }
+}
+
+.faqChevron {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.55);
+  transition: transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+    background 0.22s ease, color 0.22s ease;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.faqAnswer {
+  padding: 0 26px 22px;
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.65);
+  max-width: 760px;
+}
+
+.faqItem[open] .faqAnswer {
+  animation: faqSlide 0.5s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@keyframes faqSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faqItem[open] .faqAnswer {
+    animation: none;
+  }
+}
+
+// === FOOTER NOTE ===
+.footerNote {
+  text-align: center;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(0, 0, 0, 0.4);
+  margin: 8px 0 0;
+  letter-spacing: 0.02em;
+}
+
+// === RESPONSIVE ===
+@media (max-width: 720px) {
+  .techCard {
+    // на узких экранах горизонтальные "Frontend / список" складываются в вертикаль
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .disclaimerList {
+    grid-template-columns: 1fr;
+  }
+  .heroTitle {
+    font-size: 34px;
+  }
+  .hero {
+    padding-top: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .faqSummary {
+    padding: 18px 20px;
+    font-size: 16px;
+  }
+  .faqAnswer {
+    padding: 0 20px 18px;
+    font-size: 14px;
+  }
+  .sectionTitle {
+    font-size: 26px;
+  }
+  .heroTitle {
+    font-size: 28px;
+  }
+  .heroLead {
+    font-size: 16px;
+  }
+}
