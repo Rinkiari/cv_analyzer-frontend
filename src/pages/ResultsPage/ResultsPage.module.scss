@@ -3,9 +3,29 @@
   padding-bottom: 48px;
 }
 
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
 .pageTitle {
   color: black !important;
-  margin: 0 0 24px;
+  margin: 0;
+}
+
+.pageActions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+
+  .actionBtn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
 }
 
 .centerMessage {

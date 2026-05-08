@@ -81,6 +81,7 @@ export default function MyProfilePage() {
 
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('structure');
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
 
   useEffect(() => {
     if (isLoggedIn && !firstName && auth.userInfoStatus === 'idle') {
@@ -126,6 +127,28 @@ export default function MyProfilePage() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadAnalysis = async (format) => {
+    if (!selectedItem || exporting) return;
+    setExporting(format);
+    try {
+      // лениво подтягиваем jspdf/docx — те же чанки, что и на странице результатов
+      const mod =
+        format === 'pdf'
+          ? await import('../../utils/exportAnalysisPdf')
+          : await import('../../utils/exportAnalysisDocx');
+      const exporter = format === 'pdf' ? mod.exportAnalysisPdf : mod.exportAnalysisDocx;
+      await exporter({
+        result: selectedAnalysis,
+        analysisId: selectedAnalysis?.id,
+        options: ANALYSIS_CATEGORIES,
+      });
+    } catch (err) {
+      toast.error(err?.message || 'Не удалось сформировать файл');
+    } finally {
+      setExporting(null);
+    }
   };
 
   const handleCopyLetter = async () => {
@@ -360,7 +383,36 @@ export default function MyProfilePage() {
                     <span>Скачать</span>
                   </button>
                 </div>
-              ) : null}
+              ) : (
+                <div className={styles.headerActions}>
+                  <button
+                    type="button"
+                    className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+                    onClick={() => handleDownloadAnalysis('pdf')}
+                    disabled={Boolean(exporting)}
+                    title="Скачать этот анализ в PDF">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span>{exporting === 'pdf' ? 'Готовим…' : 'PDF'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+                    onClick={() => handleDownloadAnalysis('docx')}
+                    disabled={Boolean(exporting)}
+                    title="Скачать этот анализ в DOCX">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    <span>{exporting === 'docx' ? 'Готовим…' : 'DOCX'}</span>
+                  </button>
+                </div>
+              )}
             </header>
 
             <div className={styles.markdown}>

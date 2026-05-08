@@ -60,6 +60,7 @@ function ResultsPage() {
   const [errorState, setErrorState] = useState(null);
   const [activeTab, setActiveTab] = useState('structure');
   const [loadingStep, setLoadingStep] = useState(0);
+  const [exporting, setExporting] = useState(null); // 'pdf' | 'docx' | null
 
   const analysisLoading = Boolean(analysisId) && !result && !errorState;
   const letterLoading = letterStatus === 'pending';
@@ -168,6 +169,25 @@ function ResultsPage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadAnalysis = async (format) => {
+    if (!result || exporting) return;
+    setExporting(format);
+    try {
+      // динамический импорт — иначе jspdf+html2canvas+docx висят
+      // в основном чанке (~700KB gzip) ради кнопки, которой пользуются не все
+      const mod =
+        format === 'pdf'
+          ? await import('../../utils/exportAnalysisPdf')
+          : await import('../../utils/exportAnalysisDocx');
+      const exporter = format === 'pdf' ? mod.exportAnalysisPdf : mod.exportAnalysisDocx;
+      await exporter({ result, analysisId, options: OPTIONS });
+    } catch (err) {
+      toast.error(err?.message || 'Не удалось сформировать файл');
+    } finally {
+      setExporting(null);
+    }
+  };
+
   const handleCopyLetter = async () => {
     if (!generatedLetter) return;
     try {
@@ -219,7 +239,55 @@ function ResultsPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.pageTitle}>Результаты анализа</h1>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Результаты анализа</h1>
+        {result ? (
+          <div className={styles.pageActions}>
+            <button
+              type="button"
+              className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+              onClick={() => handleDownloadAnalysis('pdf')}
+              disabled={Boolean(exporting)}
+              title="Скачать весь анализ в PDF">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>{exporting === 'pdf' ? 'Готовим…' : 'PDF'}</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.actionBtn} ${styles.actionBtnGhost}`}
+              onClick={() => handleDownloadAnalysis('docx')}
+              disabled={Boolean(exporting)}
+              title="Скачать весь анализ в DOCX">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>{exporting === 'docx' ? 'Готовим…' : 'DOCX'}</span>
+            </button>
+          </div>
+        ) : null}
+      </div>
 
       <div className={styles.layout}>
         {/* левая колонка — навигация по категориям */}

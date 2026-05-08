@@ -441,6 +441,11 @@
   display: flex;
   gap: 8px;
   flex-shrink: 0;
+
+  .actionBtn:disabled {
+    opacity: 0.55;
+    cursor: progress;
+  }
 }
 
 .actionBtn {
