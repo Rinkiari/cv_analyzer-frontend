@@ -15,7 +15,7 @@ import accountpic from '../../assets/portrait2.png';
 // AboutPage сам скроллит к нужной секции — react-router этого не делает.
 const NAV_ITEMS = [
   { label: 'О сервисе', to: '/about' },
-  { label: 'FAQ', to: '/about#faq' },
+  { label: 'ЧАВО', to: '/about#faq' },
   { label: 'Контакты', to: '/#contacts' },
 ];
 
