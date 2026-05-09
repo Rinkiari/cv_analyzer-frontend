@@ -44,21 +44,28 @@
 
 .fileBox {
   margin-top: 20px;
-  width: 300px;
-  height: 60px;
+  width: 100%;
+  max-width: 300px;
+  min-height: 60px;
   border-radius: 23px;
-  // background: #fff1cd;
   border: 2px dotted #fbc02d;
 
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 
-  padding: 0 16px;
+  padding: 8px 16px;
+  box-sizing: border-box;
 }
 
 .fileName {
   font-size: 22px !important;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .removeIcon {
@@ -79,4 +86,33 @@
 
 .hidden_input {
   display: none;
+}
+
+@media (max-width: 560px) {
+  .upload_wrapper {
+    height: 280px;
+
+    .cloud_picture {
+      width: 90px;
+      height: 90px;
+    }
+
+    h3 {
+      font-size: 22px;
+    }
+
+    .drugIt_text {
+      font-size: 16px;
+      padding-top: 6px;
+    }
+  }
+
+  .fileBox {
+    margin-top: 14px;
+    padding: 8px 14px;
+  }
+
+  .fileName {
+    font-size: 16px !important;
+  }
 }

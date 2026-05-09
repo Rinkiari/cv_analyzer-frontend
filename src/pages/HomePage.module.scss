@@ -812,6 +812,34 @@
   }
 }
 
+// previewBody на узких экранах: вертикальный стэк вместо 180px-сайдбара,
+// сайдбар становится горизонтальной лентой табов
+@media (max-width: 640px) {
+  .previewBody {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  .previewSidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 6px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .previewTab {
+    flex-shrink: 0;
+  }
+
+  .previewTabLabel {
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 560px) {
   .trustLine {
     font-size: 12px;
@@ -830,5 +858,37 @@
   .btnPrimary,
   .btnGhost {
     width: 100%;
+  }
+
+  .titleBlock {
+    padding: 22px 18px;
+  }
+
+  .heroTitle {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .previewIntro {
+    padding: 18px 18px 14px;
+  }
+
+  .previewIntroTitle {
+    font-size: 20px;
+  }
+
+  .stepCard {
+    padding: 22px 20px;
+  }
+
+  .finalCta {
+    padding: 36px 20px;
+  }
+
+  .finalTitle {
+    font-size: 22px;
   }
 }

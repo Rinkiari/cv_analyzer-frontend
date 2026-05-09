@@ -279,3 +279,77 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 560px) {
+  .titleBlock {
+    padding: 20px;
+  }
+
+  .cardTitle {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .infoCard {
+    padding: 14px 16px;
+    gap: 12px;
+    margin-top: 16px;
+
+    img {
+      width: 56px;
+      height: 56px;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .featuresCard {
+    padding: 14px 16px;
+
+    li {
+      font-size: 14px;
+    }
+  }
+
+  .actionCard {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .segBtn {
+    font-size: 15px;
+    height: 38px;
+  }
+
+  .inputWrapper {
+    height: 280px;
+  }
+
+  .upload_button {
+    height: 46px;
+    font-size: 17px;
+  }
+
+  .alreadyIcon {
+    width: 96px;
+    height: 96px;
+    font-size: 56px;
+  }
+
+  .alreadyTitle {
+    font-size: 22px;
+  }
+
+  .alreadySub {
+    font-size: 15px;
+  }
+}

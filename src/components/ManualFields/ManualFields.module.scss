@@ -86,3 +86,28 @@
     }
   }
 }
+
+@media (max-width: 560px) {
+  .manual_wrapper {
+    height: 320px;
+    padding: 10px;
+
+    .fio_field {
+      height: 40px;
+
+      p {
+        width: 130px;
+        font-size: 15px;
+        margin-left: 10px;
+      }
+
+      &::after {
+        left: 142px;
+      }
+
+      .editable {
+        font-size: 15px;
+      }
+    }
+  }
+}

@@ -311,3 +311,86 @@
     min-height: unset;
   }
 }
+
+@media (max-width: 560px) {
+  .titleBlock {
+    padding: 20px;
+  }
+
+  .cardTitle {
+    font-size: 26px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+  }
+
+  .infoCard {
+    padding: 14px 16px;
+    gap: 12px;
+    margin-top: 16px;
+
+    img {
+      width: 56px;
+      height: 56px;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .featuresCard {
+    padding: 14px 16px;
+
+    li {
+      font-size: 14px;
+    }
+  }
+
+  .actionCard {
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .segBtn {
+    font-size: 15px;
+    height: 38px;
+  }
+
+  .fio_field {
+    height: 46px;
+
+    p {
+      width: 70px;
+      font-size: 16px;
+      margin-left: 12px;
+    }
+
+    &::after {
+      left: 86px;
+    }
+
+    .editable {
+      font-size: 16px !important;
+    }
+  }
+
+  .upload_button {
+    height: 46px;
+    font-size: 17px;
+  }
+
+  .hintCard {
+    padding: 14px 16px;
+  }
+
+  .hintExample {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
