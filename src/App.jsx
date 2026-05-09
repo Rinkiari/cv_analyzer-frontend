@@ -10,6 +10,9 @@ import MyProfilePage from './pages/MyProfilePage/MyProfilePage';
 import AuthPage from './pages/AuthPage/AuthPage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import Header from './components/Header';
+import RequireAuth from './components/guards/RequireAuth';
+import RequireCvId from './components/guards/RequireCvId';
+import RequireAnalysisId from './components/guards/RequireAnalysisId';
 import { useTokenRefresh } from './hooks/Usetokenrefresh';
 
 function App() {
@@ -22,12 +25,40 @@ function App() {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="uploadresume" element={<UploadResumePage />} />
-          <Route path="uploadvacancy" element={<UploadVacancyPage />} />
-          <Route path="generateletter" element={<GenerateLetterPage />} />
-          <Route path="resultspage" element={<ResultsPage />} />
+          <Route
+            path="uploadvacancy"
+            element={
+              <RequireCvId>
+                <UploadVacancyPage />
+              </RequireCvId>
+            }
+          />
+          <Route
+            path="generateletter"
+            element={
+              <RequireAnalysisId>
+                <GenerateLetterPage />
+              </RequireAnalysisId>
+            }
+          />
+          <Route
+            path="resultspage"
+            element={
+              <RequireAnalysisId>
+                <ResultsPage />
+              </RequireAnalysisId>
+            }
+          />
           <Route path="login" element={<AuthPage />} />
           <Route path="about" element={<AboutPage />} />
-          <Route path="myprofile" element={<MyProfilePage />} />
+          <Route
+            path="myprofile"
+            element={
+              <RequireAuth>
+                <MyProfilePage />
+              </RequireAuth>
+            }
+          />
           <Route path="*" element={<ErrorPage />} />
         </Route>
       </Routes>
