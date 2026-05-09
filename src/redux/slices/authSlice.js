@@ -170,6 +170,32 @@ export const fetchUserInfo = createAsyncThunk(
   },
 );
 
+// Под локом сначала перечитываем storage: если другой таб уже успел обновить
+// refresh-token, пока мы ждали, его новая пара уже лежит в localStorage —
+// берём её и не дёргаем сеть второй раз. Это решает гонку, когда два таба
+// одновременно идут в /auth/refresh с одним refresh-token'ом, и сервер с
+// rotation инвалидирует наш до того, как мы успеваем им воспользоваться.
+async function refreshUnderLock(initialRefreshToken) {
+  const fresh = readStoredAuth();
+  if (fresh.refreshToken && fresh.refreshToken !== initialRefreshToken) {
+    return fresh;
+  }
+
+  const data = await authRequest('/auth/refresh', { refreshToken: initialRefreshToken });
+  const auth = normalizeAuthPayload(data);
+  persistAuth(auth);
+  return auth;
+}
+
+function withAuthRefreshLock(callback) {
+  if (typeof navigator !== 'undefined' && navigator.locks?.request) {
+    return navigator.locks.request('auth-refresh', callback);
+  }
+  // Фолбэк для древних браузеров без Web Locks API: гонка остаётся возможной,
+  // но это лучше, чем уронить всю авторизацию на отсутствии API.
+  return callback();
+}
+
 export const refreshTokens = createAsyncThunk(
   'auth/refreshTokens',
   async (_, { getState, rejectWithValue }) => {
@@ -181,10 +207,7 @@ export const refreshTokens = createAsyncThunk(
         throw new Error('Отсутствует refresh token');
       }
 
-      const data = await authRequest('/auth/refresh', { refreshToken });
-      const auth = normalizeAuthPayload(data);
-      persistAuth(auth);
-      return auth;
+      return await withAuthRefreshLock(() => refreshUnderLock(refreshToken));
     } catch (error) {
       clearStoredAuth();
       return rejectWithValue(error.message || 'Не удалось обновить токен');
