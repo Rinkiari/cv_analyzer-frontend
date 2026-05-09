@@ -200,6 +200,22 @@ const ArrowRight = ({ size = 14 }) => (
   </svg>
 );
 
+const HamburgerIcon = ({ size = 20 }) => (
+  <svg
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.4"
+    strokeLinecap="round"
+    aria-hidden="true">
+    <line x1="4" y1="7" x2="20" y2="7" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="4" y1="17" x2="20" y2="17" />
+  </svg>
+);
+
 // ----- contextual strip components -----
 
 const BackArrow = () => (
@@ -320,6 +336,24 @@ const Header = () => {
 
   const scrolled = useScrolled(12);
 
+  // мобильное меню — гамбургер виден только на ≤880px (см. SCSS)
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // закрываем при смене маршрута/якоря
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname, location.hash]);
+
+  // ESC закрывает меню
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [menuOpen]);
+
   // Подгружаем имя один раз после логина — чтобы greeting в шапке тоже знал имя
   useEffect(() => {
     if (auth?.isAuthenticated && !auth.firstName && auth.userInfoStatus === 'idle') {
@@ -418,7 +452,35 @@ const Header = () => {
               </>
             )}
           </div>
+
+          <button
+            type="button"
+            className={styles.menuToggle}
+            aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={menuOpen}
+            aria-controls="header-mobile-menu"
+            onClick={() => setMenuOpen((v) => !v)}>
+            {menuOpen ? <CloseX size={18} /> : <HamburgerIcon />}
+          </button>
         </div>
+
+        {/* ===== мобильное меню (≤880px, скрыто на десктопе через SCSS) ===== */}
+        <nav
+          id="header-mobile-menu"
+          className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ''}`}
+          aria-label="Главное меню (мобильное)"
+          aria-hidden={!menuOpen}>
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={styles.mobileMenuLink}
+              tabIndex={menuOpen ? 0 : -1}
+              onClick={() => setMenuOpen(false)}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
         {/* ===== нижняя контекстная строка ===== */}
         {/* Скрываем целиком, если контекста нет (маршруты вне потока + нет состояний) */}

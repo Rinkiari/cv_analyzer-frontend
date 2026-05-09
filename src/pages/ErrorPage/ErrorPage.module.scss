@@ -10,7 +10,8 @@
 
   img {
     width: 380px;
-    height: 380px;
+    max-width: 100%;
+    height: auto;
     object-fit: contain;
     aspect-ratio: 1/1;
   }
@@ -40,6 +41,25 @@
 
     &:hover {
       background: #161616;
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .icon_container {
+    margin: 60px auto;
+
+    .title {
+      font-size: 22px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+    }
+
+    .homeLink {
+      font-size: 15px;
+      padding: 10px 22px;
     }
   }
 }

@@ -6,9 +6,9 @@
 .hero {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
-  gap: 24px;
+  gap: 16px;
   align-items: stretch;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .titleBlock,
@@ -16,14 +16,16 @@
 .stateCard {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 22px;
+  border-radius: 18px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 }
 
 .titleBlock {
-  padding: 28px;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 4px;
 }
 
 .kicker,
@@ -33,41 +35,40 @@
 .contentKicker {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(0, 0, 0, 0.5);
-  margin: 0 0 10px;
+  margin: 0;
 }
 
 .heroTitle {
-  font-size: 34px;
-  line-height: 1.1;
-  margin: 0 0 12px;
+  font-size: 22px;
+  line-height: 1.2;
+  margin: 0;
   color: #000 !important;
 }
 
 .subtitle {
-  font-size: 16px;
-  color: rgba(0, 0, 0, 0.65);
-  line-height: 1.55;
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.4;
   margin: 0;
 }
 
 .heroStats {
-  margin-top: auto;
-  padding-top: 20px;
+  margin-top: 6px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 14px;
 }
 
 .statItem {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .statValue {
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 600;
   color: #000;
   margin: 0;
@@ -75,63 +76,67 @@
 }
 
 .statLabel {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.55);
   margin: 0;
 }
 
 .statDivider {
   width: 1px;
-  height: 32px;
-  background: rgba(0, 0, 0, 0.1);
+  height: 16px;
+  background: rgba(0, 0, 0, 0.12);
 }
 
 .profileCard {
-  padding: 28px;
+  padding: 14px 18px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
 }
 
 .profileHeader {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .profileAvatar {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #fbc02d 0%, #f5a623 100%);
   color: #000;
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(251, 192, 45, 0.35);
+  box-shadow: 0 3px 10px rgba(251, 192, 45, 0.3);
 }
 
 .profileName {
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 600;
   color: #000 !important;
-  margin: 0 0 4px;
-  line-height: 1.15;
+  margin: 0;
+  line-height: 1.2;
 }
 
 .profileId {
-  font-size: 13px;
+  font-size: 11px;
   color: rgba(0, 0, 0, 0.5);
-  margin: 0;
+  margin: 2px 0 0;
   font-family: 'SF Mono', Menlo, Consolas, monospace;
+  word-break: break-all;
 }
 
 .cardActions {
   display: flex;
+  flex-shrink: 0;
 }
 
 // === STATE CARDS (loading/empty/error) ===
@@ -161,9 +166,12 @@
 }
 
 // === MASTER-DETAIL LAYOUT ===
+// minmax(0, …) обязателен на колонках с горизонтально-скроллящимися детьми
+// (.listInner, .tabs) — иначе колонка раздувается под суммарную ширину карточек,
+// и внутренний overflow-x не работает: скроллится вся страница.
 .layout {
   display: grid;
-  grid-template-columns: 220px 250px 1fr;
+  grid-template-columns: 220px 250px minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -181,23 +189,34 @@
 
 .listKicker {
   padding: 0 8px;
+  margin-bottom: 12px;
 }
 
 .listInner {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: calc(100vh - 280px);
+  // ограничиваем высоту, чтобы стопка анализов не уезжала вниз ниже категорий.
+  // на больших мониторах фиксируем 400px (≈ высоте sidebar с категориями),
+  // на коротких — берём calc(100vh - 280px), чтобы не съесть весь экран
+  max-height: min(400px, calc(100vh - 280px));
   overflow-y: auto;
   padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
 
   &::-webkit-scrollbar {
     width: 4px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 999px;
   }
 }
 
@@ -293,6 +312,7 @@
 
 .sidebarKicker {
   padding: 0 10px;
+  margin-bottom: 12px;
 }
 
 .tabs {
@@ -401,9 +421,13 @@
   min-height: 460px;
 }
 
+// MyProfile живёт в 3-колоночном layout (220 + 250 + 1fr) — content-колонка
+// всегда узкая. Чтобы 4 кнопки экспорта не давили kicker и title в вертикаль,
+// всегда держим headerActions отдельной строкой.
 .contentHeader {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 16px;
   padding-bottom: 20px;
   margin-bottom: 24px;
@@ -442,6 +466,9 @@
   gap: 8px;
   flex-shrink: 0;
   flex-wrap: wrap;
+  // 100%-ширина базиса гарантирует, что блок кнопок всегда уезжает на следующую
+  // строку под заголовком — см. комментарий у .contentHeader
+  flex-basis: 100%;
 
   .actionBtn:disabled {
     opacity: 0.55;
@@ -494,6 +521,11 @@
   font-size: 16px;
   line-height: 1.7;
   color: rgba(0, 0, 0, 0.86);
+  min-width: 0;
+  // длинные неразрывные строки (URL, токены, сплошной текст без пробелов)
+  // переносятся вместо того, чтобы пушить ширину контентной колонки
+  overflow-wrap: anywhere;
+  word-break: break-word;
 
   > *:first-child {
     margin-top: 0;
@@ -661,7 +693,7 @@
 // Складываем в 2 колонки уже на 1200px, чтобы контентной колонке хватало воздуха.
 @media (max-width: 1200px) {
   .layout {
-    grid-template-columns: 220px 1fr;
+    grid-template-columns: 220px minmax(0, 1fr);
   }
 
   .sidebar {
@@ -678,23 +710,26 @@
 
 @media (max-width: 980px) {
   .hero {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
+  // min-width: 0 + width: 100% — гарантируем, что блоки не раздуваются под
+  // содержимое горизонтального скролла, а ограничены шириной экрана
   .analysesList,
-  .sidebar {
+  .sidebar,
+  .content {
     position: static;
     grid-column: 1;
     grid-row: auto;
+    min-width: 0;
+    width: 100%;
   }
 
   .content {
-    grid-column: 1;
-    grid-row: auto;
     padding: 22px;
   }
 
@@ -702,6 +737,8 @@
     flex-direction: row;
     overflow-x: auto;
     max-height: none;
+    padding-right: 0;
+    padding-bottom: 8px;
 
     .analysisItem {
       flex-shrink: 0;
@@ -713,13 +750,179 @@
     flex-direction: row;
     overflow-x: auto;
     gap: 6px;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.18);
+      border-radius: 999px;
+    }
   }
 
   .tab {
     flex-shrink: 0;
   }
 
-  .actionBtn span {
-    display: none;
+  // на мобиле/планшете оставляем подписи (PDF / DOCX / TXT / Копировать) —
+  // одни иконки скачивания неотличимы друг от друга
+  .actionBtn {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ≤768: уплотняем gap/padding (flex-wrap и flex-basis на этой странице
+// действуют всегда, не нужно повторять)
+@media (max-width: 768px) {
+  .contentHeader {
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+
+  .titleBlock,
+  .profileCard {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .heroTitle {
+    font-size: 18px;
+  }
+
+  .heroStats {
+    margin-top: 4px;
+    gap: 10px;
+  }
+
+  .statValue {
+    font-size: 16px;
+  }
+
+  .statLabel {
+    font-size: 11px;
+  }
+
+  .profileHeader {
+    gap: 10px;
+  }
+
+  .profileAvatar {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+    border-radius: 11px;
+  }
+
+  .profileName {
+    font-size: 14px;
+  }
+
+  .profileId {
+    font-size: 10px;
+  }
+
+  .stateCard {
+    padding: 28px 20px;
+    min-height: 220px;
+    border-radius: 18px;
+
+    h2 {
+      font-size: 20px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .analysesList,
+  .sidebar {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .listInner .analysisItem {
+    min-width: 160px;
+    padding: 10px 12px;
+  }
+
+  .itemTitle {
+    font-size: 13px;
+  }
+
+  .content {
+    padding: 18px 16px;
+    border-radius: 18px;
+    min-height: 320px;
+  }
+
+  // .contentHeader и .headerActions переведены в «двухрядный» режим
+  // ещё на ≤768 — здесь только размеры
+  .contentIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .contentTitle {
+    font-size: 18px;
+  }
+
+  .headerActions {
+    gap: 6px;
+  }
+
+  .actionBtn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .markdown {
+    font-size: 15px;
+    line-height: 1.6;
+
+    h1 {
+      font-size: 20px;
+    }
+
+    h2 {
+      font-size: 18px;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    h4 {
+      font-size: 15px;
+    }
   }
 }

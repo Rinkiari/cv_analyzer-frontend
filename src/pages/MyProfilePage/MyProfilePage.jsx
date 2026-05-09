@@ -185,9 +185,6 @@ export default function MyProfilePage() {
         <div className={styles.titleBlock}>
           <p className={styles.kicker}>Личный кабинет</p>
           <h1 className={styles.heroTitle}>История анализов</h1>
-          <p className={styles.subtitle}>
-            Здесь собраны все проверки резюме и сопроводительные письма.
-          </p>
 
           <div className={styles.heroStats}>
             <div className={styles.statItem}>
@@ -210,7 +207,6 @@ export default function MyProfilePage() {
               {(firstName?.[0] || 'U').toUpperCase()}
             </div>
             <div>
-              <p className={styles.cardLabel}>Пользователь</p>
               <h2 className={styles.profileName}>
                 {firstName || 'Без имени'}
               </h2>
@@ -222,24 +218,24 @@ export default function MyProfilePage() {
             {isLoggedIn ? (
               <Button
                 onClick={() => navigate('/uploadresume')}
-                width="100%"
-                height="48px"
-                borderRadius="14px"
+                height="40px"
+                px="18px"
+                borderRadius="12px"
                 bg="#000"
                 color="#FBC02D"
-                fontSize="17px"
+                fontSize="14px"
                 _hover={{ bg: '#161616' }}>
                 Новый анализ
               </Button>
             ) : (
               <Button
                 onClick={() => navigate('/login')}
-                width="100%"
-                height="48px"
-                borderRadius="14px"
+                height="40px"
+                px="18px"
+                borderRadius="12px"
                 bg="#000"
                 color="#FBC02D"
-                fontSize="17px"
+                fontSize="14px"
                 _hover={{ bg: '#161616' }}>
                 Войти
               </Button>

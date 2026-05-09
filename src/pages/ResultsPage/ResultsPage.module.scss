@@ -618,11 +618,31 @@
     padding: 22px;
   }
 
-  .actionBtn span {
-    display: none;
+  // на мобиле/планшете оставляем подписи (PDF / DOCX / Копировать) —
+  // одни иконки скачивания неотличимы друг от друга
+  .actionBtn {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// ≤768: иконка+заголовок не успевают сосуществовать с 4 кнопками в одной строке —
+// заголовок крошится, кикер ломается. Переводим headerActions на отдельную строку.
+@media (max-width: 768px) {
+  .contentHeader {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
   }
 
-  .actionBtn {
-    padding: 10px 12px;
+  .headerActions {
+    flex-basis: 100%;
   }
 }
