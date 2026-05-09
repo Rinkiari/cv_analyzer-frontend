@@ -14,24 +14,36 @@ function canUseStorage() {
   return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 }
 
-function readStoredAuth() {
-  if (!canUseStorage()) {
-    return {
-      userId: null,
-      accessToken: null,
-      refreshToken: null,
-      accessTokenExpiresAt: null,
-      refreshTokenExpiresAt: null,
-    };
-  }
-
+function emptyStoredAuth() {
   return {
+    userId: null,
+    accessToken: null,
+    refreshToken: null,
+    accessTokenExpiresAt: null,
+    refreshTokenExpiresAt: null,
+  };
+}
+
+function readStoredAuth() {
+  if (!canUseStorage()) return emptyStoredAuth();
+
+  const stored = {
     userId: localStorage.getItem(STORAGE_KEYS.userId),
     accessToken: localStorage.getItem(STORAGE_KEYS.accessToken),
     refreshToken: localStorage.getItem(STORAGE_KEYS.refreshToken),
     accessTokenExpiresAt: Number(localStorage.getItem(STORAGE_KEYS.accessTokenExpiresAt)) || null,
     refreshTokenExpiresAt: Number(localStorage.getItem(STORAGE_KEYS.refreshTokenExpiresAt)) || null,
   };
+
+  // Если refresh-token уже протух, восстановить сессию нечем — без него и
+  // /auth/refresh не сработает. Чистим storage, чтобы isAuthenticatedSync в
+  // resumeSlice тоже видел гостя, а не считал его залогиненным.
+  if (stored.refreshTokenExpiresAt && stored.refreshTokenExpiresAt <= Date.now()) {
+    clearStoredAuth();
+    return emptyStoredAuth();
+  }
+
+  return stored;
 }
 
 function persistAuth(payload) {
