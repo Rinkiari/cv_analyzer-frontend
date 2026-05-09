@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
@@ -27,6 +27,10 @@ export default function AuthPage() {
   const [registerForm, setRegisterForm] = useState(initialRegisterForm);
 
   const isLoading = auth.status === 'loading';
+  // synchronous-страж от двойного submit: auth.status переключается на
+  // 'loading' только в pending-reducer, а до его прохождения и rerender'а
+  // кнопки между двумя подряд нажатиями Enter укладывается ещё один submit.
+  const isSubmittingRef = useRef(false);
 
   const switchMode = (nextMode) => {
     if (nextMode === mode) return;
@@ -73,6 +77,8 @@ export default function AuthPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     dispatch(clearAuthError());
 
     try {
@@ -105,6 +111,8 @@ export default function AuthPage() {
       // отрабатывает guard для уже залогиненных, заходящих на /login
     } catch (error) {
       toast.error(getReadableAuthError(error));
+    } finally {
+      isSubmittingRef.current = false;
     }
   };
 
