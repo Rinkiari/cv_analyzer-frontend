@@ -39,7 +39,8 @@ export default function Dropzone({ onFileSelect }) {
     validateAndSend(file);
   };
 
-  const clearFile = () => {
+  const clearFile = (e) => {
+    e?.stopPropagation();
     setSelectedFile(null);
     onFileSelect(null);
     inputRef.current.value = '';
