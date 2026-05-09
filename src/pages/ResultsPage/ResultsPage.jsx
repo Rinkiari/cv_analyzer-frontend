@@ -40,6 +40,11 @@ const LOADING_MESSAGES_LETTER = [
   'Финализируем текст...',
 ];
 
+// если бэкенд бесконечно отвечает 202 (например, очередь не достучалась до
+// LLM), пользователь без таймаута крутит лоадер вечно. 90 сек — потолок,
+// после которого показываем ошибку и даём перезагрузиться/вернуться.
+const ANALYSIS_POLL_TIMEOUT_MS = 90 * 1000;
+
 function ResultsPage() {
   const dispatch = useDispatch();
   const reduxAnalysisId = useSelector((state) => state.resume.analysisId);
@@ -73,6 +78,7 @@ function ResultsPage() {
 
     let cancelled = false;
     let timeoutId = null;
+    const startedAt = Date.now();
 
     const poll = async () => {
       try {
@@ -87,6 +93,12 @@ function ResultsPage() {
         }
 
         if (res.status === 202) {
+          if (Date.now() - startedAt >= ANALYSIS_POLL_TIMEOUT_MS) {
+            setErrorState(
+              'Анализ занимает слишком много времени. Попробуйте обновить страницу позже.',
+            );
+            return;
+          }
           timeoutId = setTimeout(poll, 2000);
           return;
         }
