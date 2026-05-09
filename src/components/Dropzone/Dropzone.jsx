@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { toast } from 'react-toastify';
 import styles from './Dropzone.module.scss';
 import cloudpic from '../../assets/cloud.png';
 import clearIcon from '../../assets/fknbin.png';
@@ -23,7 +24,7 @@ export default function Dropzone({ onFileSelect }) {
     ];
 
     if (!allowed.includes(file.type)) {
-      alert('Разрешены только PDF и DOCX файлы.');
+      toast.warn('Разрешены только PDF и DOCX файлы.');
       return;
     }
 
