@@ -691,11 +691,22 @@ $success-deep: #1f7a55;
     gap: 6px;
   }
 
-  .btnPrimary,
+  // на iPhone SE логотип + 2 auth-кнопки + гамбургер не помещаются в 375px,
+  // и menuToggle обрезается shell{overflow:hidden}. «Регистрация» остаётся
+  // доступной со страницы /login (там есть переключатель режима).
   .btnGhost {
-    height: 36px;
-    padding: 0 14px;
+    display: none;
+  }
+
+  .btnPrimary {
+    height: 34px;
+    padding: 0 12px;
     font-size: 13px;
+  }
+
+  .menuToggle {
+    width: 36px;
+    height: 36px;
   }
 
   .contextRow {
