@@ -313,6 +313,11 @@
 }
 
 @media (max-width: 560px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
   .titleBlock {
     padding: 20px;
   }

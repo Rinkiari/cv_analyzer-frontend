@@ -57,3 +57,16 @@
     }
   }
 }
+
+@media (max-width: 560px) {
+  .textarea_wrapper {
+    margin-top: 24px;
+    height: 280px;
+    border-radius: 18px;
+
+    textarea {
+      font-size: 16px;
+      width: 94%;
+    }
+  }
+}

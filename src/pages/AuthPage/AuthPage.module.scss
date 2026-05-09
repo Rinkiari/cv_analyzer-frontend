@@ -217,6 +217,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  flex-wrap: wrap;
 
   &[data-tone='weak'] .strengthFill {
     background: #d64545;
@@ -239,7 +241,8 @@
 }
 
 .strengthBar {
-  flex: 1;
+  flex: 1 1 120px;
+  min-width: 0;
   height: 6px;
   background: rgba(0, 0, 0, 0.08);
   border-radius: 999px;
@@ -255,7 +258,10 @@
 
 .strengthLabel {
   font-size: 13px !important;
-  white-space: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
 }
 
 .footerRow {
@@ -306,12 +312,62 @@
     padding: 10px 0 28px;
   }
 
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .heroText h1 {
+    font-size: 30px;
+  }
+
+  .kicker {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    margin-top: 12px;
+    font-size: 15px;
+  }
+
   .formCard {
     padding: 18px;
+    border-radius: 22px;
+  }
+
+  .switchButton {
+    font-size: 15px;
+    padding: 10px 12px;
   }
 
   .heroCard {
     flex-direction: column;
     align-items: flex-start;
+    margin-top: 18px;
+    padding: 16px;
+    gap: 12px;
+
+    img {
+      width: 64px;
+      height: 64px;
+    }
+
+    h2 {
+      font-size: 18px;
+    }
+
+    p {
+      font-size: 14px;
+    }
+  }
+
+  .field input {
+    height: 46px;
+  }
+
+  .footerRow p,
+  .backLink {
+    font-size: 14px;
   }
 }
