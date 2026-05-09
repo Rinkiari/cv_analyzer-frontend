@@ -8,8 +8,10 @@
   grid-template-columns: 1.2fr 0.9fr;
   gap: 24px;
   align-items: stretch;
+  // верхний предел тот же, что на UploadVacancyPage — на больших мониторах
+  // карточки не растягиваются дальше осмысленного, см. комментарий там
   // ~220px = header(40) + header-margin(40) + topbar(60) + page-padding(38) + paddings
-  min-height: calc(100vh - 220px);
+  min-height: min(calc(100vh - 220px), 720px);
 }
 
 .titleBlock,

@@ -10,12 +10,30 @@ body {
 .global_container {
   padding: 3px 80px;
   width: 100%;
+  // верхний предел ширины контента: на мониторах 23–27" макет перестаёт
+  // растягиваться на всю ширину и центрируется — 1440px это типичная
+  // «ноутбучная» ширина, дальше по бокам остаются симметричные поля.
+  max-width: 1440px;
   margin: 0 auto;
 
   h1 {
     font-family: 'SF-Pro-Display-Medium', sans-serif !important;
     font-size: 36px;
     font-weight: 500;
+  }
+}
+
+// горизонтальные поля сжимаются вместе с экраном, чтобы на узких ноутбуках
+// 80px не съедали полезную ширину
+@media (max-width: 1100px) {
+  .global_container {
+    padding: 3px 32px;
+  }
+}
+
+@media (max-width: 560px) {
+  .global_container {
+    padding: 3px 16px;
   }
 }
 

@@ -9,9 +9,11 @@
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   align-items: stretch;
-  // заполняем оставшееся пространство экрана
+  // заполняем оставшееся пространство экрана, но с верхним пределом — иначе на
+  // мониторах 1440+ по высоте карточки растягивались до ~1200px и контент тонул
+  // в пустоте. 720px подобрано под содержимое (infoCard + form/dropzone).
   // ~260px = header(40) + header-margin(40) + progressbar(14) + page-padding(38) + backbutton(38) + h1(72) + paddings
-  min-height: calc(100vh - 260px);
+  min-height: min(calc(100vh - 260px), 720px);
 }
 
 // общие стили карточек
