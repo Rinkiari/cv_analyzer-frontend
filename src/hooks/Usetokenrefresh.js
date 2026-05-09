@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { refreshTokens, logout, selectAuth } from '../redux/slices/authSlice';
 
@@ -11,15 +11,21 @@ const CHECK_INTERVAL_MS = 60 * 1000;
 export function useTokenRefresh() {
   const dispatch = useDispatch();
   const { isAuthenticated, accessTokenExpiresAt, refreshTokenExpiresAt } = useSelector(selectAuth);
-  const isRefreshing = useRef(false);
 
   useEffect(() => {
     // если не залогинен , то не сработает
     if (!isAuthenticated) return;
 
+    // inFlight живёт в замыкании конкретного run'а эффекта, а не в useRef:
+    // при ремаунте/смене deps старый замок не "залипнет" на true, если
+    // refresh-промис где-то завис или был отменён нестандартно.
+    // cancelled — defence-in-depth от просочившегося колбэка интервала
+    // после cleanup.
+    let inFlight = false;
+    let cancelled = false;
+
     async function checkAndRefresh() {
-      // если уже обновляем — то скип
-      if (isRefreshing.current) return;
+      if (cancelled || inFlight) return;
 
       const now = Date.now();
 
@@ -33,16 +39,16 @@ export function useTokenRefresh() {
       const shouldRefresh =
         !accessTokenExpiresAt || now >= accessTokenExpiresAt - REFRESH_THRESHOLD_MS;
 
-      if (shouldRefresh) {
-        isRefreshing.current = true;
-        try {
-          await dispatch(refreshTokens()).unwrap();
-        } catch {
-          // refreshTokens сам сделает clearStoredAuth при ошибке,
-          // но isAuthenticated станет false и этот эффект больше не запустится
-        } finally {
-          isRefreshing.current = false;
-        }
+      if (!shouldRefresh) return;
+
+      inFlight = true;
+      try {
+        await dispatch(refreshTokens()).unwrap();
+      } catch {
+        // refreshTokens сам сделает clearStoredAuth при ошибке,
+        // но isAuthenticated станет false и этот эффект больше не запустится
+      } finally {
+        inFlight = false;
       }
     }
 
@@ -52,6 +58,9 @@ export function useTokenRefresh() {
     // и потом раз в минуту
     const intervalId = setInterval(checkAndRefresh, CHECK_INTERVAL_MS);
 
-    return () => clearInterval(intervalId);
+    return () => {
+      cancelled = true;
+      clearInterval(intervalId);
+    };
   }, [isAuthenticated, accessTokenExpiresAt, refreshTokenExpiresAt, dispatch]);
 }
