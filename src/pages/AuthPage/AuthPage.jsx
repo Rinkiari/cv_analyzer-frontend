@@ -101,8 +101,8 @@ export default function AuthPage() {
           }),
         ).unwrap();
       }
-
-      navigate('/', { replace: true });
+      // навигацию после успешного логина делает useEffect выше — он же
+      // отрабатывает guard для уже залогиненных, заходящих на /login
     } catch (error) {
       toast.error(getReadableAuthError(error));
     }
