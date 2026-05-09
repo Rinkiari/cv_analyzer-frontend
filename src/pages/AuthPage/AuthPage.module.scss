@@ -159,6 +159,105 @@
   }
 }
 
+.passwordWrapper {
+  position: relative;
+
+  input {
+    padding-right: 48px;
+  }
+}
+
+.toggleVisibility {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  background: transparent;
+  color: #6f6a63;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #111;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fbc02d;
+    outline-offset: 2px;
+  }
+}
+
+.capsLockHint {
+  font-size: 13px !important;
+  color: #b5651d !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '⇪';
+    font-size: 14px;
+  }
+}
+
+.strengthMeter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  &[data-tone='weak'] .strengthFill {
+    background: #d64545;
+  }
+  &[data-tone='medium'] .strengthFill {
+    background: #e0a020;
+  }
+  &[data-tone='strong'] .strengthFill {
+    background: #2e9e5b;
+  }
+  &[data-tone='weak'] .strengthLabel {
+    color: #b53b3b;
+  }
+  &[data-tone='medium'] .strengthLabel {
+    color: #8c6a1a;
+  }
+  &[data-tone='strong'] .strengthLabel {
+    color: #1f7445;
+  }
+}
+
+.strengthBar {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.strengthFill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease, background-color 0.2s ease;
+}
+
+.strengthLabel {
+  font-size: 13px !important;
+  white-space: nowrap;
+}
+
 .footerRow {
   margin-top: 18px;
   display: flex;

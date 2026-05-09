@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Spinner } from '@chakra-ui/react';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import styles from './AuthPage.module.scss';
 import { toast } from 'react-toastify';
 import { clearAuthError, loginUser, registerUser, selectAuth } from '../../redux/slices/authSlice';
@@ -9,6 +10,31 @@ import cvIllustration from '../../assets/cv.png';
 
 const initialLoginForm = { login: '', password: '' };
 const initialRegisterForm = { name: '', login: '', password: '', confirmPassword: '' };
+
+// Минимум для регистрации: 8 символов И минимум 2 разных типа (буквы/цифры/спецсимволы).
+// Это «защита от дурака», а не PCI-DSS — но мешает '12345' и 'qwerty'.
+function evaluatePassword(pw) {
+  if (!pw) return { tone: null, label: '', accepted: false, score: 0 };
+  const classes =
+    Number(/[a-z]/.test(pw)) +
+    Number(/[A-Z]/.test(pw)) +
+    Number(/\d/.test(pw)) +
+    Number(/[^A-Za-z0-9]/.test(pw));
+  const longEnough = pw.length >= 8;
+
+  if (!longEnough || classes < 2) {
+    return {
+      tone: 'weak',
+      label: 'Слабый — минимум 8 символов и сочетание букв и цифр',
+      accepted: false,
+      score: 1,
+    };
+  }
+  if (classes >= 3 || pw.length >= 12) {
+    return { tone: 'strong', label: 'Надёжный', accepted: true, score: 3 };
+  }
+  return { tone: 'medium', label: 'Средний', accepted: true, score: 2 };
+}
 
 export default function AuthPage() {
   const navigate = useNavigate();
@@ -25,6 +51,10 @@ export default function AuthPage() {
   const [mode, setMode] = useState(initialMode);
   const [loginForm, setLoginForm] = useState(initialLoginForm);
   const [registerForm, setRegisterForm] = useState(initialRegisterForm);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordCapsLock, setPasswordCapsLock] = useState(false);
+  const [confirmCapsLock, setConfirmCapsLock] = useState(false);
 
   const isLoading = auth.status === 'loading';
   // synchronous-страж от двойного submit: auth.status переключается на
@@ -68,6 +98,17 @@ export default function AuthPage() {
   const handleRegisterChange = (field) => (e) =>
     setRegisterForm((prev) => ({ ...prev, [field]: e.target.value }));
 
+  const passwordStrength = useMemo(
+    () => evaluatePassword(registerForm.password),
+    [registerForm.password],
+  );
+
+  const handleCapsLockProbe = (setter) => (e) => {
+    if (typeof e.getModifierState === 'function') {
+      setter(e.getModifierState('CapsLock'));
+    }
+  };
+
   const getReadableAuthError = (error) => {
     if (!error) return 'Ошибка авторизации';
     if (typeof error === 'string' && error.includes('Invalid login or password'))
@@ -93,6 +134,12 @@ export default function AuthPage() {
       } else {
         if (!registerForm.name.trim() || !registerForm.login.trim() || !registerForm.password) {
           toast.warn('Заполните имя, логин и пароль');
+          return;
+        }
+        if (!passwordStrength.accepted) {
+          toast.warn(
+            'Пароль слишком простой: минимум 8 символов и сочетание букв и цифр (или спецсимволов)',
+          );
           return;
         }
         if (registerForm.password !== registerForm.confirmPassword) {
@@ -173,28 +220,71 @@ export default function AuthPage() {
             </label>
             <label className={styles.field}>
               <span>Пароль</span>
-              <input
-                type="password"
-                value={mode === 'login' ? loginForm.password : registerForm.password}
-                onChange={
-                  mode === 'login'
-                    ? handleLoginChange('password')
-                    : handleRegisterChange('password')
-                }
-                placeholder="••••••••"
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              />
+              <div className={styles.passwordWrapper}>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={mode === 'login' ? loginForm.password : registerForm.password}
+                  onChange={
+                    mode === 'login'
+                      ? handleLoginChange('password')
+                      : handleRegisterChange('password')
+                  }
+                  onKeyDown={handleCapsLockProbe(setPasswordCapsLock)}
+                  onKeyUp={handleCapsLockProbe(setPasswordCapsLock)}
+                  onBlur={() => setPasswordCapsLock(false)}
+                  placeholder="••••••••"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                />
+                <button
+                  type="button"
+                  className={styles.toggleVisibility}
+                  onClick={() => setShowPassword((v) => !v)}
+                  aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}>
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+              {passwordCapsLock && (
+                <span className={styles.capsLockHint}>Включён Caps Lock</span>
+              )}
+              {mode === 'register' && registerForm.password && (
+                <div
+                  className={styles.strengthMeter}
+                  data-tone={passwordStrength.tone}>
+                  <div className={styles.strengthBar}>
+                    <span
+                      className={styles.strengthFill}
+                      style={{ width: `${(passwordStrength.score / 3) * 100}%` }}
+                    />
+                  </div>
+                  <span className={styles.strengthLabel}>{passwordStrength.label}</span>
+                </div>
+              )}
             </label>
             {mode === 'register' && (
               <label className={styles.field}>
                 <span>Повторите пароль</span>
-                <input
-                  type="password"
-                  value={registerForm.confirmPassword}
-                  onChange={handleRegisterChange('confirmPassword')}
-                  placeholder="••••••••"
-                  autoComplete="new-password"
-                />
+                <div className={styles.passwordWrapper}>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={registerForm.confirmPassword}
+                    onChange={handleRegisterChange('confirmPassword')}
+                    onKeyDown={handleCapsLockProbe(setConfirmCapsLock)}
+                    onKeyUp={handleCapsLockProbe(setConfirmCapsLock)}
+                    onBlur={() => setConfirmCapsLock(false)}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    className={styles.toggleVisibility}
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}>
+                    {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
+                {confirmCapsLock && (
+                  <span className={styles.capsLockHint}>Включён Caps Lock</span>
+                )}
               </label>
             )}
 
