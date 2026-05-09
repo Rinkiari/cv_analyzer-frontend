@@ -20,7 +20,6 @@ export default function Dropzone({ onFileSelect }) {
     const allowed = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/msword',
     ];
 
     if (!allowed.includes(file.type)) {
@@ -67,7 +66,7 @@ export default function Dropzone({ onFileSelect }) {
 
       <input
         type="file"
-        accept=".pdf,.doc,.docx"
+        accept=".pdf,.docx"
         ref={inputRef}
         className={styles.hidden_input}
         onChange={handleSelectFile}

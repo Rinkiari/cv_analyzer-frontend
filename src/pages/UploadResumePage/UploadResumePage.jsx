@@ -36,8 +36,7 @@ const UploadResumePage = () => {
     }
     setIsLoading(true);
     try {
-      const result = await dispatch(uploadResume(file)).unwrap();
-      console.log('Ответ сервера (сохранён в стор):', result);
+      await dispatch(uploadResume(file)).unwrap();
       navigate('/uploadvacancy');
       toast.success('Файл успешно загружен!');
     } catch (err) {
@@ -60,7 +59,6 @@ const UploadResumePage = () => {
       await dispatch(uploadManualResume()).unwrap();
       navigate('/uploadvacancy');
     } catch (e) {
-      console.log(e);
       toast.error('Не удалось загрузить файл: ' + (e || 'Unknown error'));
     } finally {
       setIsLoading(false);
