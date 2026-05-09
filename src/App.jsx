@@ -1,5 +1,4 @@
 import { Routes, Route } from 'react-router';
-import Layout from './layouts/Layout';
 import HomePage from './pages/HomePage';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import UploadResumePage from './pages/UploadResumePage/UploadResumePage';
@@ -22,45 +21,43 @@ function App() {
     <div className="global_container">
       <Header />
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="uploadresume" element={<UploadResumePage />} />
-          <Route
-            path="uploadvacancy"
-            element={
-              <RequireCvId>
-                <UploadVacancyPage />
-              </RequireCvId>
-            }
-          />
-          <Route
-            path="generateletter"
-            element={
-              <RequireAnalysisId>
-                <GenerateLetterPage />
-              </RequireAnalysisId>
-            }
-          />
-          <Route
-            path="resultspage"
-            element={
-              <RequireAnalysisId>
-                <ResultsPage />
-              </RequireAnalysisId>
-            }
-          />
-          <Route path="login" element={<AuthPage />} />
-          <Route path="about" element={<AboutPage />} />
-          <Route
-            path="myprofile"
-            element={
-              <RequireAuth>
-                <MyProfilePage />
-              </RequireAuth>
-            }
-          />
-          <Route path="*" element={<ErrorPage />} />
-        </Route>
+        <Route path="/" element={<HomePage />} />
+        <Route path="uploadresume" element={<UploadResumePage />} />
+        <Route
+          path="uploadvacancy"
+          element={
+            <RequireCvId>
+              <UploadVacancyPage />
+            </RequireCvId>
+          }
+        />
+        <Route
+          path="generateletter"
+          element={
+            <RequireAnalysisId>
+              <GenerateLetterPage />
+            </RequireAnalysisId>
+          }
+        />
+        <Route
+          path="resultspage"
+          element={
+            <RequireAnalysisId>
+              <ResultsPage />
+            </RequireAnalysisId>
+          }
+        />
+        <Route path="login" element={<AuthPage />} />
+        <Route path="about" element={<AboutPage />} />
+        <Route
+          path="myprofile"
+          element={
+            <RequireAuth>
+              <MyProfilePage />
+            </RequireAuth>
+          }
+        />
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </div>
   );
