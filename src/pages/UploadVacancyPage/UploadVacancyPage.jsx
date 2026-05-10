@@ -4,6 +4,7 @@ import { startAnalysis, updateVacancyInput } from '../../redux/slices/resumeSlic
 import styles from './UploadVacancyPage.module.scss';
 import { toast } from 'react-toastify';
 import TextArea from '../../components/TextArea/TextArea';
+import Disclosure from '../../components/Disclosure/Disclosure';
 import bulbpng from '../../assets/bulb.png';
 
 const UploadVacancyPage = () => {
@@ -82,26 +83,28 @@ const UploadVacancyPage = () => {
             Анализ резюме без вакансии — это общие рекомендации. С вакансией — точное сравнение
             навыков и требований.
           </p>
-          <div className={styles.infoCard}>
-            <img src={bulbpng} alt="bulb icon" />
-            <div>
-              <h3>Бонус для зарегистрированных</h3>
-              <p>
-                Укажите ссылку — и на следующем шаге вы сможете сгенерировать сопроводительное
-                письмо под эту вакансию.
-              </p>
+          <Disclosure label="Подробнее о шаге">
+            <div className={styles.infoCard}>
+              <img src={bulbpng} alt="bulb icon" />
+              <div>
+                <h3>Бонус для зарегистрированных</h3>
+                <p>
+                  Укажите ссылку — и на следующем шаге вы сможете сгенерировать сопроводительное
+                  письмо под эту вакансию.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className={styles.featuresCard}>
-            <h4>Что вы получите с вакансией</h4>
-            <ul>
-              <li>Точный анализ совпадения навыков</li>
-              <li>Пробелы между резюме и требованиями</li>
-              <li>Сопроводительное письмо под вакансию</li>
-              <li>Конкретные советы по доработке резюме</li>
-            </ul>
-          </div>
+            <div className={styles.featuresCard}>
+              <h4>Что вы получите с вакансией</h4>
+              <ul>
+                <li>Точный анализ совпадения навыков</li>
+                <li>Пробелы между резюме и требованиями</li>
+                <li>Сопроводительное письмо под вакансию</li>
+                <li>Конкретные советы по доработке резюме</li>
+              </ul>
+            </div>
+          </Disclosure>
         </div>
 
         {/* правая карточка — инпут и кнопки */}

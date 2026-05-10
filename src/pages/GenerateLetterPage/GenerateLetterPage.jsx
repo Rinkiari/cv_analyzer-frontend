@@ -5,6 +5,7 @@ import { Button, Spinner } from '@chakra-ui/react';
 import styles from './GenerateLetterPage.module.scss';
 import { toast } from 'react-toastify';
 import letterIcon from '../../assets/letter.png';
+import Disclosure from '../../components/Disclosure/Disclosure';
 import { generateLetter, readStoredAnalysisId } from '../../redux/slices/resumeSlice';
 import { selectAuth } from '../../redux/slices/authSlice';
 
@@ -81,26 +82,28 @@ const GenerateLetterPage = () => {
           <p className={styles.subtitle}>
             Нажмите на кнопку правее, и мы подготовим письмо для отклика на основе текущего анализа.
           </p>
-          <div className={styles.infoCard}>
-            <img src={letterIcon} alt="letter icon" />
-            <div>
-              <h2>Письмо будет привязано к текущему анализу</h2>
-              <p>
-                После генерации оно появится на странице результатов и в личном кабинете рядом с
-                вашим анализом.
-              </p>
+          <Disclosure label="Подробнее о шаге">
+            <div className={styles.infoCard}>
+              <img src={letterIcon} alt="letter icon" />
+              <div>
+                <h2>Письмо будет привязано к текущему анализу</h2>
+                <p>
+                  После генерации оно появится на странице результатов и в личном кабинете рядом
+                  с вашим анализом.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className={styles.featuresCard}>
-            <h4>Что будет в письме</h4>
-            <ul>
-              <li>Персональное обращение к работодателю</li>
-              <li>Акцент на навыках под вакансию</li>
-              <li>Мотивация и интерес к должности</li>
-              <li>Готово к отправке без правок</li>
-            </ul>
-          </div>
+            <div className={styles.featuresCard}>
+              <h4>Что будет в письме</h4>
+              <ul>
+                <li>Персональное обращение к работодателю</li>
+                <li>Акцент на навыках под вакансию</li>
+                <li>Мотивация и интерес к должности</li>
+                <li>Готово к отправке без правок</li>
+              </ul>
+            </div>
+          </Disclosure>
         </div>
 
         <div className={styles.actionCard}>

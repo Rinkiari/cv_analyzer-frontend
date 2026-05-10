@@ -43,7 +43,7 @@
   align-items: center;
   gap: 18px;
   text-align: center;
-  padding: 40px 20px;
+  padding: 30px 20px;
 }
 
 .loadingContent {
@@ -595,8 +595,37 @@
     grid-template-columns: 1fr;
   }
 
+  // Без min-width: 0 на grid-элементах их intrinsic min-content (длинные
+  // подписи табов с white-space: nowrap, длинные слова в markdown) распирает
+  // 1fr-колонку шире viewport — и вся страница получает горизонтальный
+  // скролл. Это была причина, почему «Категории» и «Раздел анализа» визуально
+  // уезжали направо: распёртая колонка тянула всю сетку.
+  .sidebar,
+  .content {
+    min-width: 0;
+  }
+
   .sidebar {
-    position: static;
+    // relative + overflow:hidden — основание для fade-индикатора в ::after,
+    // который намекает на горизонтальную прокрутку категорий
+    position: relative;
+    padding: 14px;
+    overflow: hidden;
+  }
+
+  // тонкая fade-маска на правом краю сайдбара: подсказка «прокрути дальше».
+  // Это дешевле и аккуратнее, чем JS-индикатор; известный trade-off — при
+  // прокрутке до самого конца последняя категория уходит под фейд, но это
+  // стандартная мобильная карусель-патерн и пользователи к нему привыкли.
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 14px;
+    bottom: 14px;
+    right: 0;
+    width: 28px;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff 65%);
   }
 
   .tabs {
@@ -604,10 +633,19 @@
     overflow-x: auto;
     gap: 8px;
     padding-bottom: 4px;
+    // тап по табу аккуратно подведёт его к левому краю
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tab {
-    flex-shrink: 0;
+    // КЛЮЧЕВОЙ override: на десктопе .tab имеет width: 100% (вертикальный
+    // сайдбар), и без этого на мобилке каждая кнопка хочет 100% ширины
+    // контейнера → 5 табов × 100% распирают сетку в 5× viewport.
+    flex: 0 0 auto;
+    width: auto;
+    scroll-snap-align: start;
   }
 
   .tabLabel {
@@ -616,6 +654,12 @@
 
   .content {
     padding: 22px;
+  }
+
+  // длинные URL и непрерывные слова в анализе тоже могут распереть .content;
+  // anywhere разрешает разрыв в любом месте, чтобы текст помещался по ширине
+  .markdown {
+    overflow-wrap: anywhere;
   }
 
   // на мобиле/планшете оставляем подписи (PDF / DOCX / Копировать) —

@@ -1,6 +1,6 @@
 .page {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding-top: 2px;
+  padding-bottom: 2px;
 }
 
 // двухколоночная сетка
@@ -55,6 +55,7 @@
 // карточка с лампочкой — копирует стиль infoCard с GenerateLetterPage
 .infoCard {
   margin-top: 24px;
+  margin-bottom: 12px;
   padding: 20px;
   border-radius: 20px;
   background: #fffaf4;

@@ -3,6 +3,7 @@ import styles from './UploadResumePage.module.scss';
 import { toast } from 'react-toastify';
 import Dropzone from '../../components/Dropzone/Dropzone';
 import ManualFields from '../../components/ManualFields/ManualFields';
+import Disclosure from '../../components/Disclosure/Disclosure';
 import { Spinner } from '@chakra-ui/react';
 import { useNavigate } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -76,25 +77,28 @@ const UploadResumePage = () => {
             Загрузите готовый файл или заполните резюме вручную — мы разберём его и подготовим
             персональный анализ.
           </p>
-          <div className={styles.infoCard}>
-            <img src={cvpng} alt="cv icon" />
-            <div>
-              <h3>Поддерживаемые форматы</h3>
-              <p>
-                PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить вручную.
-              </p>
+          <Disclosure label="Подробнее о шаге">
+            <div className={styles.infoCard}>
+              <img src={cvpng} alt="cv icon" />
+              <div>
+                <h3>Поддерживаемые форматы</h3>
+                <p>
+                  PDF и DOCX — самые распространённые форматы резюме. Можно также заполнить
+                  вручную.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className={styles.featuresCard}>
-            <h4>Что мы извлечём</h4>
-            <ul>
-              <li>ФИО и желаемую позицию</li>
-              <li>Опыт работы и проекты</li>
-              <li>Навыки и технологии</li>
-              <li>Образование и сертификаты</li>
-            </ul>
-          </div>
+            <div className={styles.featuresCard}>
+              <h4>Что мы извлечём</h4>
+              <ul>
+                <li>ФИО и желаемую позицию</li>
+                <li>Опыт работы и проекты</li>
+                <li>Навыки и технологии</li>
+                <li>Образование и сертификаты</li>
+              </ul>
+            </div>
+          </Disclosure>
         </div>
 
         {/* правый блок — форма или баннер «уже загружено» */}
