@@ -45,7 +45,10 @@ const PREVIEW_CONTENT = {
     improvements: ['Добавить краткое summary в начало'],
   },
   technologies: {
-    strengths: ['React, TypeScript, Node.js — релевантны рынку', 'Указаны версии и контекст использования'],
+    strengths: [
+      'React, TypeScript, Node.js — релевантны рынку',
+      'Указаны версии и контекст использования',
+    ],
     improvements: ['Сгруппировать стек: frontend / backend / tooling'],
   },
   relevance: {
@@ -77,7 +80,7 @@ const AUTHORS = [
   },
   {
     role: 'Backend',
-    email: 'ekaterinaryzhenkova@gmail.com',
+    email: 'vadivazikryzh@gmail.com',
     github: 'https://github.com/ekaterinaryzhenkova',
     githubLabel: 'github.com/ekaterinaryzhenkova',
   },
@@ -160,7 +163,13 @@ const HomePage = () => {
           <ul className={styles.benefits}>
             <li className={styles.benefitItem}>
               <span className={styles.benefitCheck} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
                   <polyline points="5 13 10 18 20 7" />
                 </svg>
               </span>
@@ -170,7 +179,13 @@ const HomePage = () => {
             </li>
             <li className={styles.benefitItem}>
               <span className={styles.benefitCheck} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
                   <polyline points="5 13 10 18 20 7" />
                 </svg>
               </span>
@@ -180,14 +195,21 @@ const HomePage = () => {
             </li>
             <li className={styles.benefitItem}>
               <span className={styles.benefitCheck} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
                   <polyline points="5 13 10 18 20 7" />
                 </svg>
               </span>
               <span>
                 {isAuthenticated ? (
                   <>
-                    <b>История в профиле</b> — возвращайтесь к прошлым отчётам и сравнивайте версии резюме
+                    <b>История в профиле</b> — возвращайтесь к прошлым отчётам и сравнивайте версии
+                    резюме
                   </>
                 ) : (
                   <>
@@ -219,15 +241,21 @@ const HomePage = () => {
             </div>
             {isAuthenticated ? (
               <p className={styles.perkLine}>
-                <span className={styles.perkCheck} aria-hidden="true">✓</span>
+                <span className={styles.perkCheck} aria-hidden="true">
+                  ✓
+                </span>
                 Сопроводительное письмо в комплекте
               </p>
             ) : null}
             <p className={styles.trustLine}>
               <span>~10 секунд на анализ</span>
-              <span className={styles.trustDot} aria-hidden="true">·</span>
+              <span className={styles.trustDot} aria-hidden="true">
+                ·
+              </span>
               <span>PDF, DOCX или вручную</span>
-              <span className={styles.trustDot} aria-hidden="true">·</span>
+              <span className={styles.trustDot} aria-hidden="true">
+                ·
+              </span>
               <span>Полностью бесплатно</span>
             </p>
           </div>
