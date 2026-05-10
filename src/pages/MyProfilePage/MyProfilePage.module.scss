@@ -729,6 +729,29 @@
     width: 100%;
   }
 
+  // у sidebar отдельно — relative + overflow:hidden, чтобы абсолютный
+  // fade-индикатор на правом краю (см. ::after ниже) корректно клипался
+  // по скруглённому углу карточки
+  .sidebar {
+    position: relative;
+    overflow: hidden;
+  }
+
+  // тонкий fade-маски на правом краю карточки «Категории» — намёк, что
+  // ленту табов можно скроллить дальше. Стандартный мобильно-карусельный
+  // патерн; известный trade-off: на полной прокрутке последняя категория
+  // уходит под фейд, но это не сбивает с навигации.
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    bottom: 16px;
+    right: 0;
+    width: 28px;
+    pointer-events: none;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff 65%);
+  }
+
   .content {
     padding: 22px;
   }
@@ -753,6 +776,9 @@
     padding-bottom: 6px;
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.18) transparent;
+    // тап по табу аккуратно подведёт его к левому краю
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
       height: 4px;
@@ -769,7 +795,15 @@
   }
 
   .tab {
-    flex-shrink: 0;
+    // КЛЮЧЕВОЙ override: на десктопе .tab имеет width: 100% (вертикальный
+    // сайдбар), и без width: auto на мобилке каждая кнопка хочет 100%
+    // ширины контейнера → видна одна категория во весь экран, начало
+    // следующей вообще не подсвечивается. flex: 0 0 auto + width: auto
+    // дают content-based ширину: разные подписи получают разные ширины,
+    // и в видимой области всегда есть «подглядывание» следующей.
+    flex: 0 0 auto;
+    width: auto;
+    scroll-snap-align: start;
   }
 
   // на мобиле/планшете оставляем подписи (PDF / DOCX / TXT / Копировать) —
