@@ -23,6 +23,9 @@
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 24px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  // без этого CSS Grid оставляет min-width: auto у дочерних элементов,
+  // из-за чего карточки вылезают за пределы трека на мобильных
+  min-width: 0;
 }
 
 .titleBlock {
@@ -44,6 +47,7 @@
   line-height: 1.1;
   margin-bottom: 12px;
   color: black !important;
+  overflow-wrap: break-word;
 }
 
 .subtitle {
