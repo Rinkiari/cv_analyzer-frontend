@@ -1,9 +1,10 @@
+// '/' — точка входа, шаг 0 (не считается в прогрессе)
 export const routeSteps = {
-  '/': 1,
-  '/uploadresume': 2,
-  '/uploadvacancy': 3,
-  '/generateletter': 4,
-  '/resultspage': 5,
+  '/': 0,
+  '/uploadresume': 1,
+  '/uploadvacancy': 2,
+  '/generateletter': 3,
+  '/resultspage': 4,
 };
 
 // куда ведёт кнопка «Назад» с каждой страницы
