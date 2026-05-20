@@ -3,7 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { startAnalysis, updateVacancyInput } from '../../redux/slices/resumeSlice';
 import styles from './UploadVacancyPage.module.scss';
 import { toast } from 'react-toastify';
-import TextArea from '../../components/TextArea/TextArea';
 import Disclosure from '../../components/Disclosure/Disclosure';
 import bulbpng from '../../assets/bulb.png';
 
@@ -32,22 +31,20 @@ const UploadVacancyPage = () => {
         return;
       }
 
-      const link = vacancyInput.mode === 'link' ? vacancyInput.link : vacancyInput.text;
-
-      if (vacancyInput.mode === 'link') {
-        const linkError = validateHhLink(link);
-        if (linkError) {
-          if (!link || !link.trim()) {
-            toast.warn(linkError);
-          } else {
-            toast.warn(linkError, {
-              autoClose: 8000,
-              closeButton: true,
-              hideProgressBar: false,
-            });
-          }
-          return;
+      // бекенд больше не принимает текст вакансии — режим всегда «ссылка»
+      const link = vacancyInput.link;
+      const linkError = validateHhLink(link);
+      if (linkError) {
+        if (!link || !link.trim()) {
+          toast.warn(linkError);
+        } else {
+          toast.warn(linkError, {
+            autoClose: 8000,
+            closeButton: true,
+            hideProgressBar: false,
+          });
         }
+        return;
       }
 
       await dispatch(startAnalysis({ cvId, link: link || undefined })).unwrap();
@@ -111,46 +108,42 @@ const UploadVacancyPage = () => {
         <div className={styles.actionCard}>
           <div>
             <p className={styles.kicker}>Источник вакансии</p>
-            <div className={styles.segmentedControl}>
-              <span
-                className={styles.slider}
-                style={{
-                  transform: vacancyInput.mode === 'link' ? 'translateX(0%)' : 'translateX(100%)',
-                }}
-              />
-              <button
-                className={`${styles.segBtn} ${
-                  vacancyInput.mode === 'link' ? styles.segActive : ''
-                }`}
-                onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'link' }))}>
-                Ссылка
-              </button>
-              <button
-                disabled
-                className={`${styles.segBtn} ${
-                  vacancyInput.mode === 'text' ? styles.segActive : ''
-                }`}
-                onClick={() => dispatch(updateVacancyInput({ field: 'mode', value: 'text' }))}>
-                Текст
-              </button>
+            {/*
+              Раньше тут был segmented control «Ссылка / Текст». Бекенд перестал
+              принимать сырой текст, поэтому оставлен только «Ссылка» — но в виде
+              одиночного full-width бейджа с теми же размерами и жёлтой заливкой,
+              что и активный сегмент переключателя. Так после предыдущего шага
+              ритм карточки не ломается: на месте полосы — полоса.
+            */}
+            <div className={styles.sourceBadge} role="status">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true">
+                <path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                <path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+              </svg>
+              <span>Ссылка с hh.ru / hh.kz</span>
             </div>
 
             <div className={styles.inputWrapper}>
-              {vacancyInput.mode === 'link' ? (
-                <div className={styles.fio_field}>
-                  <p>Ссылка</p>
-                  <input
-                    className={styles.editable}
-                    value={vacancyInput.link}
-                    onChange={(e) =>
-                      dispatch(updateVacancyInput({ field: 'link', value: e.target.value }))
-                    }
-                    placeholder="https://hh.ru/vacancy/..."
-                  />
-                </div>
-              ) : (
-                <TextArea />
-              )}
+              <div className={styles.fio_field}>
+                <p>Ссылка</p>
+                <input
+                  className={styles.editable}
+                  value={vacancyInput.link}
+                  onChange={(e) =>
+                    dispatch(updateVacancyInput({ field: 'link', value: e.target.value }))
+                  }
+                  placeholder="https://hh.ru/vacancy/..."
+                />
+              </div>
             </div>
 
             <div className={styles.hintCard}>

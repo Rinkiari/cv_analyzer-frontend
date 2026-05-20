@@ -270,7 +270,12 @@ function ResultsPage() {
     <div className={styles.page}>
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Результаты анализа</h1>
-        {result ? (
+        {/*
+          Экспорт всего анализа в PDF/DOCX скрываем на вкладке письма —
+          там есть собственный блок скачивания (txt/pdf/docx), а кнопки
+          сверху относятся к контенту анализа и в этом контексте сбивают.
+        */}
+        {result && activeTab !== 'letter' ? (
           <div className={styles.pageActions}>
             <button
               type="button"
