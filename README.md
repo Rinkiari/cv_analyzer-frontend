@@ -4,12 +4,12 @@
 
 В этом репозитории находится фронтенд-часть проекта. Бэкенд принимает резюме, обращается к GigaChat и отдаёт результаты через REST API.
 
-<!-- ![Главная страница](docs/screenshots/home.png) -->
-<!-- ![Страница загрузки резюме](docs/screenshots/uploadresume.png) -->
-<!-- ![Страница загрузки вакансии](docs/screenshots/uploadvacancy.png) -->
-<!-- ![Страница загрузки сопроводительного письма](docs/screenshots/generateletter.png) -->
-<!-- ![Результаты анализа](docs/screenshots/results.png) -->
-<!-- ![Мой профиль](docs/screenshots/myprofile.png) -->
+![Главная страница](docs/screenshots/home.png)
+![Страница загрузки резюме](docs/screenshots/uploadresume.png)
+![Страница загрузки вакансии](docs/screenshots/uploadvacancy.png)
+![Страница загрузки сопроводительного письма](docs/screenshots/generateletter.png)
+![Результаты анализа](docs/screenshots/results.png)
+![Мой профиль](docs/screenshots/myprofile.png)
 
 ## Возможности
 
